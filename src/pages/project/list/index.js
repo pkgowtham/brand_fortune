@@ -1,0 +1,407 @@
+import React, { useEffect, useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { NavLink } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { enqueueSnackbar } from 'notistack';
+
+import AssignmentLateIcon from '@material-ui/icons/AssignmentLate';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import {
+  Paper,
+  Button,
+  IconButton,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  Backdrop,
+  CircularProgress,
+} from '@material-ui/core';
+
+import {
+  deleteProject,
+  getListProject,  
+  initialStateDeleteProject,
+  initialStateGetListProject,
+} from '../../../service/project/action';
+import { INTERNAL } from '../../../constant/internal';
+import { filterDataProject } from '../../../service/internal/action';
+
+const useStyles = makeStyles((theme) => ({
+  table: {
+    minWidth: 650,
+  },
+  paper: {
+    width: '100%',
+    marginBottom: theme.spacing(2),
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+  tableCell: {
+    fontWeight: 'bold',
+    backgroundColor: '#ededed',
+    padding: '8px 10px',
+    textTransform: 'uppercase',
+    cursor: 'pointer', // Add cursor pointer for clickable headers
+  },
+  evenRow: {
+    backgroundColor: '#ffffff',
+    padding: '5px 10px',
+  },
+  oddRow: {
+    backgroundColor: '#f0f7ff',
+  },
+  TablethZero: {
+    padding: '0 10px',
+    border: 'None',
+  },
+}));
+
+const initialOrderBy = 'id';
+const initialOrder = 'asc';
+
+export default function List() {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const auth = useSelector((store) => store.auth);
+  const project = useSelector((store) => store.project);
+  const internal = useSelector((store) => store.internal);
+
+  const [openBackdrop, setOpenBackdrop] = useState(false);
+  const [orderBy, setOrderBy] = useState('createdAt');
+  const [order, setOrder] = useState('dec');
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const getProjectDispatchFunc = (
+    offset = INTERNAL.DEFAULT_INITIAL_PAGE_AFTER_SIDE_EFFECTS,
+    pageSize = INTERNAL.DEFAULT_ITEMS_PER_PAGE_TABLE_VIEW
+  ) => {
+    dispatch(
+      getListProject({
+        ...internal.filterDataProject,
+        assignee:auth?.payloadLogin?.payload?.data?.user?._id,
+        currentPage: offset,
+        itemsPerPage: pageSize,
+        
+      })
+    );
+  };
+
+  useEffect(() => {
+    dispatch(filterDataProject({}));
+  }, []);
+
+  useEffect(() => {
+    getProjectDispatchFunc();
+  }, [internal.filterDataProject, orderBy, order]);
+
+  useEffect(() => {
+    if (project.isLoadingGet) {
+      setOpenBackdrop(true);
+    } else {
+      setOpenBackdrop(false);
+    }
+  }, [project.isLoadingGet]);
+
+  useEffect(() => {
+    if (project.isSuccessGet) {
+      setOpenBackdrop(false);
+    }
+  }, [project.isSuccessGet]);
+
+  useEffect(() => {
+    if (project.isErrorGet) {
+      setOpenBackdrop(false);
+      enqueueSnackbar('Something went wrong. Please reload again.', {
+        variant: 'error',
+      });
+      dispatch(initialStateGetListProject());
+    }
+  }, [project.isErrorGet]);
+
+  const emptyRows =
+    rowsPerPage -
+    Math.min(
+      rowsPerPage,
+      project?.payloadGetList?.payload?.data?.length - page * rowsPerPage
+    );
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+    getProjectDispatchFunc(newPage, Number(rowsPerPage));
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    getProjectDispatchFunc(
+      INTERNAL.DEFAULT_INITIAL_PAGE_AFTER_SIDE_EFFECTS,
+      parseInt(event.target.value, 10)
+    );
+  };
+
+  const handleSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const sortData = (a, b) => {
+    if (order === 'asc') {
+      return a[orderBy] > b[orderBy] ? 1 : -1;
+    } else {
+      return a[orderBy] < b[orderBy] ? 1 : -1;
+    }
+  };
+
+  return (
+    <Paper className={classes.paper}>
+      {project?.payloadGetList?.payload?.data?.length > 0 ? (
+        <div>
+          <TableContainer component={Paper}>
+            <Table className={classes.table} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    className={classes.tableCell}
+                    align="center"
+                    style={{ minWidth: '43px' }}
+                    onClick={() => handleSort('mailSubject')}
+                  >
+                    Mail Subject{' '}
+                    {orderBy === 'mailSubject' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    style={{ minWidth: '85px' }}
+                    onClick={() => handleSort('marketplace')}
+                  >
+                    Market Place{' '}
+                    {orderBy === 'marketplace' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>                 
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    style={{ minWidth: '95px' }}
+                    onClick={() => handleSort('brand')}
+                  >
+                    Gender{' '}
+                    {orderBy === 'brand' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    onClick={() => handleSort('articleType')}
+                  >
+                    Brand{' '}
+                    {orderBy === 'articleType' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    onClick={() => handleSort('listingType')}
+                  >
+                    Article Type{' '}
+                    {orderBy === 'listingType' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    onClick={() => handleSort('informationType')}
+                  >
+                    Listing Type{' '}
+                    {orderBy === 'informationType' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    onClick={() => handleSort('proirity')}
+                  >
+                    Information Type{' '}
+                    {orderBy === 'proirity' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    onClick={() => handleSort('status')}
+                  >
+                    Proirity{' '}
+                    {orderBy === 'status' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    onClick={() => handleSort('currentAssignee')}
+                  >
+                    Status{' '}
+                    {orderBy === 'currentAssignee' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    style={{ minWidth: '65px' }}
+                    onClick={() => handleSort('gender')}
+                  >
+                    Current Assignee{' '}
+                    {orderBy === 'gender' && (
+                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableCell}>
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {project?.payloadGetList?.payload?.data.sort(sortData).map((row, index) => (
+                  <TableRow
+                    key={row._id}
+                    className={
+                      index % 2 === 0 ? classes.evenRow : classes.oddRow
+                    }
+                  >
+                    <TableCell align="center" className={classes.TablethZero}>
+                      {row.mailSubject}
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.TablethZero}
+                    >
+                      {row.marketplace}
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.TablethZero}                      
+                    >
+                      {row.gender}
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.TablethZero}
+                    >
+                      {row.brand}
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.TablethZero}
+                    >
+                      {row.articleType }
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.TablethZero}
+                    >
+                      {row.listingType }
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.TablethZero}
+                    >
+                      {row.informationType }
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.TablethZero}
+                    >
+                      {row.proirity }
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.TablethZero}
+                    >
+                      {row.status }
+                    </TableCell>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      className={classes.TablethZero}
+                    >
+                      {row.currentAssignee }
+                    </TableCell>                   
+                    
+                    <TableCell align="center" className={classes.TablethZero}>
+                    <NavLink to="/layout/create" state={{ type: "ADD",data:{row}}}>
+                        <IconButton>
+                          <EditIcon />
+                        </IconButton>
+                      </NavLink>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 1 * emptyRows }}>
+                    <TableCell colSpan={6} />
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[1, 5, 10, 25]}
+            colSpan={3}
+            component="div"
+            count={project?.payloadGetList?.payload?.meta?.totalCount}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '15px' }}>
+          <AssignmentLateIcon style={{ fontSize: '80px', color: '#c4e2ff' }} />
+          <Typography
+            variant="h4"
+            style={{ fontSize: '14px', color: '#c4e2ff' }}
+          >
+            No Data to display
+          </Typography>
+        </div>
+      )}
+      <Backdrop className={classes.backdrop} open={openBackdrop}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    </Paper>
+  );
+}
