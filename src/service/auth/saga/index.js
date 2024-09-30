@@ -16,7 +16,6 @@ function* workerLoginUser(action){
 
 
 export function* watchLoginUser(){
-    console.log("Im here")
     yield takeLatest(ACTION_TYPE.LOGIN_USER_SAGA, workerLoginUser)
 }
 

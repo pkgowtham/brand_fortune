@@ -11,7 +11,8 @@ import theme from './theme';
 import ProtectedRoute from './protectedRoute';
 import Login from './pages/login';
 import Layout from './pages/layout';
-import Project from './pages/project'
+import Project from './pages/project';
+import   Comment  from './pages/comment';
 import { default as ProjectCreate } from './pages/project/create';
 
 
@@ -28,13 +29,15 @@ function App() {
               <Route
                 path="/layout"
                 element={
-                  <ProtectedRoute>
-                    <Layout />
-                  </ProtectedRoute>
+                  <Layout/>
+                  // <ProtectedRoute>
+                  //   <Layout />
+                  // </ProtectedRoute>
                 }
               >
                 <Route path="dashboard" element={<Project />} />
                 <Route path="create" element={<ProjectCreate />} />
+                <Route path='comment' element={<Comment/>}/>
                
               </Route>
             </Routes>

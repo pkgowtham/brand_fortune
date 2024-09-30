@@ -7,6 +7,17 @@ import { enqueueSnackbar } from "notistack";
 import * as Yup from "yup";
 import ClearIcon from "@material-ui/icons/Clear";
 import IconButton from "@material-ui/core/IconButton";
+import docImage from "../../../asserts/doc.svg";
+import pdfImage from "../../../asserts/pdf.svg";
+import excelImage from "../../../asserts/excel.svg";
+import imgImage from "../../../asserts/img.svg";
+import DateFnsUtils from "@date-io/date-fns";
+import utc from "dayjs/plugin/utc.js";
+
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
 
 import {
   Box,
@@ -29,6 +40,9 @@ import {
   Select,
   MenuItem,
   Paper,
+  Input,
+  Checkbox,
+  ListItemText,
 } from "@material-ui/core";
 
 import {
@@ -38,6 +52,7 @@ import {
   updatedProject,
 } from "../../../service/project/action";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import dayjs from "dayjs";
 
 const useStyles = makeStyles((theme) => ({
   // container: {
@@ -148,6 +163,13 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 30,
     width: "100%",
   },
+  uploadArea: {
+    padding: 10,
+    margin: "10px 0",
+    padding: "20px",
+    textAlign: "center",
+    cursor: "pointer",
+  },
 }));
 
 export default function Create() {
@@ -155,22 +177,18 @@ export default function Create() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
   const auth = useSelector((state) => state.auth);
   const project = useSelector((state) => state.project);
   const internal = useSelector((state) => state.internal);
-  const [projectItem, setProjectItem] = useState({});
-
-  const [requirementSheet, setRequirementSheet] = useState();
+  const [projectItem, setProjectItem] = useState(location?.state?.data);
   const [requirementSheetPreview, setRequirementSheetPreview] = useState();
   const requirementSheetFile = useRef(null);
-  const [baseSheet, setBaseSheet] = useState();
   const [baseSheetPreview, setBaseSheetPreview] = useState();
   const baseSheetFile = useRef(null);
-  const [sku, setSku] = useState();
+  const [submissionPreview, setSubmissionPreview] = useState();
+  const submissionFile = useRef(null);
   const [skuPreview, setSkuPreview] = useState();
   const skuFile = useRef(null);
-  const [reviewedSku, setReviewedSku] = useState();
   const [reviewedSkuPreview, setReviewedSkuPreview] = useState();
   const reviewedSkuFile = useRef(null);
   const [discount, setDiscount] = useState();
@@ -186,12 +204,14 @@ export default function Create() {
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   let type = location?.state?.type;
+  useEffect(() => {
+  }, []);
 
   useEffect(() => {
     if (location?.state?.data) {
-      setProjectItem(location.state.data);
+      setProjectItem(location?.state?.data);
     }
-  }, [location.state.data]);
+  }, []);
 
   useEffect(() => {
     if (project.isLoadingCreate) {
@@ -211,15 +231,12 @@ export default function Create() {
     if (project.isSuccessCreate) {
       setOpenBackdrop(false);
       enqueueSnackbar("Successfully Created", { variant: "success" });
-      // setProjectItem({
-      //   ...projectItem,
-      //   imagePath: '',
-      // });
-      // formik.setFieldValue('image', '', true);
-      // setImageShow(false);
-      // navigate('/layout/project');
+      navigate("/layout/dashboard");
     }
     if (project.isSuccessUpdate) {
+      setOpenBackdrop(false);
+      enqueueSnackbar("Successfully Created", { variant: "success" });
+      navigate("/layout/dashboard");
     }
   }, [project.isSuccessCreate, project.isSuccessUpdate]);
 
@@ -232,6 +249,7 @@ export default function Create() {
       dispatch(initialStateCreateProject());
     }
     if (project.isErrorUpdate) {
+      setOpenBackdrop(false);
       enqueueSnackbar("Something went Wrong.Try again.", {
         variant: "error",
       });
@@ -239,117 +257,122 @@ export default function Create() {
     }
   }, [project.isErrorCreate, project.isErrorUpdate]);
 
-  const onSelectFile = (e,funPre) => {
-    console.log("cateeee", e.target);
-    // if (!e?.target?.files || e?.target?.files?.length === 0) {
-    //   setSelectedFile(undefined);
-    //   return;
-    // }
-    // const file = e?.target?.files[0];
-    // if (file.size > 1048576*5) {
-    //   // 1MB = 1048576 bytes
-    //   enqueueSnackbar("File size should be less than 5MB", {
-    //     variant: "error",
-    //   });
-    //   return;
-    // }
-    // fun(file);
+  const objectUrl = (extension) => {
+    switch (extension) {
+      case "image/jpeg":
+        return imgImage;
+      case "jpeg":
+        return imgImage;
+      case "image/jpg":
+        return imgImage;
+      case "jpg":
+        return imgImage;
+      case "image/png":
+        return imgImage;
+      case "png":
+        return imgImage;
+      case "application/pdf":
+        return pdfImage;
+      case "pdf":
+        return pdfImage;
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        return excelImage;
+      case "xls":
+        return excelImage;
+      case "xlsx":
+        return excelImage;
+      case "docx":
+        return docImage;
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        return docImage;
 
-    const objectUrl = URL.createObjectURL(e?.target?.files[0]);
-    funPre(objectUrl);
+      default:
+        break;
+    }
+  };
+  const onSelectFile = (e, formikString, funPre) => {
+    let file = e?.target?.files[0];
+    let extension = e?.target?.files[0].type;
+    if (file.size > 1048576 * 2) {
+      // 1MB = 1048576 bytes
+      enqueueSnackbar("File size should be less than 2 MB", {
+        variant: "error",
+      });
+      return;
+    }
+    formik.setFieldValue(formikString, e?.target?.files[0], true);
+
+    funPre(objectUrl(extension));
   };
 
   const finalValue = (key, values) => {
     switch (key) {
-      case "CREATED":
-        return {
-          assignee: values.assignee,
-          currentAssignee: values.currentAssignee,
-          status: "ASSIGNED_FOR_CURATION",
-        };
-      case "ASSIGNED_FOR_CURATION":
-        return {
-          baseSheet: values.baseSheet,
-          assignee: values.assignee,
-          currentAssignee: values.currentAssignee,
-          status: "ASSIGNED_FOR_ALLOCATION",
-        };
-      case "ASSIGNED_FOR_ALLOCATION":
-        return {
-          assignee: values.assignee,
-          currentAssignee: values.currentAssignee,
-          status: "ASSIGNED_FOR_SUBMISSION",
-        };
-      case "ASSIGNED_FOR_SUBMISSION":
-        return {
-          submission: values.submission,
-          assignee: values.assignee,
-          currentAssignee: values.currentAssignee,
-          status: "LISTING_SUBMITTED",
-        };
-      case "LISTING_SUBMITTED":
-        return {
-          sku: values.sku,
-          assignee: values.assignee,
-          currentAssignee: values.currentAssignee,
-          status: "SKU_SUBMITTED",
-        };
-      case "SKU_SUBMITTED":
-        if (auth.role == "ANALYSIS_EXECUTIVES") {
-          return {
-            discount: values.discount,
-            assignee: values.assignee,
-            currentAssignee: values.currentAssignee,
-            status: "DISCOUNT_SUBMITTED",
-          };
+      case "LEAD_ONE": {
+        let updateData = new FormData();
+        updateData.append("assignee", values.assignee);
+        return updateData;
+      }
+      case "CURATOR": {
+        let updateData = new FormData();
+        updateData.append("baseSheet", values.baseSheet);
+        updateData.append("assignee", values.assignee);
+        return updateData;
+      }
+      case "LEAD_TWO": {
+        let updateData = new FormData();
+        updateData.append("assignee", values.assignee);
+        return updateData;
+      }
+      case "EXECUTIVE_LISTING": {
+        let updateData = new FormData();
+        updateData.append("submission", values.submission);
+        updateData.append("assignee", values.assignee);
+        return updateData;
+      }
+      case "EXECUTIVE_SKU": {
+        let updateData = new FormData();
+        updateData.append("sku", values.sku);
+        updateData.append("assignee", values.assignee);
+        updateData.append("reviewer", values.reviewer);
+        return updateData;
+      }
+      case "ANALYSIS_SYN": {
+        let updateData = new FormData();
+        if (
+          projectItem?.submissionExecutiveReview.userName ==
+          auth?.payloadLogin?.payload?.data?.user?._id
+        ) {
+          updateData.append("reviewedSku", values.reviewedSku);
+          return updateData;
         }
-        if (auth.role == "CATALOG_REVIEWER") {
-          return {
-            reviewedSku: values.reviewedSku,
-            assignee: values.assignee,
-            currentAssignee: values.currentAssignee,
-            status: "REVIEWED_SKU_SUBMITTED",
-          };
+        if (
+          projectItem?.analysisExecutiveSyn.userName ==
+          auth?.payloadLogin?.payload?.data?.user?._id
+        ) {
+          updateData.append("assignee", values.assignee);
+          updateData.append("syn", values.syn);
+          return updateData;
         }
-      case "DISCOUNT_SUBMITTED":
-        return {
-          syn: values.syn,
-          assignee: values.assignee,
-          currentAssignee: values.currentAssignee,
-          status: "SYN_SUBMITTED",
-        };
-      case "SYN_SUBMITTED":
-        // if (!reviewedSku) {
-        //   return {
-        //     approvedNeeded: true,
-        //     currentAssignee: values.currentAssignee,
-        //   };
-        // }
-        // if (approvedNeededAccepted) {
-        //   return {
-        //     status: "APPROVED_WITHOUT_REVIEWED",
-        //     currentAssignee: values.currentAssignee,
-        //   };
-        // }
-        return {
-          upload: values.upload,
-          assignee: values.assignee,
-          currentAssignee: values.currentAssignee,
-          status: "UPLOAD_SUBMITTED",
-        };
-      case "APPROVED_WITHOUT_REVIEWED":
-        return {
-          upload: values.upload,
-          assignee: values.assignee,
-          currentAssignee: values.currentAssignee,
-          status: "UPLOAD_SUBMITTED",
-        };
-      case "UPLOAD_SUBMITTED":
-        return {
-          assignee: values.assignee,
-          currentAssignee: values.currentAssignee,
-          status: "LIVE",
-        };
+      }
+      case "APPROVAL_WAITING": {
+        let updateData = new FormData();        
+        updateData.append("assignee", values.assignee);       
+        return updateData;
+      }
+      case "ANALYSIS_UPLOAD": {
+        let updateData = new FormData();  
+        updateData.append("upload", values.upload);      
+        updateData.append("assignee", values.assignee);       
+        return updateData;
+      }
+      case "LIVE_CHECK": {
+        let updateData = new FormData();           
+        updateData.append("assignee", values.assignee);       
+        return updateData;
+      }
+
+      
+       
 
       default:
         break;
@@ -359,8 +382,10 @@ export default function Create() {
   let initialValues =
     type == "ADD"
       ? {
+          mailDate: null,
           mailSubject: "",
-          marketPlace: "",
+          styles: "",
+          marketPlace: [],
           gender: "",
           brand: "",
           articleType: "",
@@ -376,11 +401,13 @@ export default function Create() {
           Upload: "",
           syn: "",
           assignee: "",
-          currentAssignee: "",
+          reviewer: "",
         }
       : {
+          mailDate: projectItem.mailDate ? projectItem.mailDate : "",
           mailSubject: projectItem.mailSubject ? projectItem.mailSubject : "",
-          marketPlace: projectItem.marketPlace ? projectItem.marketPlace : "",
+          styles: projectItem.styles ? projectItem.styles : "",
+          marketPlace: projectItem.marketPlace ? projectItem.marketPlace : [],
           gender: projectItem.gender ? projectItem.gender : "",
           brand: projectItem.brand ? projectItem.brand : "",
           articleType: projectItem.articleType ? projectItem.articleType : "",
@@ -396,39 +423,23 @@ export default function Create() {
           submission: projectItem.submission ? projectItem.submission : "",
           sku: projectItem.sku ? projectItem.sku : "",
           reviewedSku: projectItem.reviewedSku ? projectItem.reviewedSku : "",
-          discount: projectItem.discount ? projectItem.discount : "",
-          upload: projectItem.upload ? projectItem.upload : "",
           syn: projectItem.syn ? projectItem.syn : "",
+          upload: projectItem.upload ? projectItem.upload : "",          
           assignee: "",
-          currentAssignee: "",
+          reviewer: "",
         };
 
   const formik = useFormik({
     initialValues: initialValues,
-    validationSchema: Yup.object({
-      mailSubject: Yup.string("Please Enter only string").notRequired(),
-      marketPlace: Yup.string("Please Enter only string").notRequired(),
-      gender: Yup.string("Please Enter only string").notRequired(),
-      brand: Yup.string("Please Enter only string").notRequired(),
-      articleType: Yup.string("Please Enter only string").notRequired(),
-      listingType: Yup.string("Please Enter only string").notRequired(),
-      informationType: Yup.string("Please Enter only string").notRequired(),
-      proirity: Yup.string("Please Enter only string").notRequired(),
-      requirementSheet: Yup.string("Please Enter only string").notRequired(),
-      baseSheet: Yup.string("Please Enter only string").notRequired(),
-      sku: Yup.string("Please Enter only string").notRequired(),
-      reviewedSku: Yup.string("Please Enter only string").notRequired(),
-      discount: Yup.string("Please Enter only string").notRequired(),
-      Upload: Yup.string("Please Enter only string").notRequired(),
-      syn: Yup.string("Please Enter only string").notRequired(),
-      assignee: Yup.string("Please Enter only string").notRequired(),
-      currentAssignee: Yup.string("Please Enter only string").notRequired(),
-    }),
     onSubmit: (values) => {
       if (type == "ADD") {
-        const uploadData = new FormData();       
-        
+        const uploadData = new FormData();
+        uploadData.append(
+          "mailDate",
+          dayjs(values.mailDate).format("DD/MM/YYYY")
+        );
         uploadData.append("mailSubject", values.mailSubject);
+        uploadData.append("styles", values.styles);
         uploadData.append("marketPlace", values.marketPlace);
         uploadData.append("gender", values.gender);
         uploadData.append("brand", values.brand);
@@ -436,16 +447,15 @@ export default function Create() {
         uploadData.append("listingType", values.listingType);
         uploadData.append("informationType", values.informationType);
         uploadData.append("proirity", values.proirity);
-        uploadData.append("requirementSheet", values.requirementSheet); 
-
-       console.log("uploadData",uploadData)
+        uploadData.append("requirementSheet", values.requirementSheet);
+        uploadData.append("assignee", values.assignee);
         dispatch(createProject(uploadData));
       }
       if (type == "EDIT") {
         let finalValues = finalValue(projectItem.status, values);
         dispatch(
           updatedProject({
-            ...finalValues,
+            data: finalValues,
             id: projectItem._id,
           })
         );
@@ -455,6 +465,156 @@ export default function Create() {
 
   const handleCancelButton = () => {
     navigate("/layout/dashboard");
+  };
+
+  const fileUpload = (
+    title,
+    label,
+    formikString,
+    formikValue,
+    refValue,
+    preview,
+    setPreview
+  ) => {
+    return (
+      <div>
+        <Typography variant="h5">{title}</Typography>
+        <Paper
+          variant="outlined"
+          className={classes.uploadArea}
+          style={{
+            border: formikValue ? "1px dashed #ccc" : "1px dashed #3f51b5",
+            backgroundColor: formikValue ? "#f0f0f0" : "#ffffff",
+          }}
+        >
+          {!formikValue && (
+            <Box
+              onClick={() => {
+                refValue.current.click();
+              }}
+            >
+              <CloudUploadIcon style={{ fontSize: 56, color: "#3f51b5" }} />
+              <Typography variant="body1" style={{ marginTop: "10px" }}>
+                Drag & Drop the files here or click to select one
+              </Typography>
+              <Typography variant="body2" style={{ marginTop: "10px" }}>
+                Max. File Size: 2 Mb <br />
+                Supported Files: JPG, PNG, PDF,XCL,DOC ONLY.
+              </Typography>
+            </Box>
+          )}
+          <input
+            ref={refValue}
+            id={label}
+            label={label}
+            variant="outlined"
+            type="file"
+            accept=".jpeg, .jpg, .png, .pdf, .xls, .xlsx, .docx"
+            onChange={(event) => {
+              onSelectFile(event, formikString, setPreview);
+            }}
+            onFocus={() => formik.setFieldTouched(formikString, true, true)}
+            style={{ display: "none" }}
+          />
+          {preview && (
+            <img
+              src={preview}
+              style={{ maxHeight: "200px", maxWidth: "200px" }}
+            />
+          )}
+        </Paper>
+      </div>
+    );
+  };
+
+  const assign = (label, formikString, options) => {
+    return (
+      <Grid item xs={5} spacing={2} style={{ margin: "10px auto 20px auto" }}>
+        <FormControl style={{ marginTop: 5 }} fullWidth>
+          <InputLabel id="assignee-label" style={{ left: 12, top: -10 }}>
+            {label}
+          </InputLabel>
+          <Select
+            id={label}
+            variant="outlined"
+            label={label}
+            inputProps={{
+              classes: {
+                root: classes.selectInput,
+              },
+            }}
+            // value={formik.values.assignee}
+            // onChange={formik.handleChange}
+            // onBlur={formik.handleBlur}
+            // error={Boolean(formik.errors.assignee && formik.touched.assignee)}
+            {...formik.getFieldProps(formikString)}
+          >
+            {options.map((option) => {
+              return <MenuItem value={option.value}>{option.label}</MenuItem>;
+            })}
+          </Select>
+        </FormControl>
+      </Grid>
+    );
+  };
+
+  const download = (label, url) => {
+    let extension = url.split("/")[4].split(".")[1];
+    return (
+      <div>
+        <Typography variant="h5">{label}</Typography>
+        <div
+          className="Mainrequirementsheet"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "30px",
+            marginTop: "25px",
+          }}
+        >
+          <div
+            className="Image"
+            style={{
+              borderRadius: "5%",
+              overflow: "hidden",
+              height: "65px",
+              width: "65px",
+            }}
+          >
+            <img
+              src={objectUrl(extension)}
+              alt=""
+              style={{
+                height: "100%",
+                width: "100%",
+                objectFit: "cover",
+              }}
+            />
+          </div>
+          <div
+            className="text"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Typography>
+              {label}.{extension}
+            </Typography>
+
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              style={{ marginTop: "20px" }}
+            >
+              <a href={url}>Download</a>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -480,6 +640,69 @@ export default function Create() {
               spacing={2}
               style={{ margin: "10px auto 20px auto" }}
             >
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  format="dd/MM/yyyy"
+                  variant="outlined"
+                  margin="normal"
+                  id="mailDate"
+                  label="Mail Date"
+                  value={
+                    type == "EDIT"
+                      ? Date(formik.values.mailDate)
+                      : formik.values.mailDate
+                  }
+                  onChange={(e) => formik.setFieldValue("mailDate", e)}
+                  KeyboardButtonProps={{
+                    "aria-label": "change date",
+                  }}
+                  disabled={type == "EDIT" ? true : false}
+                />
+              </MuiPickersUtilsProvider>
+            </Grid>
+            <Grid
+              item
+              xs={5}
+              spacing={2}
+              style={{ margin: "10px auto 20px auto" }}
+            >
+              <FormControl style={{ marginTop: 5 }} fullWidth>
+                <TextField
+                  className={classes.textField}
+                  id="styles"
+                  label="No of Styles"
+                  variant="outlined"
+                  numeric
+                  InputLabelProps={{
+                    style: {
+                      fontSize: "14px",
+                      top: "-5px",
+                      textAlign: "left",
+                    },
+                  }}
+                  disabled={type == "EDIT" ? true : false}
+                  helperText={
+                    formik.errors.styles &&
+                    formik.touched.styles &&
+                    String(formik.errors.styles)
+                  }
+                  error={Boolean(formik.errors.styles && formik.touched.styles)}
+                  {...formik.getFieldProps("styles")}
+                  inputProps={{
+                    style: { height: "5px" },
+                    type: "number",
+                    min: 0,
+                  }}
+                />
+              </FormControl>
+            </Grid>
+            <Grid
+              item
+              xs={5}
+              spacing={2}
+              style={{ margin: "10px auto 20px auto" }}
+            >
               <FormControl style={{ marginTop: 5 }} fullWidth>
                 <TextField
                   className={classes.textField}
@@ -493,6 +716,7 @@ export default function Create() {
                       textAlign: "left",
                     },
                   }}
+                  disabled={type == "EDIT" ? true : false}
                   helperText={
                     formik.errors.mailSubject &&
                     formik.touched.mailSubject &&
@@ -502,46 +726,102 @@ export default function Create() {
                     formik.errors.mailSubject && formik.touched.mailSubject
                   )}
                   {...formik.getFieldProps("mailSubject")}
-                  inputProps={{ style: { height: "5px" } }}
+                  inputProps={{
+                    style: { height: "5px" },
+                    readOnly: type == "EDIT" ? true : false,
+                  }}
                 />
               </FormControl>
             </Grid>
-            <Grid
-              item
-              xs={5}
-              spacing={2}
-              style={{ margin: "10px auto 20px auto" }}
-            >
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel
-                  id="marketPlace-label"
-                  style={{ left: 12, top: -10 }}
-                >
-                  Market Place
-                </InputLabel>
-                <Select
-                  id="marketPlace"
-                  labelId="marketPlace-label"
-                  variant="outlined"
-                  label="Market Place"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
-                  }}
-                  value={formik.values.marketPlace}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(
-                    formik.errors.marketPlace && formik.touched.marketPlace
-                  )}
-                  {...formik.getFieldProps("marketPlace")}
-                >
-                  <MenuItem value="AMAZON">Amazon</MenuItem>
-                  <MenuItem value="FLIPKART">Flipkart</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
+            {projectItem.marketPlaceSingle ? (
+              <Grid
+                item
+                xs={5}
+                spacing={2}
+                style={{ margin: "10px auto 20px auto" }}
+              >
+                <FormControl className={classes.formControl} fullWidth>
+                  <InputLabel id="demo-mutiple-checkbox-label">
+                    {" "}
+                    Market Place
+                  </InputLabel>
+                  <Select
+                    labelId="demo-mutiple-checkbox-label"
+                    id="demo-mutiple-checkbox"
+                    variant="outlined"
+                    multiple
+                    value={[projectItem.marketPlaceSingle]}
+                    onChange={(e) =>
+                      formik.setFieldValue("marketPlace", e.target.value)
+                    }
+                    disabled={type == "EDIT" ? true : false}
+                    input={<Input variant="outlined" />}
+                    renderValue={(selected) => selected.join(", ")}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 48 * 4.5 + 8,
+                          width: 250,
+                        },
+                      },
+                    }}
+                  >
+                    {["AMAZON", "FLIPKART", "MYNTHRA"].map((name) => (
+                      <MenuItem key={name} value={name}>
+                        <Checkbox
+                          checked={formik.values.marketPlace.indexOf(name) > -1}
+                        />
+                        <ListItemText primary={name} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            ) : (
+              <Grid
+                item
+                xs={5}
+                spacing={2}
+                style={{ margin: "10px auto 20px auto" }}
+              >
+                <FormControl className={classes.formControl} fullWidth>
+                  <InputLabel id="demo-mutiple-checkbox-label">
+                    {" "}
+                    Market Place
+                  </InputLabel>
+                  <Select
+                    labelId="demo-mutiple-checkbox-label"
+                    id="demo-mutiple-checkbox"
+                    variant="outlined"
+                    multiple
+                    value={formik.values.marketPlace}
+                    onChange={(e) =>
+                      formik.setFieldValue("marketPlace", e.target.value)
+                    }
+                    disabled={type == "EDIT" ? true : false}
+                    input={<Input variant="outlined" />}
+                    renderValue={(selected) => selected.join(", ")}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 48 * 4.5 + 8,
+                          width: 250,
+                        },
+                      },
+                    }}
+                  >
+                    {["AMAZON", "FLIPKART", "MYNTHRA"].map((name) => (
+                      <MenuItem key={name} value={name}>
+                        <Checkbox
+                          checked={formik.values.marketPlace.indexOf(name) > -1}
+                        />
+                        <ListItemText primary={name} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            )}
             <Grid
               item
               xs={5}
@@ -562,6 +842,7 @@ export default function Create() {
                       root: classes.selectInput,
                     },
                   }}
+                  disabled={type == "EDIT" ? true : false}
                   value={formik.values.gender}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -598,6 +879,7 @@ export default function Create() {
                       root: classes.selectInput,
                     },
                   }}
+                  disabled={type == "EDIT" ? true : false}
                   value={formik.values.brand}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -632,6 +914,7 @@ export default function Create() {
                       root: classes.selectInput,
                     },
                   }}
+                  disabled={type == "EDIT" ? true : false}
                   value={formik.values.articleType}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -668,6 +951,7 @@ export default function Create() {
                       root: classes.selectInput,
                     },
                   }}
+                  disabled={type == "EDIT" ? true : false}
                   value={formik.values.listingType}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -705,6 +989,7 @@ export default function Create() {
                       root: classes.selectInput,
                     },
                   }}
+                  disabled={type == "EDIT" ? true : false}
                   value={formik.values.informationType}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -746,6 +1031,7 @@ export default function Create() {
                       root: classes.selectInput,
                     },
                   }}
+                  disabled={type == "EDIT" ? true : false}
                   value={formik.values.proirity}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -762,126 +1048,365 @@ export default function Create() {
               </FormControl>
             </Grid>
           </div>
-
-          <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
-            <Typography variant="h5">Requirement Sheet</Typography>
-            <Paper
-              variant="outlined"
-              style={{
-                padding: 10,
-                margin: "10px 0",
-                padding: "20px",
-                textAlign: "center",
-                cursor: "pointer",
-                border: formik.values.requirementSheet
-                  ? "1px dashed #ccc"
-                  : "1px dashed #3f51b5",
-                backgroundColor: formik.values.requirementSheet
-                  ? "#f0f0f0"
-                  : "#ffffff",
-              }}
-            >
-              {!formik.values.requirementSheet && (
-                <Box
-                  onClick={() => {
-                    requirementSheetFile.current.click();
-                  }}
-                >
-                  <CloudUploadIcon style={{ fontSize: 56, color: "#3f51b5" }} />
-                  <Typography variant="body1" style={{ marginTop: "10px" }}>
-                    Drag & Drop an image here or click to select one
-                  </Typography>
-                  <Typography variant="body2" style={{ marginTop: "10px" }}>
-                    Image Size: 512 X 512 <br />
-                    Supported Files: JPG, PNG, GIF, SVG only
-                  </Typography>
-                </Box>
+          {type == "ADD" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+              {fileUpload(
+                "Requirement Sheet",
+                "Requirement Sheet",
+                "requirementSheet",
+                formik.values.requirementSheet,
+                requirementSheetFile,
+                requirementSheetPreview,
+                setRequirementSheetPreview
+              )}
+              {assign("Select Assignee", "assignee", [
+                {
+                  label: "catalog lead",
+                  value: "66ec0a4dc8f2eda25bf0a819",
+                },
+              ])}
+            </div>
+          ) : null}
+          {projectItem?.status == "LEAD_ONE" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+              {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
+              )}
+              {projectItem?.leadOne.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                assign("Select Assignee", "assignee", [
+                  {
+                    label: "Catalog Curator",
+                    value: "66ec09b2c8f2eda25bf0a811",
+                  },
+                ])}
+            </div>
+          ) : null}
+          {projectItem?.status == "CURATOR" ? (
+            // lead have to assign for curator
+            <div>
+              {/* REQ. SHEET DOWNLOAD */}
+              {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
               )}
 
-              <input
-                ref={requirementSheetFile}
-                // className={classes.textField}
-                id="requirementSheet"
-                label="requirementSheet"
-                variant="outlined"
-                type="file"
-                helperText={
-                  formik.errors.requirementSheet &&
-                  formik.touched.requirementSheet &&
-                  String(formik.errors.requirementSheet)
-                }
-                error={Boolean(
-                  formik.errors.requirementSheet &&
-                    formik.touched.requirementSheet
+              {/* base sheet upload */}
+              {projectItem?.curator.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                fileUpload(
+                  "Base Sheet",
+                  "Base Sheet",
+                  "baseSheet",
+                  formik.values.baseSheet,
+                  baseSheetFile,
+                  baseSheetPreview,
+                  setBaseSheetPreview
                 )}
-                onChange={(event) => {
-                  onSelectFile(event, setRequirementSheetPreview);
-                  formik.setFieldValue(
-                    "requirementSheet",
-                    event?.target?.files[0],
-                    true
-                  );
-                }}
-                onFocus={() =>
-                  formik.setFieldTouched("requirementSheet", true, true)
-                }
-                style={{ display: "none" }}
-              />
 
-              {requirementSheetPreview && (
-                <img
-                  src={requirementSheetPreview}
-                  style={{ maxHeight: "200px", maxWidth: "200px" }}
-                />
+              {/* again lead assignment */}
+              {projectItem?.curator.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                assign("Select Assignee", "assignee", [
+                  {
+                    label: "Catalog Lead",
+                    value: "66ec0a4dc8f2eda25bf0a819",
+                  },
+                ])}
+            </div>
+          ) : null}
+          {projectItem?.status == "LEAD_TWO" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+              {/* req. download */}
+              {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
               )}
-            </Paper>
-            <Grid
-              item
-              xs={5}
-              spacing={2}
-              style={{ margin: "10px auto 20px auto" }}
-            >
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel id="assignee-label" style={{ left: 12, top: -10 }}>
-                  Select Assignee
-                </InputLabel>
-                <Select
-                  id="assignee"
-                  labelId="assignee-label"
-                  variant="outlined"
-                  label="Select Assignee"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
-                  }}
-                  value={formik.values.assignee}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(
-                    formik.errors.assignee && formik.touched.assignee
-                  )}
-                  {...formik.getFieldProps("assignee")}
-                >
-                  <MenuItem value="66ec09b2c8f2eda25bf0a811">
-                    Catalog Curator
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        // disabled={imageShow || !formik.dirty || !formik.isValid}
-        onClick={formik.handleSubmit}
-        style={{ marginTop: '20px' }}
-      >
-        Upload
-      </Button>
-          </div>
+              {/* base sheet download */}
+              {download("Base Sheet", location.state.data.baseSheet)}
+              {/* for executive assignment */}
+              {projectItem?.leadTwo.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                assign("Select Assignee", "assignee", [
+                  {
+                    label: "Catalog Executive",
+                    value: "66ec0a17c8f2eda25bf0a815",
+                  },
+                ])}
+            </div>
+          ) : null}
+          {projectItem?.status == "EXECUTIVE_LISTING" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+              {/* req. download */}
+              {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
+              )}
+              {/* base sheet download */}
+              {download("Base Sheet", location.state.data.baseSheet)}
+              {/* Listing Upload */}
+              {projectItem?.submissionExecutiveListing.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                fileUpload(
+                  "submission Sheet",
+                  "submission Sheet",
+                  "submission",
+                  formik.values.submission,
+                  submissionFile,
+                  submissionPreview,
+                  setSubmissionPreview
+                )}
+              {/* for executive assignment */}
+              {projectItem?.submissionExecutiveListing.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                assign("Select Assignee", "assignee", [
+                  {
+                    label: "Catalog Executive",
+                    value: "66ec0a17c8f2eda25bf0a815",
+                  },
+                ])}
+            </div>
+          ) : null}
+          {projectItem?.status == "EXECUTIVE_SKU" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+              {/* req. download */}
+              {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
+              )}
+              {/* base sheet download */}
+              {download("Base Sheet", location.state.data.baseSheet)}
+              {/* submission sheet download */}
+              {download("Submission Sheet", location.state.data.submission)}
+              {/* sku Upload */}
+              {projectItem?.submissionExecutiveSku.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                fileUpload(
+                  "sku Sheet",
+                  "sku Sheet",
+                  "sku",
+                  formik.values.sku,
+                  skuFile,
+                  skuPreview,
+                  setSkuPreview
+                )}
+              {/* for executive assignment */}
+              {projectItem?.submissionExecutiveSku.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                assign("Select Assignee", "assignee", [
+                  {
+                    label: "Analysis Executive",
+                    value: "66ec0aabc8f2eda25bf0a821",
+                  },
+                ])}
+              {/* for reviewer assignment */}
+              {projectItem?.submissionExecutiveSku.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                assign("Select Assignee", "reviewer", [
+                  {
+                    label: "Catalog Reviewer",
+                    value: "66ec0a73c8f2eda25bf0a81d",
+                  },
+                ])}
+            </div>
+          ) : null}
+          {projectItem?.status == "ANALYSIS_SYN" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+              {/* req. download */}
+              {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
+              )}
+              {/* base sheet download */}
+              {download("Base Sheet", location.state.data.baseSheet)}
+              {/* submission sheet download */}
+              {download("Submission Sheet", location.state.data.submission)}
+              {/* sku sheet download */}
+              {download("Sku Sheet", location.state.data.sku)}
+              {/* reviwer Upload */}
+              {projectItem?.submissionExecutiveReview.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                fileUpload(
+                  "Review Sheet",
+                  "Review Sheet",
+                  "reviewedSku",
+                  formik.values.reviewedSku,
+                  reviewedSkuFile,
+                  reviewedSkuPreview,
+                  setReviewedSkuPreview
+                )}
+              {/* syn Upload */}
+              {projectItem?.analysisExecutiveSyn.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                fileUpload(
+                  "Syn Sheet",
+                  "Syn Sheet",
+                  "syn",
+                  formik.values.syn,
+                  synFile,
+                  synPreview,
+                  setSynPreview
+                )}
+              {/* for Upload assignment */}
+              {projectItem?.analysisExecutiveSyn.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                projectItem.reviewedSku &&
+                assign("Select Assignee", "assignee", [
+                  {
+                    label: "Analysis Executive",
+                    value: "66ec0aabc8f2eda25bf0a821",
+                  },
+                ])}
+              {/* for Approval assignment */}
+              {projectItem?.analysisExecutiveSyn.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                !projectItem.reviewedSku &&
+                assign("Select Assignee", "assignee", [
+                  {
+                    label: "Account Manager",
+                    value: "66ec091bc8f2eda25bf0a80d",
+                  },
+                ])}
+            </div>
+          ) : null}
+          {projectItem?.status == "APPROVAL_WAITING" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+               {/* req. download */}
+               {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
+              )}
+              {/* base sheet download */}
+              {download("Base Sheet", location.state.data.baseSheet)}
+              {/* submission sheet download */}
+              {download("Submission Sheet", location.state.data.submission)}
+              {/* sku sheet download */}
+              {download("Sku Sheet", location.state.data.sku)}
+              {/* review sheet download */}
+              { location.state.data.reviewedSku && download("Review Sheet", location.state.data.sku)}            
+              {/* account manager Approval*/}
+              {projectItem?.accountManagerApproval.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                !projectItem.reviewedSku &&
+                assign("Approve by select Assignee", "assignee", [
+                  {
+                    label: "Analysis Executive",
+                    value: "66ec0aabc8f2eda25bf0a821",
+                  },
+                ])}
+             
+            </div>
+          ) : null}          
+          {projectItem?.status == "ANALYSIS_UPLOAD" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+              {/* req. download */}
+              {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
+              )}
+              {/* base sheet download */}
+              {download("Base Sheet", location.state.data.baseSheet)}
+              {/* submission sheet download */}
+              {download("Submission Sheet", location.state.data.submission)}
+              {/* sku sheet download */}
+              {download("Sku Sheet", location.state.data.sku)}
+              {/* review sheet download */}
+              { location.state.data.reviewedSku && download("Review Sheet", location.state.data.sku)} 
+              {/* syn sheet download */}
+              { location.state.data.syn && download("Syn Sheet", location.state.data.syn)} 
+              {/* upload Upload */}
+              {projectItem?.analysisExecutiveUpload.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                fileUpload(
+                  "upload Sheet",
+                  "upload Sheet",
+                  "upload",
+                  formik.values.upload,
+                  uploadFile,
+                  uploadPreview,
+                  setUploadPreview
+                )}           
+              {/* assign for live check*/}
+              {projectItem?.analysisExecutiveUpload.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&                
+                assign("select Assignee", "assignee", [
+                  {
+                    label: "Analysis Executive",
+                    value: "66ec0aabc8f2eda25bf0a821",
+                  },
+                ])}
+             </div>
+          ) : null}
+          {projectItem?.status == "LIVE_CHECK" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+               {/* req. download */}
+               {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
+              )}
+              {/* base sheet download */}
+              {download("Base Sheet", location.state.data.baseSheet)}
+              {/* submission sheet download */}
+              {download("Submission Sheet", location.state.data.submission)}
+              {/* sku sheet download */}
+              {download("Sku Sheet", location.state.data.sku)}
+              {/* review sheet download */}
+              { location.state.data.reviewedSku && download("Review Sheet", location.state.data.sku)} 
+              {/* syn sheet download */}
+              { location.state.data.syn && download("Syn Sheet", location.state.data.syn)} 
+              {/* upload Upload */}
+              { location.state.data.upload && download("Upload Sheet", location.state.data.upload)} 
+              {/* completion status change*/}
+              {projectItem?.analysisExecutiveLiveCheck.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                !projectItem.reviewedSku &&
+                assign("Update Status", "assignee", [
+                  {
+                    label: "Completed",
+                    value: "66ec0aabc8f2eda25bf0a821",
+                  },
+                ])}
+            </div>
+          ) : null}
+           {projectItem?.status == "COMPLETED" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+               {/* req. download */}
+               {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
+              )}
+              {/* base sheet download */}
+              {download("Base Sheet", location.state.data.baseSheet)}
+              {/* submission sheet download */}
+              {download("Submission Sheet", location.state.data.submission)}
+              {/* sku sheet download */}
+              {download("Sku Sheet", location.state.data.sku)}
+              {/* review sheet download */}
+              { location.state.data.reviewedSku && download("Review Sheet", location.state.data.sku)} 
+              {/* syn sheet download */}
+              { location.state.data.syn && download("Syn Sheet", location.state.data.syn)} 
+              {/* upload Upload */}
+              { location.state.data.upload && download("Upload Sheet", location.state.data.upload)} 
+             {"status indicator"}
+             <Typography variant="h4">Completed</Typography>
+              
+            </div>
+          ) : null}
         </Card>
       </Grid>
+      <div>
+        {!projectItem?.status == "COMPLETED" && <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          // disabled={imageShow || !formik.dirty || !formik.isValid}
+          onClick={formik.handleSubmit}
+          style={{ marginTop: "20px" }}
+        >
+          {type == "EDIT" ? "UPDATE" : "CREATE"}
+        </Button>}
+      </div>
 
       <Backdrop className={classes.backdrop} open={openBackdrop}>
         <CircularProgress color="inherit" />

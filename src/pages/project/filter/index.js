@@ -26,6 +26,12 @@ import {
   MenuItem,
   Tooltip,
 } from "@material-ui/core";
+import DateFnsUtils from "@date-io/date-fns";
+
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import IconButton from "@material-ui/core/IconButton";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -134,36 +140,31 @@ export default function Filter() {
   const classes = useStyles();
   const dispatch = useDispatch();
 
+  const auth = useSelector((store) => store.auth);
   const project = useSelector((state) => state.project);
   const internal = useSelector((state) => state.internal);
 
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
   let initialValues = {
-    mailSubject: "",
-    marketPlace: "",
-    gender: "",
+    taskId: "",
     brand: "",
-    articleType: "",
-    listingType: "",
-    informationType: "",
+    reqDate: null,
+    createdDate: null,   
     proirity: "",
     status: "",
   };
 
   const formik = useFormik({
     initialValues: initialValues,
-    validationSchema: Yup.object({
-      mailSubject: Yup.string("Please Enter only string").notRequired(),
-      marketPlace: Yup.string("Please Enter only string").notRequired(),
-      gender: Yup.string("Please Enter only string").notRequired(),
-      brand: Yup.string("Please Enter only string").notRequired(),
-      articleType: Yup.string("Please Enter only string").notRequired(),
-      listingType: Yup.string("Please Enter only string").notRequired(),
-      informationType: Yup.string("Please Enter only string").notRequired(),
-      proirity: Yup.string("Please Enter only string").notRequired(),
-      status: Yup.string("Please Enter only string").notRequired(),
-    }),
+    // validationSchema: Yup.object({
+    //   taskId: Yup.string("Please Enter only string").notRequired(),      
+    //   brand: Yup.string("Please Enter only string").notRequired(),
+    //   reqDate: Yup.string("Please Enter only string").notRequired(),
+    //   createdDate: Yup.string("Please Enter only string").notRequired(),     
+    //   proirity: Yup.string("Please Enter only string").notRequired(),
+    //   status: Yup.string("Please Enter only string").notRequired(),
+    // }),
     onSubmit: async (values) => {
       Object.keys(values).forEach(
         (q) =>
@@ -201,19 +202,26 @@ export default function Filter() {
             Information Sheet List
           </Typography>
 
-          <NavLink to="/layout/create" state={{ type: "ADD"}}>
-            <Button variant="contained" color="primary" type="submit">
-              <ControlPointIcon style={{ maxWidth: 20, paddingRight: 3 }} />
-              Add
-            </Button>
-          </NavLink>
+          {(auth?.payloadLogin?.payload?.data?.user?.role.includes(
+            "ACCOUNT_MANAGER"
+          ) ||
+            auth?.payloadLogin?.payload?.data?.user?.role.includes(
+              "MANAGEMENT"
+            )) && (
+            <NavLink to="/layout/create" state={{ type: "ADD" }}>
+              <Button variant="contained" color="primary" type="submit">
+                <ControlPointIcon style={{ maxWidth: 20, paddingRight: 3 }} />
+                Add
+              </Button>
+            </NavLink>
+          )}
         </Grid>
       </Grid>
       <Card className={"${classes.card} "}>
         <div>
           <Grid
             container
-            spacing={2}
+            spacing={3}
             style={{
               padding: "10px 10px",
               marginBottom: 0,
@@ -222,93 +230,76 @@ export default function Filter() {
               justifyContent: "center",
             }}
           >
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <FormControl style={{ marginTop: 5 }} fullWidth>
                 <TextField
                   className={classes.textField}
-                  id="mailSubject"
-                  label="Mail Subject"
+                  id="taskId"
+                  label="Task Id"
                   variant="outlined"
                   InputLabelProps={{
                     style: { fontSize: "14px", top: "-5px", textAlign: "left" },
                   }}
                   helperText={
-                    formik.errors.mailSubject &&
-                    formik.touched.mailSubject &&
-                    String(formik.errors.mailSubject)
+                    formik.errors.taskId &&
+                    formik.touched.taskId &&
+                    String(formik.errors.taskId)
                   }
                   error={Boolean(
-                    formik.errors.mailSubject && formik.touched.mailSubject
+                    formik.errors.taskId && formik.touched.taskId
                   )}
-                  {...formik.getFieldProps("mailSubject")}
+                  {...formik.getFieldProps("taskId")}
                   inputProps={{ style: { height: "5px" } }}
                   onKeyDown={handleKeyDown}
                 />
               </FormControl>
-            </Grid>
-            <Grid item xs={2}>
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel
-                  id="marketplace-label"
-                  style={{ left: 12, top: -10 }}
-                >
-                  Market Place
-                </InputLabel>
-                <Select
-                  id="marketplace"
-                  labelId="marketplace-label"
+            </Grid>  
+            <Grid
+              item
+              xs={3}              
+              style={{ margin: "10px auto 10px auto" }}
+            >
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                  disableToolbar                 
+                  format="dd/MM/yyyy"
                   variant="outlined"
-                  label="Market Place"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
+                  margin="normal"
+                  id="reqDate"
+                  label="Request Date"
+                  value={formik.values.reqDate}                  
+                  onChange={(e) => formik.setFieldValue("reqDate", e)}
+                  KeyboardButtonProps={{
+                    "aria-label": "change date",
                   }}
-                  value={formik.values.marketPlace}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(
-                    formik.errors.marketplace && formik.touched.marketplace
-                  )}
-                  {...formik.getFieldProps("marketplace")}
-                >
-                  <MenuItem value="AMAZON">Amazon</MenuItem>
-                  <MenuItem value="FLIPKART">Flipkart</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={2}>
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel id="gender-label" style={{ left: 12, top: -10 }}>
-                  Select Gender
-                </InputLabel>
-                <Select
-                  id="gender"
-                  labelId="gender-label"
+                 
+                />
+              </MuiPickersUtilsProvider>
+            </Grid>  
+            <Grid
+              item
+              xs={3}              
+              style={{ margin: "10px auto 10px auto" }}
+            >
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                  disableToolbar                 
+                  format="dd/MM/yyyy"
                   variant="outlined"
-                  label="Select Gender"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
+                  margin="normal"
+                  id="createdDate"
+                  label="Created Date"
+                  value={formik.values.createdDate}                  
+                  onChange={(e) => formik.setFieldValue("createdDate", e)}
+                  KeyboardButtonProps={{
+                    "aria-label": "change date",
                   }}
-                  value={formik.values.gender}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(formik.errors.gender && formik.touched.gender)}
-                  {...formik.getFieldProps("gender")}
-                  // renderValue={(selected) => !selected && 'Select Status'}
-                >
-                  <MenuItem value="">Select Gender</MenuItem>
-                  <MenuItem value="MALE">Male</MenuItem>
-                  <MenuItem value="FEMALE">Female</MenuItem>
-                  <MenuItem value="BOYS">Boys</MenuItem>
-                  <MenuItem value="GIRLS">Girls</MenuItem>
-                  <MenuItem value="KIDS">Kids</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={2}>
+                  
+                />
+              </MuiPickersUtilsProvider>
+            </Grid> 
+           
+            <Grid item xs={3}>
               <FormControl style={{ marginTop: 5 }} fullWidth>
                 <InputLabel id="brand-label" style={{ left: 12, top: -10 }}>
                   Select Brand
@@ -334,109 +325,7 @@ export default function Filter() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={2}>
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel
-                  id="articleType-label"
-                  style={{ left: 12, top: -10 }}
-                >
-                  Select Article Type
-                </InputLabel>
-                <Select
-                  id="articleType"
-                  labelId="articleType-label"
-                  variant="outlined"
-                  label="Select Article Type"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
-                  }}
-                  value={formik.values.articleType}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(
-                    formik.errors.articleType && formik.touched.articleType
-                  )}
-                  {...formik.getFieldProps("articleType")}
-                >
-                  <MenuItem value="ARTICLE1">Article Type - 1 </MenuItem>
-                  <MenuItem value="ARTICLE2">Article Type - 2</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={2}>
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel
-                  id="listingType-label"
-                  style={{ left: 12, top: -10 }}
-                >
-                  Select Listing Type
-                </InputLabel>
-                <Select
-                  id="listingType"
-                  labelId="listingType-label"
-                  variant="outlined"
-                  label="Select Listing Type"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
-                  }}
-                  value={formik.values.listingType}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(
-                    formik.errors.listingType && formik.touched.listingType
-                  )}
-                  {...formik.getFieldProps("listingType")}
-                >
-                  <MenuItem value="LISTING">Listing</MenuItem>
-                  <MenuItem value="RELISTING">Relisting</MenuItem>
-                  <MenuItem value="CORRECTION">Correction request</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={2}>
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel
-                  id="informationType-label"
-                  style={{ left: 12, top: -10 }}
-                >
-                  Select Information Type
-                </InputLabel>
-                <Select
-                  id="informationType"
-                  labelId="informationType-label"
-                  variant="outlined"
-                  label="Select Information Type"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
-                  }}
-                  value={formik.values.informationType}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(
-                    formik.errors.informationType &&
-                      formik.touched.informationType
-                  )}
-                  {...formik.getFieldProps("informationType")}
-                >
-                  <MenuItem value="L1">
-                    Level 1 – Information sheet and images available{" "}
-                  </MenuItem>
-                  <MenuItem value="L2">
-                    Level 2 - Already listed style only relisting code available
-                  </MenuItem>
-                  <MenuItem value="L3">
-                    Level 3 – Only image is available
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <FormControl style={{ marginTop: 5 }} fullWidth>
                 <InputLabel id="proirity-label" style={{ left: 12, top: -10 }}>
                   Select Proirity
@@ -466,7 +355,7 @@ export default function Filter() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <FormControl style={{ marginTop: 5 }} fullWidth>
                 <InputLabel id="status-label" style={{ left: 12, top: -10 }}>
                   Select Status
@@ -487,7 +376,7 @@ export default function Filter() {
                   error={Boolean(formik.errors.status && formik.touched.status)}
                   {...formik.getFieldProps("status")}
                 >
-                  <MenuItem value="CREATED">CREATED</MenuItem>
+                  <MenuItem value="LEAD_ONE">CREATED</MenuItem>
                   <MenuItem value="ASSIGNED_FOR_CURATION">
                     ASSIGNED_FOR_CURATION
                   </MenuItem>

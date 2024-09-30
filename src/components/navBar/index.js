@@ -26,12 +26,20 @@ import CardGiftcardIcon from "@material-ui/icons/CardGiftcard";
 import ProductIcon from "@material-ui/icons/ShoppingCart";
 import CustomerIcon from "@material-ui/icons/People";
 import OffersIcon from "@material-ui/icons/LocalOffer";
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 // import AnjaliNavLogo from '../../Admin-Side-Nav-Logo180x60.png';
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { initialStateLogin } from "../../service/auth/action";
 import EcoIcon from "@material-ui/icons/Eco";
 import ShoppingBasketIcon from "@material-ui/icons/ShoppingBasket";
+import NotificationsActiveIcon from "@material-ui/icons/NotificationsActive";
+import { Badge, Menu, MenuItem, Avatar } from "@material-ui/core";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import ImageIcon from "@material-ui/icons/Image";
+import WorkIcon from "@material-ui/icons/Work";
+import BeachAccessIcon from "@material-ui/icons/BeachAccess";
+import { filterDataProject } from "../../service/internal/action";
 
 const drawerWidth = 240;
 
@@ -119,11 +127,25 @@ const useStyles = makeStyles((theme) => ({
   sideNav: {
     backgroundColor: "#f9c02829",
   },
-  logoutButton: {
+  logoutButton: { 
     marginLeft: "auto",
   },
   drawerPaper: {
     backgroundColor: "#f4f9fd", // Set the background color to red
+  },
+  badge: {
+    right: 20,
+    top: 2,
+    padding: "0 3px",
+  },
+  notification: {
+    width: "100%",
+    // maxWidth: 360,
+    backgroundColor: theme.palette.background.paper,
+    textAlign:'center',
+    display:'flex',
+    flexDirection:'column',
+    
   },
 }));
 
@@ -133,6 +155,38 @@ export default function NavBar() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [roleMenu, setRoleMenu] = React.useState(null);
+  const auth = useSelector((state) => state.auth);
+
+
+  const notifyData = [
+    {
+      name: "Sanjay",
+      message: "Im here",
+      avatar:
+        "https://w0.peakpx.com/wallpaper/138/828/HD-wallpaper-vinayagar-vinayagar-lord-god.jpg",
+      path: "/layout/dashbord",
+    },
+    {
+      name: "Sanjay",
+      message: "Im here",
+      avatar:
+        "https://w0.peakpx.com/wallpaper/138/828/HD-wallpaper-vinayagar-vinayagar-lord-god.jpg",
+      path: "/layout/dashbord",
+    },
+    {
+      name: "Sanjay",
+      message: "Im here",
+      avatar:
+        "https://w0.peakpx.com/wallpaper/138/828/HD-wallpaper-vinayagar-vinayagar-lord-god.jpg",
+      path: "/layout/dashbord",
+    },
+  ];
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -142,12 +196,28 @@ export default function NavBar() {
     setOpen(false);
   };
   const handleLogout = () => {
-    // dispatch(initialStateLogin());
+    dispatch(initialStateLogin());
     navigate("/login");
   };
 
-  const navLinks = [
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const handleCloseRoleMenu = () => {
+    setRoleMenu(null);
+  };
+  const roleMenuOpen = (event) => {
+    event.stopPropagation();
+    setRoleMenu(event.currentTarget)
     
+  };
+  const changeRole = (e,role) => {    
+    e.stopPropagation();
+    dispatch(filterDataProject({role:role}));
+    setRoleMenu(null);
+  };
+
+  const navLinks = [
     { label: "Dashboard", route: "Dashboard", icon: <DashboardIcon /> },
     {
       label: "Information Sheet",
@@ -190,19 +260,106 @@ export default function NavBar() {
             to={"/layout/dashboard"}
             className={classes.anyLink}
             style={{ color: "#fff" }}
-          >
+          > 
             <Typography variant="h6" noWrap>
               Brand Fortunes
             </Typography>
           </NavLink>
-          <IconButton
-            onClick={handleLogout}
-            aria-label="logout"
-            color="inherit"
-            className={classes.logoutButton}
-          >
-            <ExitToAppIcon />
-          </IconButton>
+          <div className={classes.logoutButton}>
+            <Badge badgeContent={4} color="secondary" className={classes.badge}>
+              <IconButton
+                style={{ color: "white", padding: "5px " }}
+                aria-controls="simple-menu"
+                onClick={handleClick}
+              >
+                <NotificationsActiveIcon />
+              </IconButton>
+            </Badge>
+            <Menu
+              id="simple-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              style={{top:'40px'}}
+            >
+              <div style={{ width: "300px", }} onClick={handleClick}>
+              <Typography variant="h6" style={{margin:'6px 0 0 20px'}} noWrap>
+              Notification
+            </Typography>
+                <List className={classes.notification} style={{margin:'0px 0 0 0px'}}>
+                  {notifyData.map((data) => {     
+                    return (    
+                      <NavLink to={data.path}>
+                        <div>
+                          <ListItem>
+                            <ListItemAvatar>
+                              <Avatar>
+                                <img src={data.avatar}/>
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText style={{padding:'6px',}}
+                              primary={data.name}
+                              secondary={data.message}
+                            />
+                          </ListItem>
+                          <Divider variant="inset" component="li" />  
+                        </div>
+                      </NavLink>
+                    );
+                  })}
+                </List>
+              </div>
+            </Menu>
+            <IconButton
+              onClick={roleMenuOpen}              
+              color="inherit"
+            >
+              < AssignmentIndIcon />
+            </IconButton>
+            <Menu
+              id="simple-menu"
+              anchorEl={roleMenu}
+              keepMounted
+              open={Boolean(roleMenu)}
+              onClose={handleCloseRoleMenu}
+              style={{top:'40px'}}
+            >
+              <div style={{ width: "300px", }}>
+              <Typography variant="h6" style={{margin:'6px 0 0 20px'}} noWrap>
+              Roles
+            </Typography>
+                <List className={classes.notification} style={{margin:'0px 0 0 0px'}}>
+                  { auth?.payloadLogin?.payload?.data?.user?.role.map((data) => {     
+                    return (    
+                      <div style={{cursor:"pointer"}} onClick={e=>changeRole(e,data)}>
+                          <ListItem>
+                            <ListItemAvatar>
+                              <Avatar>
+                               R
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText style={{padding:'6px',}}
+                              primary={data}
+                              // secondary={data}
+                            />
+                          </ListItem>
+                          <Divider variant="inset" component="li" />  
+                        </div>
+                      
+                    );
+                  })}
+                </List>
+              </div>
+            </Menu>
+            <IconButton
+              onClick={handleLogout}
+              aria-label="logout"
+              color="inherit"
+            >
+              <ExitToAppIcon />
+            </IconButton>
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer

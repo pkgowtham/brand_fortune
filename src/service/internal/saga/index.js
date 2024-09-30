@@ -21,7 +21,6 @@
 
 
 // export function* watchHsn() {
-//   console.log("Im here");
 //   yield takeLatest(ACTION_TYPE.GET_HSN_SAGA, workerHsn);
 // }
 

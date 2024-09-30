@@ -37,7 +37,6 @@ function* workerGetListProject(action){
     yield put({type:ACTION_TYPE.GET_LIST_PROJECT_PENDING})
     try {
         const data = yield call(getProjectApi,action.payload.data);
-       console.log("in getlist",data)
         yield put({type:ACTION_TYPE.GET_LIST_PROJECT_FULFILLED,payload:{data:data.data}})
     } catch (error) {
         yield put({type:ACTION_TYPE.GET_LIST_PROJECT_REJECTED,payload:{error:error}})

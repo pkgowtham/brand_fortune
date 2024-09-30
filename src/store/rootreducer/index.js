@@ -14,14 +14,14 @@ import internalReducer from '../../service/internal/reducer';
 const config = {
   key: 'auth',
   storage,
-  // whitelist: ['token'],
+  // whitelist: ['auth'],
 };
 
-// auth:persistReducer(config,authenticateReducer),
+
 
 const appReducer = combineReducers({
   // style:styleReducer,
-  auth: authReducer,
+  auth:persistReducer(config,authReducer), 
   project:projectReducer,
   internal: internalReducer,
   

@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { NavLink } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { enqueueSnackbar } from 'notistack';
+import React, { useEffect, useState } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { enqueueSnackbar } from "notistack";
 
-import AssignmentLateIcon from '@material-ui/icons/AssignmentLate';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteIcon from '@material-ui/icons/Delete';
+import AssignmentLateIcon from "@material-ui/icons/AssignmentLate";
+import EditIcon from "@material-ui/icons/Edit";
+import DeleteIcon from "@material-ui/icons/Delete";
+import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
 import {
   Paper,
   Button,
@@ -26,51 +29,53 @@ import {
   TablePagination,
   Backdrop,
   CircularProgress,
-} from '@material-ui/core';
+  Collapse,
+  Box
+} from "@material-ui/core";
 
 import {
   deleteProject,
-  getListProject,  
+  getListProject,
   initialStateDeleteProject,
   initialStateGetListProject,
-} from '../../../service/project/action';
-import { INTERNAL } from '../../../constant/internal';
-import { filterDataProject } from '../../../service/internal/action';
+} from "../../../service/project/action";
+import { INTERNAL } from "../../../constant/internal";
+import { filterDataProject } from "../../../service/internal/action";
 
 const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
   },
   paper: {
-    width: '100%',
+    width: "100%",
     marginBottom: theme.spacing(2),
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
+    color: "#fff",
   },
   tableCell: {
-    fontWeight: 'bold',
-    backgroundColor: '#ededed',
-    padding: '8px 10px',
-    textTransform: 'uppercase',
-    cursor: 'pointer', // Add cursor pointer for clickable headers
+    fontWeight: "bold",
+    backgroundColor: "#ededed",
+    padding: "8px 10px",
+    textTransform: "uppercase",
+    cursor: "pointer", // Add cursor pointer for clickable headers
   },
   evenRow: {
-    backgroundColor: '#ffffff',
-    padding: '5px 10px',
+    backgroundColor: "#ffffff",
+    padding: "5px 10px",
   },
   oddRow: {
-    backgroundColor: '#f0f7ff',
+    backgroundColor: "#f0f7ff",
   },
   TablethZero: {
-    padding: '0 10px',
-    border: 'None',
+    padding: "0 10px",
+    border: "None",
   },
 }));
 
-const initialOrderBy = 'id';
-const initialOrder = 'asc';
+const initialOrderBy = "id";
+const initialOrder = "asc";
 
 export default function List() {
   const classes = useStyles();
@@ -80,8 +85,9 @@ export default function List() {
   const internal = useSelector((store) => store.internal);
 
   const [openBackdrop, setOpenBackdrop] = useState(false);
-  const [orderBy, setOrderBy] = useState('createdAt');
-  const [order, setOrder] = useState('dec');
+  const [open, setOpen] = useState(false);
+  const [orderBy, setOrderBy] = useState("createdAt");
+  const [order, setOrder] = useState("dec");
   const [selectedRow, setSelectedRow] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -93,11 +99,10 @@ export default function List() {
   ) => {
     dispatch(
       getListProject({
-        ...internal.filterDataProject,
-        assignee:auth?.payloadLogin?.payload?.data?.user?._id,
+        role: auth?.payloadLogin?.payload?.data?.user?.role[0],
         currentPage: offset,
         itemsPerPage: pageSize,
-        
+        ...internal.filterDataProject,
       })
     );
   };
@@ -127,8 +132,8 @@ export default function List() {
   useEffect(() => {
     if (project.isErrorGet) {
       setOpenBackdrop(false);
-      enqueueSnackbar('Something went wrong. Please reload again.', {
-        variant: 'error',
+      enqueueSnackbar("Something went wrong. Please reload again.", {
+        variant: "error",
       });
       dispatch(initialStateGetListProject());
     }
@@ -155,13 +160,13 @@ export default function List() {
   };
 
   const handleSort = (property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
   const sortData = (a, b) => {
-    if (order === 'asc') {
+    if (order === "asc") {
       return a[orderBy] > b[orderBy] ? 1 : -1;
     } else {
       return a[orderBy] < b[orderBy] ? 1 : -1;
@@ -179,196 +184,291 @@ export default function List() {
                   <TableCell
                     className={classes.tableCell}
                     align="center"
-                    style={{ minWidth: '43px' }}
-                    onClick={() => handleSort('mailSubject')}
+                    style={{ minWidth: "43px" }}
+                  ></TableCell>
+                  <TableCell
+                    className={classes.tableCell}
+                    align="center"
+                    style={{ minWidth: "43px" }}
+                    onClick={() => handleSort("mailSubject")}
                   >
-                    Mail Subject{' '}
-                    {orderBy === 'mailSubject' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                   Task Id{" "}
+                    {orderBy === "mailSubject" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
+                    )}
+                  </TableCell>  
+                  <TableCell
+                    className={classes.tableCell}
+                    align="center"
+                    style={{ minWidth: "43px" }}
+                    onClick={() => handleSort("mailSubject")}
+                  >
+                   Subtask Id{" "}
+                    {orderBy === "mailSubject" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
+                    )}
+                  </TableCell>   
+                  <TableCell
+                    className={classes.tableCell}
+                    align="center"
+                    style={{ minWidth: "43px" }}
+                    onClick={() => handleSort("mailSubject")}
+                  >
+                   Market Place{" "}
+                    {orderBy === "mailSubject" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
+                    )}
+                  </TableCell>                
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    style={{ minWidth: "95px" }}
+                    onClick={() => handleSort("brand")}
+                  >
+                    Gender{" "}
+                    {orderBy === "brand" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
                   <TableCell
                     align="left"
                     className={classes.tableCell}
-                    style={{ minWidth: '85px' }}
-                    onClick={() => handleSort('marketplace')}
+                    onClick={() => handleSort("articleType")}
                   >
-                    Market Place{' '}
-                    {orderBy === 'marketplace' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
-                    )}
-                  </TableCell>                 
-                  <TableCell
-                    align="left"
-                    className={classes.tableCell}
-                    style={{ minWidth: '95px' }}
-                    onClick={() => handleSort('brand')}
-                  >
-                    Gender{' '}
-                    {orderBy === 'brand' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    Brand{" "}
+                    {orderBy === "articleType" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
                   <TableCell
                     align="left"
                     className={classes.tableCell}
-                    onClick={() => handleSort('articleType')}
+                    onClick={() => handleSort("listingType")}
                   >
-                    Brand{' '}
-                    {orderBy === 'articleType' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    Article Type{" "}
+                    {orderBy === "listingType" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
                   <TableCell
                     align="left"
                     className={classes.tableCell}
-                    onClick={() => handleSort('listingType')}
+                    onClick={() => handleSort("informationType")}
                   >
-                    Article Type{' '}
-                    {orderBy === 'listingType' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    Listing Type{" "}
+                    {orderBy === "informationType" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
                   <TableCell
                     align="left"
                     className={classes.tableCell}
-                    onClick={() => handleSort('informationType')}
+                    onClick={() => handleSort("proirity")}
                   >
-                    Listing Type{' '}
-                    {orderBy === 'informationType' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    Information Type{" "}
+                    {orderBy === "proirity" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
                   <TableCell
                     align="left"
                     className={classes.tableCell}
-                    onClick={() => handleSort('proirity')}
+                    onClick={() => handleSort("status")}
                   >
-                    Information Type{' '}
-                    {orderBy === 'proirity' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    Proirity{" "}
+                    {orderBy === "status" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
                   <TableCell
                     align="left"
                     className={classes.tableCell}
-                    onClick={() => handleSort('status')}
+                    onClick={() => handleSort("currentAssignee")}
                   >
-                    Proirity{' '}
-                    {orderBy === 'status' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
+                    Status{" "}
+                    {orderBy === "currentAssignee" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
-                  <TableCell
-                    align="left"
-                    className={classes.tableCell}
-                    onClick={() => handleSort('currentAssignee')}
-                  >
-                    Status{' '}
-                    {orderBy === 'currentAssignee' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
-                    )}
-                  </TableCell>
-                  <TableCell
-                    align="left"
-                    className={classes.tableCell}
-                    style={{ minWidth: '65px' }}
-                    onClick={() => handleSort('gender')}
-                  >
-                    Current Assignee{' '}
-                    {orderBy === 'gender' && (
-                      <span>{order === 'asc' ? '▲' : '▼'}</span>
-                    )}
-                  </TableCell>
+                  
                   <TableCell align="center" className={classes.tableCell}>
                     Actions
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {project?.payloadGetList?.payload?.data.sort(sortData).map((row, index) => (
-                  <TableRow
-                    key={row._id}
-                    className={
-                      index % 2 === 0 ? classes.evenRow : classes.oddRow
-                    }
-                  >
-                    <TableCell align="center" className={classes.TablethZero}>
-                      {row.mailSubject}
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      className={classes.TablethZero}
-                    >
-                      {row.marketplace}
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      className={classes.TablethZero}                      
-                    >
-                      {row.gender}
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      className={classes.TablethZero}
-                    >
-                      {row.brand}
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      className={classes.TablethZero}
-                    >
-                      {row.articleType }
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      className={classes.TablethZero}
-                    >
-                      {row.listingType }
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      className={classes.TablethZero}
-                    >
-                      {row.informationType }
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      className={classes.TablethZero}
-                    >
-                      {row.proirity }
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      className={classes.TablethZero}
-                    >
-                      {row.status }
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      className={classes.TablethZero}
-                    >
-                      {row.currentAssignee }
-                    </TableCell>                   
-                    
-                    <TableCell align="center" className={classes.TablethZero}>
-                    <NavLink to="/layout/create" state={{ type: "ADD",data:{row}}}>
-                        <IconButton>
-                          <EditIcon />
+                {project?.payloadGetList?.payload?.data
+                  .sort(sortData)
+                  .map((row, index) => (
+                    <>
+                      <TableRow
+                        key={row._id}
+                        className={
+                          index % 2 === 0 ? classes.evenRow : classes.oddRow
+                        }
+                      >
+                        <IconButton
+                          aria-label="expand row"
+                          size="small"
+                          onClick={() => setOpen(!open)}
+                        >
+                          {open ? (
+                            <KeyboardArrowUpIcon />
+                          ) : (
+                            <KeyboardArrowDownIcon />
+                          )}
                         </IconButton>
-                      </NavLink>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                        <TableCell
+                          align="center"
+                          className={classes.TablethZero}
+                        >
+                          {row.taskId}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          className={classes.TablethZero}
+                        >
+                          {row.subtaskId?row.subtaskId:'-'}
+                        </TableCell>
+                       { row.marketPlaceSingle? <TableCell
+                          align="center"
+                          className={classes.TablethZero}
+                        >
+                          {row.marketPlaceSingle}
+                        </TableCell>:
+                        <TableCell
+                        align="center"
+                        className={classes.TablethZero}
+                      >
+                        {row?.marketPlace?.join()}
+                      </TableCell>
+                       }
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          className={classes.TablethZero}
+                        >
+                          {row.gender}
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          className={classes.TablethZero}
+                        >
+                          {row.brand}
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          className={classes.TablethZero}
+                        >
+                          {row.articleType}
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          className={classes.TablethZero}
+                        >
+                          {row.listingType}
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          className={classes.TablethZero}
+                        >
+                          {row.informationType}
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          className={classes.TablethZero}
+                        >
+                          {row.proirity}
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          className={classes.TablethZero}
+                        >
+                          {row.status}
+                        </TableCell>
+                       
+                        <TableCell
+                          align="center"
+                          className={classes.TablethZero}
+                        >
+                          <NavLink
+                            to="/layout/create"
+                            state={{ type: "EDIT", data: { ...row } }}
+                          >
+                            <IconButton>
+                              <EditIcon />
+                            </IconButton>
+                            
+                          </NavLink>
+                          { <NavLink
+                            to="/layout/comment"
+                            state={{ _id:row._id }}
+                          >
+                            <IconButton>
+                              <QueryBuilderIcon />
+                            </IconButton>
+                            
+                          </NavLink>}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          style={{ paddingBottom: 0, paddingTop: 0 }}
+                          colSpan={6}
+                        >
+                          <Collapse in={open} timeout="auto" unmountOnExit>
+                            <Box margin={1}>
+                              <Typography
+                                variant="h6"
+                                gutterBottom
+                                component="div"
+                              >
+                                History
+                              </Typography>
+                              <Table size="small" aria-label="purchases">
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell>Date</TableCell>
+                                    <TableCell>Customer</TableCell>
+                                    <TableCell align="right">Amount</TableCell>
+                                    <TableCell align="right">
+                                      Total price ($)
+                                    </TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {/* {row.history.map((historyRow) => ( */}
+                                  <TableRow key={"historyRow.date"}>
+                                    <TableCell component="th" scope="row">
+                                      {"historyRow.date"}
+                                    </TableCell>
+                                    <TableCell>
+                                      {"historyRow.customerId"}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      {"historyRow.amount"}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      {
+                                        "Math.round(historyRow.amount * row.price * 100) / 100"
+                                      }
+                                    </TableCell>
+                                  </TableRow>
+                                  {/* ))} */}
+                                </TableBody>
+                              </Table>
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </>
+                  ))}
                 {emptyRows > 0 && (
                   <TableRow style={{ height: 1 * emptyRows }}>
                     <TableCell colSpan={6} />
@@ -389,11 +489,11 @@ export default function List() {
           />
         </div>
       ) : (
-        <div style={{ textAlign: 'center', padding: '15px' }}>
-          <AssignmentLateIcon style={{ fontSize: '80px', color: '#c4e2ff' }} />
+        <div style={{ textAlign: "center", padding: "15px" }}>
+          <AssignmentLateIcon style={{ fontSize: "80px", color: "#c4e2ff" }} />
           <Typography
             variant="h4"
-            style={{ fontSize: '14px', color: '#c4e2ff' }}
+            style={{ fontSize: "14px", color: "#c4e2ff" }}
           >
             No Data to display
           </Typography>
