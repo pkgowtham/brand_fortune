@@ -180,12 +180,7 @@ export default function List() {
           <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
-                <TableRow>
-                  <TableCell
-                    className={classes.tableCell}
-                    align="center"
-                    style={{ minWidth: "43px" }}
-                  ></TableCell>
+                <TableRow>                 
                   <TableCell
                     className={classes.tableCell}
                     align="center"
@@ -307,17 +302,7 @@ export default function List() {
                           index % 2 === 0 ? classes.evenRow : classes.oddRow
                         }
                       >
-                        <IconButton
-                          aria-label="expand row"
-                          size="small"
-                          onClick={() => setOpen(!open)}
-                        >
-                          {open ? (
-                            <KeyboardArrowUpIcon />
-                          ) : (
-                            <KeyboardArrowDownIcon />
-                          )}
-                        </IconButton>
+                        
                         <TableCell
                           align="center"
                           className={classes.TablethZero}
@@ -417,56 +402,7 @@ export default function List() {
                           </NavLink>}
                         </TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell
-                          style={{ paddingBottom: 0, paddingTop: 0 }}
-                          colSpan={6}
-                        >
-                          <Collapse in={open} timeout="auto" unmountOnExit>
-                            <Box margin={1}>
-                              <Typography
-                                variant="h6"
-                                gutterBottom
-                                component="div"
-                              >
-                                History
-                              </Typography>
-                              <Table size="small" aria-label="purchases">
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell>Date</TableCell>
-                                    <TableCell>Customer</TableCell>
-                                    <TableCell align="right">Amount</TableCell>
-                                    <TableCell align="right">
-                                      Total price ($)
-                                    </TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {/* {row.history.map((historyRow) => ( */}
-                                  <TableRow key={"historyRow.date"}>
-                                    <TableCell component="th" scope="row">
-                                      {"historyRow.date"}
-                                    </TableCell>
-                                    <TableCell>
-                                      {"historyRow.customerId"}
-                                    </TableCell>
-                                    <TableCell align="right">
-                                      {"historyRow.amount"}
-                                    </TableCell>
-                                    <TableCell align="right">
-                                      {
-                                        "Math.round(historyRow.amount * row.price * 100) / 100"
-                                      }
-                                    </TableCell>
-                                  </TableRow>
-                                  {/* ))} */}
-                                </TableBody>
-                              </Table>
-                            </Box>
-                          </Collapse>
-                        </TableCell>
-                      </TableRow>
+                      
                     </>
                   ))}
                 {emptyRows > 0 && (

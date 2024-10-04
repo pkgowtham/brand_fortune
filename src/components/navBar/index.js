@@ -1,4 +1,4 @@
-import React, { useDebugValue } from "react";
+import React, { useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
@@ -11,7 +11,7 @@ import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight"; 
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -26,7 +26,7 @@ import CardGiftcardIcon from "@material-ui/icons/CardGiftcard";
 import ProductIcon from "@material-ui/icons/ShoppingCart";
 import CustomerIcon from "@material-ui/icons/People";
 import OffersIcon from "@material-ui/icons/LocalOffer";
-import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import AssignmentIndIcon from "@material-ui/icons/AssignmentInd";
 // import AnjaliNavLogo from '../../Admin-Side-Nav-Logo180x60.png';
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,8 +38,12 @@ import { Badge, Menu, MenuItem, Avatar } from "@material-ui/core";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ImageIcon from "@material-ui/icons/Image";
 import WorkIcon from "@material-ui/icons/Work";
+import PersonIcon from '@material-ui/icons/Person';
 import BeachAccessIcon from "@material-ui/icons/BeachAccess";
 import { filterDataProject } from "../../service/internal/action";
+// import {axio} from "../../axios/index.js"
+import axios from "axios";
+import dayjs from "dayjs";
 
 const drawerWidth = 240;
 
@@ -127,7 +131,7 @@ const useStyles = makeStyles((theme) => ({
   sideNav: {
     backgroundColor: "#f9c02829",
   },
-  logoutButton: { 
+  logoutButton: {
     marginLeft: "auto",
   },
   drawerPaper: {
@@ -142,10 +146,9 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     // maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
-    textAlign:'center',
-    display:'flex',
-    flexDirection:'column',
-    
+    textAlign: "center",
+    display: "flex",
+    flexDirection: "column",
   },
 }));
 
@@ -157,32 +160,35 @@ export default function NavBar() {
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [roleMenu, setRoleMenu] = React.useState(null);
+  const [initialData, setInitialData] = React.useState(null);
+
   const auth = useSelector((state) => state.auth);
 
+  const res = async()=>{
+    const token = localStorage.getItem("accessToken");
+    await axios 
+      .get("http://3.108.100.249/api/v1/notification/getlist", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
 
-  const notifyData = [
-    {
-      name: "Sanjay",
-      message: "Im here",
-      avatar:
-        "https://w0.peakpx.com/wallpaper/138/828/HD-wallpaper-vinayagar-vinayagar-lord-god.jpg",
-      path: "/layout/dashbord",
-    },
-    {
-      name: "Sanjay",
-      message: "Im here",
-      avatar:
-        "https://w0.peakpx.com/wallpaper/138/828/HD-wallpaper-vinayagar-vinayagar-lord-god.jpg",
-      path: "/layout/dashbord",
-    },
-    {
-      name: "Sanjay",
-      message: "Im here",
-      avatar:
-        "https://w0.peakpx.com/wallpaper/138/828/HD-wallpaper-vinayagar-vinayagar-lord-god.jpg",
-      path: "/layout/dashbord",
-    },
-  ];
+      })
+      .then((data) => {
+        console.log("data",data)
+        setInitialData(data.data.payload);
+      })
+      .catch((err) => {
+        console.log("ERR", err);
+      });
+  }
+
+  useEffect( () => {
+    console.log("im running")
+    res();
+  }, []);
+  
+
+ 
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -208,12 +214,11 @@ export default function NavBar() {
   };
   const roleMenuOpen = (event) => {
     event.stopPropagation();
-    setRoleMenu(event.currentTarget)
-    
+    setRoleMenu(event.currentTarget);
   };
-  const changeRole = (e,role) => {    
+  const changeRole = (e, role) => {
     e.stopPropagation();
-    dispatch(filterDataProject({role:role}));
+    dispatch(filterDataProject({ role: role }));
     setRoleMenu(null);
   };
 
@@ -223,6 +228,11 @@ export default function NavBar() {
       label: "Information Sheet",
       route: "infosheet",
       icon: <AccountTreeIcon />,
+    },
+    {
+      label: "Employee",
+      route: "employee",
+      icon: <PersonIcon />,  
     },
     // { text: "Category", icon: <AccountTreeIcon /> },
     // { text: "Subcategory", icon: <DeviceHubIcon /> },
@@ -260,13 +270,13 @@ export default function NavBar() {
             to={"/layout/dashboard"}
             className={classes.anyLink}
             style={{ color: "#fff" }}
-          > 
+          >
             <Typography variant="h6" noWrap>
               Brand Fortunes
             </Typography>
           </NavLink>
           <div className={classes.logoutButton}>
-            <Badge badgeContent={4} color="secondary" className={classes.badge}>
+            <Badge badgeContent={initialData?.data.length} color="secondary" className={classes.badge}>
               <IconButton
                 style={{ color: "white", padding: "5px " }}
                 aria-controls="simple-menu"
@@ -281,29 +291,38 @@ export default function NavBar() {
               keepMounted
               open={Boolean(anchorEl)}
               onClose={handleClose}
-              style={{top:'40px'}}
+              style={{ top: "40px" }}
             >
-              <div style={{ width: "300px", }} onClick={handleClick}>
-              <Typography variant="h6" style={{margin:'6px 0 0 20px'}} noWrap>
-              Notification
-            </Typography>
-                <List className={classes.notification} style={{margin:'0px 0 0 0px'}}>
-                  {notifyData.map((data) => {     
-                    return (    
-                      <NavLink to={data.path}>
+              <div style={{ width: "300px" }} onClick={handleClick}>
+                <Typography
+                  variant="h6"
+                  style={{ margin: "6px 0 0 20px" }}
+                  noWrap
+                >
+                  Notification
+                </Typography>
+                <List
+                  className={classes.notification}
+                  style={{ margin: "0px 0 0 0px" }}
+                >
+                  {initialData?.data.map((data) => {
+                    return (
+                      <NavLink to={"/"} style={{textDecoration:'none'}}>
                         <div>
                           <ListItem>
                             <ListItemAvatar>
                               <Avatar>
-                                <img src={data.avatar}/>
+                                N
+                                {/* <img src={data.avatar} /> */}
                               </Avatar>
                             </ListItemAvatar>
-                            <ListItemText style={{padding:'6px',}}
-                              primary={data.name}
-                              secondary={data.message}
+                            <ListItemText
+                              style={{ padding: "6px" }}
+                              primary={data.message}
+                              secondary={dayjs(data.createdAt).format("MMMM D, YYYY h:mm A")}
                             />
                           </ListItem>
-                          <Divider variant="inset" component="li" />  
+                          <Divider variant="inset" component="li" />
                         </div>
                       </NavLink>
                     );
@@ -311,11 +330,8 @@ export default function NavBar() {
                 </List>
               </div>
             </Menu>
-            <IconButton
-              onClick={roleMenuOpen}              
-              color="inherit"
-            >
-              < AssignmentIndIcon />
+            <IconButton onClick={roleMenuOpen} color="inherit">
+              <AssignmentIndIcon />
             </IconButton>
             <Menu
               id="simple-menu"
@@ -323,30 +339,38 @@ export default function NavBar() {
               keepMounted
               open={Boolean(roleMenu)}
               onClose={handleCloseRoleMenu}
-              style={{top:'40px'}}
+              style={{ top: "40px" }}
             >
-              <div style={{ width: "300px", }}>
-              <Typography variant="h6" style={{margin:'6px 0 0 20px'}} noWrap>
-              Roles
-            </Typography>
-                <List className={classes.notification} style={{margin:'0px 0 0 0px'}}>
-                  { auth?.payloadLogin?.payload?.data?.user?.role.map((data) => {     
-                    return (    
-                      <div style={{cursor:"pointer"}} onClick={e=>changeRole(e,data)}>
-                          <ListItem>
-                            <ListItemAvatar>
-                              <Avatar>
-                               R
-                              </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText style={{padding:'6px',}}
-                              primary={data}
-                              // secondary={data}
-                            />
-                          </ListItem>
-                          <Divider variant="inset" component="li" />  
-                        </div>
-                      
+              <div style={{ width: "300px" }}>
+                <Typography
+                  variant="h6"
+                  style={{ margin: "6px 0 0 20px" }}
+                  noWrap
+                >
+                  Roles
+                </Typography>
+                <List
+                  className={classes.notification}
+                  style={{ margin: "0px 0 0 0px" }}
+                >
+                  {auth?.payloadLogin?.payload?.data?.user?.role.map((data) => {
+                    return (
+                      <div
+                        style={{ cursor: "pointer" }}
+                        onClick={(e) => changeRole(e, data)}
+                      >
+                        <ListItem>
+                          <ListItemAvatar>
+                            <Avatar>R</Avatar>
+                          </ListItemAvatar>
+                          <ListItemText
+                            style={{ padding: "6px" }}
+                            primary={data}
+                            // secondary={data}
+                          />
+                        </ListItem>
+                        <Divider variant="inset" component="li" />
+                      </div>
                     );
                   })}
                 </List>

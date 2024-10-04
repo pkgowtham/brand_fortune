@@ -14,6 +14,8 @@ import Layout from './pages/layout';
 import Project from './pages/project';
 import   Comment  from './pages/comment';
 import { default as ProjectCreate } from './pages/project/create';
+import Create from './pages/employee/create';
+import Employee from './pages/employee';
 
 
 
@@ -34,10 +36,13 @@ function App() {
                   //   <Layout />
                   // </ProtectedRoute>
                 }
+                
               >
                 <Route path="dashboard" element={<Project />} />
+                <Route path="employee" element={<Employee />} />
                 <Route path="create" element={<ProjectCreate />} />
                 <Route path='comment' element={<Comment/>}/>
+                <Route path='user' element={<Create/>}/>
                
               </Route>
             </Routes>

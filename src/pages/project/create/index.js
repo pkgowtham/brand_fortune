@@ -733,7 +733,7 @@ export default function Create() {
                 />
               </FormControl>
             </Grid>
-            {projectItem.marketPlaceSingle ? (
+            {projectItem?.marketPlaceSingle ? (
               <Grid
                 item
                 xs={5}
