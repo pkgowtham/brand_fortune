@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Container,
@@ -10,9 +10,13 @@ import {
   Select,
   MenuItem,
   InputLabel,
-  Checkbox,ListItemText
+  Checkbox,
+  ListItemText,
+  FormHelperText,
 } from "@material-ui/core";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { enqueueSnackbar } from "notistack";
 
 const useStyles = makeStyles((theme) => ({
   mainContainer: {
@@ -49,12 +53,13 @@ function Create() {
   console.log("users", user);
 
   const [inputvalue, setInputvalue] = useState({
-    firstname: user?.firstname ? user.firstname : "",
-    lastname: user?.lastname ? user.lastname : "",
+    firstname: user?.firstName ? user.firstName : "",
+    lastname: user?.lastName ? user.lastName : "",
     email: user?.email ? user.email : "",
     password: user?.password ? user.password : "",
     mobile: user?.mobile ? user.mobile : "",
     role: user?.role ? user.role : [],
+    subrole: "",
   });
   console.log(inputvalue);
   const [error, setError] = useState({
@@ -64,6 +69,7 @@ function Create() {
     password: false,
     mobile: false,
     role: false,
+    subrole: false,
   });
   const regex = {
     firstname: /^[a-zA-Z]*$/,
@@ -72,7 +78,9 @@ function Create() {
     mobile: /^[0-9]{1,10}$/,
     password:
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>\/?~`-]).{8,}$/,
+    // subrole:
   };
+
   const roleValues = [
     "MANAGEMENT",
     "ACCOUNT_MANAGER",
@@ -83,9 +91,107 @@ function Create() {
     "ANALYSIS_EXECUTIVES",
     "ANALYSIS_LEAD",
   ];
+  const subroleValues = ["DISCOUNT", "LIVE_CHECK", "SYN", "UPLOAD"];
+
+  const formCreate = async () => {
+    console.log("Formmessage", inputvalue);
+    const token = localStorage.getItem("accessToken");
+
+    await axios
+      .post(
+        "http://3.108.100.249/api/v1/user/create",
+        {
+          firstName: `${inputvalue.firstname}`,
+          lastName: `${inputvalue.lastname}`,
+          mobile: `${inputvalue.mobile}`,
+          email: `${inputvalue.email}`,
+          role: `${inputvalue.role}`,
+          password: `${inputvalue.password}`,
+          subrole: `${inputvalue.subrole}`,
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : null,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("formmessage", response);
+        enqueueSnackbar("Successfully Created", { variant: "success" });
+        navigate("/layout/employee");
+        setInputvalue({
+          firstname: "",
+          lastname: "",
+          email: "",
+          password: "",
+          mobile: "",
+          role: [],
+          subrole: "",
+        });
+      })
+      .catch((err) => {
+        enqueueSnackbar("Please Fill the Form", {
+          variant: "error",
+        });
+        console.log("formErrr message", err);
+      });
+  };
+
+  // useEffect(() => {
+  //   console.log("runingformmessage");
+  //   formMessage();
+  // }, []);
+
+  const formUpdate = async () => {
+    console.log("Formupdate", inputvalue);
+    const token = localStorage.getItem("accessToken");
+
+    await axios
+      .put(
+        `http://3.108.100.249/api/v1/user/update`,
+        {
+          _id: user._id,
+          firstName: `${inputvalue.firstname}`,
+          lastName: `${inputvalue.lastname}`,
+          mobile: `${inputvalue.mobile}`,
+          email: `${inputvalue.email}`,
+          role: `${inputvalue.role}`,
+          password: `${inputvalue.password}`,
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : null,
+          },
+        }
+      )
+      .then((updateresponse) => {
+        console.log("formupdate", updateresponse);
+        setInputvalue({
+          firstname: "",
+          lastname: "",
+          email: "",
+          password: "",
+          mobile: "",
+          role: [],
+        });
+        enqueueSnackbar("Successfully Updated", { variant: "success" });
+        navigate("/layout/employee");
+      })
+      .catch((err) => {
+        enqueueSnackbar("Please Fill the Form", {
+          variant: "error",
+        });
+        console.log("updateErrr message", err);
+      });
+  };
+
+  // useEffect(() => {
+  //   console.log("runing upate");
+  //   formUpdate();
+  // }, []);
+
   const handelTextinput = (e) => {
     const { name, value } = e.target;
-    // setInputvalue(e.target.value);
     setInputvalue((prev) => ({
       ...prev,
       [name]: value,
@@ -109,7 +215,11 @@ function Create() {
         isError = !regex.mobile.test(value);
         break;
       case "role":
-        isError = !roleValues.includes(value);
+        console.log("roelVlue", value);
+        isError = !value.every((val) => roleValues.includes(val));
+        break;
+      case "subrole":
+        isError = !subroleValues.includes(value);
         break;
 
       default:
@@ -120,17 +230,13 @@ function Create() {
 
   const handelSubmit = (e) => {
     e.preventDefault();
+    if (user) {
+      console.log("im here1");
+      formUpdate();
+    } else {
+      formCreate();
+    }
     console.log("Form submitted:", inputvalue);
-    setInputvalue({
-      firstname: "",
-      lastname: "",
-      email: "",
-      password: "",
-      mobile: "",
-      role: "",
-      createdAt: "",
-      updatedAt: "",
-    });
   };
   return (
     <Container className={classes.mainContainer}>
@@ -239,13 +345,13 @@ function Create() {
               multiple
               label="Role"
               name="role"
-              value={inputvalue.role}
+              value={inputvalue.role ? inputvalue.role : []}
               onChange={handelTextinput}
               inputProps={{
                 name: "role",
                 id: "outlined-age-native-simple",
               }}
-              renderValue={(selected) => selected.join(", ")}
+              renderValue={(selected) => selected.join(",")}
               MenuProps={{
                 PaperProps: {
                   style: {
@@ -257,41 +363,43 @@ function Create() {
             >
               {roleValues.map((name) => (
                 <MenuItem key={name} value={name}>
-                  <Checkbox
-                    checked={inputvalue.role.indexOf(name) > -1}
-                  />
+                  <Checkbox checked={inputvalue.role.indexOf(name) > -1} />
                   <ListItemText primary={name} />
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
-        {/* <Grid item xs={6}>
-          <FormControl variant="outlined" className={classes.formControlSelect}>
-            <InputLabel htmlFor="outlined-age-native-simple">Role</InputLabel>
-            <Select
-              native
-              label="Role"
-              name="role"
-              value={inputvalue.role}
-              onChange={handelTextinput}
-              inputProps={{
-                name: "role",
-                id: "outlined-age-native-simple",
-              }}
-            >
-              <option aria-label="Select Role" value="" />
-              <option value="ACCOUNT_MANAGER">Account Manager</option>
-              <option value="CATALOG_CURATOR">Catalog Curator</option>
-              <option value="CATALOG_EXCECUTIVE">Catalog Excecutive</option>
-              <option value="CATALOG_LEAD">Catalog Lead</option>
-              <option value="CATALOG_REVIEWER">Catalog Reviewer</option>
-              <option value="ANALYSIS_EXECUTIVES">Analysis Executives</option>
-              <option value="ANALYSIS_LEAD">Analysis Lead</option>
-            </Select>
-          </FormControl>
-        </Grid> */}
       </Grid>
+
+      {/* sub role */}
+      {inputvalue.role.includes("ANALYSIS_EXECUTIVES") && (
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <FormControl className={classes.formControl} error={error.subrole}>
+              <InputLabel id="additional-dropdown-label">Sub Role</InputLabel>
+              <Select
+                labelId="additional-dropdown-label"
+                id="additional-dropdown"
+                variant="outlined"
+                name="subrole"
+                value={inputvalue.subrole}
+                onChange={handelTextinput}
+              >
+                {subroleValues.map((dat) => {
+                  return (
+                    <MenuItem value={dat}>{dat.toLocaleLowerCase()}</MenuItem>
+                  );
+                })}
+              </Select>
+              {error.subrole && (
+                <FormHelperText>Please select a subrole.</FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+        </Grid>
+      )}
+
       <div className={classes.button}>
         <Button
           variant="contained"
@@ -300,7 +408,7 @@ function Create() {
           onClick={handelSubmit}
           disabled={Object.values(error).includes(true)}
         >
-          Submit
+          {user ? "Submit" : "Update"}
         </Button>
       </div>
     </Container>

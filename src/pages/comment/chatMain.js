@@ -61,32 +61,7 @@ const ChatMain = ({ id }) => {
 
   const auth = useSelector((state) => state.auth);
 
-  const message = [
-    {
-      id: "1234567890",
-      text: "Having difficulty in requirement sheet",
-      sender: {
-        id: "user123",
-        username: "john_doe",
-        avatar: "https://example.com/avatar/john_doe.png",
-      },
-      timestamp: "2024-09-01T12:34:56Z",
-      chatRoomId: "room123",
-      isRead: false,
-    },
-    {
-      id: "1234567891",
-      text: "I will solve by myself",
-      sender: {
-        id: "user456",
-        username: "jane_doe",
-        avatar: "https://example.com/avatar/jane_doe.png",
-      },
-      timestamp: "2024-09-01T12:35:56Z",
-      chatRoomId: "room123",
-      isRead: true,
-    },
-  ];
+ 
 
   const [chatData, setChatData] = React.useState([]);
   const [inputvalue, setInputvalue] = useState("");

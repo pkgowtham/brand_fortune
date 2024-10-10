@@ -53,6 +53,7 @@ import {
 } from "../../../service/project/action";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import dayjs from "dayjs";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   // container: {
@@ -202,10 +203,35 @@ export default function Create() {
   const synFile = useRef(null);
   const [finalValues, setFinalValues] = useState({});
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [user, setUser] = React.useState([]);
+
+  const getUser = async () => {
+    console.log("initialTableData", user);
+
+    const token = localStorage.getItem("accessToken");
+
+    await axios
+      .get("http://3.108.100.249/api/v1/user/getlist", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
+      .then((tableresponse) => {
+        console.log("tableresponse", tableresponse);
+        setUser(tableresponse.data.payload.data);
+      })
+      .catch((err) => {
+        console.log("tableERR", err);
+      });
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
+
+
 
   let type = location?.state?.type;
-  useEffect(() => {
-  }, []);
+  useEffect(() => {}, []);
 
   useEffect(() => {
     if (location?.state?.data) {
@@ -355,24 +381,21 @@ export default function Create() {
         }
       }
       case "APPROVAL_WAITING": {
-        let updateData = new FormData();        
-        updateData.append("assignee", values.assignee);       
+        let updateData = new FormData();
+        updateData.append("assignee", values.assignee);
         return updateData;
       }
       case "ANALYSIS_UPLOAD": {
-        let updateData = new FormData();  
-        updateData.append("upload", values.upload);      
-        updateData.append("assignee", values.assignee);       
+        let updateData = new FormData();
+        updateData.append("upload", values.upload);
+        updateData.append("assignee", values.assignee);
         return updateData;
       }
       case "LIVE_CHECK": {
-        let updateData = new FormData();           
-        updateData.append("assignee", values.assignee);       
+        let updateData = new FormData();
+        updateData.append("assignee", values.assignee);
         return updateData;
       }
-
-      
-       
 
       default:
         break;
@@ -424,7 +447,7 @@ export default function Create() {
           sku: projectItem.sku ? projectItem.sku : "",
           reviewedSku: projectItem.reviewedSku ? projectItem.reviewedSku : "",
           syn: projectItem.syn ? projectItem.syn : "",
-          upload: projectItem.upload ? projectItem.upload : "",          
+          upload: projectItem.upload ? projectItem.upload : "",
           assignee: "",
           reviewer: "",
         };
@@ -527,7 +550,11 @@ export default function Create() {
     );
   };
 
-  const assign = (label, formikString, options) => {
+  const assign = (label, formikString, roleString) => {
+    let options = user.filter((dat) => {
+      return dat.role.includes(roleString);
+    });
+
     return (
       <Grid item xs={5} spacing={2} style={{ margin: "10px auto 20px auto" }}>
         <FormControl style={{ marginTop: 5 }} fullWidth>
@@ -550,7 +577,11 @@ export default function Create() {
             {...formik.getFieldProps(formikString)}
           >
             {options.map((option) => {
-              return <MenuItem value={option.value}>{option.label}</MenuItem>;
+              return (
+                <MenuItem value={option._id}>
+                  {option.firstName} {option.lastName}
+                </MenuItem>
+              );
             })}
           </Select>
         </FormControl>
@@ -1059,12 +1090,7 @@ export default function Create() {
                 requirementSheetPreview,
                 setRequirementSheetPreview
               )}
-              {assign("Select Assignee", "assignee", [
-                {
-                  label: "catalog lead",
-                  value: "66ec0a4dc8f2eda25bf0a819",
-                },
-              ])}
+              {assign("Select Assignee", "assignee", "CATALOG_LEAD")}
             </div>
           ) : null}
           {projectItem?.status == "LEAD_ONE" ? (
@@ -1075,12 +1101,7 @@ export default function Create() {
               )}
               {projectItem?.leadOne.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("Select Assignee", "assignee", [
-                  {
-                    label: "Catalog Curator",
-                    value: "66ec09b2c8f2eda25bf0a811",
-                  },
-                ])}
+                assign("Select Assignee", "assignee", "CATALOG_CURATOR")}
             </div>
           ) : null}
           {projectItem?.status == "CURATOR" ? (
@@ -1108,12 +1129,7 @@ export default function Create() {
               {/* again lead assignment */}
               {projectItem?.curator.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("Select Assignee", "assignee", [
-                  {
-                    label: "Catalog Lead",
-                    value: "66ec0a4dc8f2eda25bf0a819",
-                  },
-                ])}
+                assign("Select Assignee", "assignee", "CATALOG_LEAD" )}
             </div>
           ) : null}
           {projectItem?.status == "LEAD_TWO" ? (
@@ -1128,12 +1144,7 @@ export default function Create() {
               {/* for executive assignment */}
               {projectItem?.leadTwo.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("Select Assignee", "assignee", [
-                  {
-                    label: "Catalog Executive",
-                    value: "66ec0a17c8f2eda25bf0a815",
-                  },
-                ])}
+                assign("Select Assignee", "assignee", "CATALOG_EXCECUTIVE")}
             </div>
           ) : null}
           {projectItem?.status == "EXECUTIVE_LISTING" ? (
@@ -1160,12 +1171,7 @@ export default function Create() {
               {/* for executive assignment */}
               {projectItem?.submissionExecutiveListing.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("Select Assignee", "assignee", [
-                  {
-                    label: "Catalog Executive",
-                    value: "66ec0a17c8f2eda25bf0a815",
-                  },
-                ])}
+                assign("Select Assignee", "assignee", "CATALOG_EXECUTIVE")}
             </div>
           ) : null}
           {projectItem?.status == "EXECUTIVE_SKU" ? (
@@ -1194,21 +1200,11 @@ export default function Create() {
               {/* for executive assignment */}
               {projectItem?.submissionExecutiveSku.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("Select Assignee", "assignee", [
-                  {
-                    label: "Analysis Executive",
-                    value: "66ec0aabc8f2eda25bf0a821",
-                  },
-                ])}
+                assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVE")}
               {/* for reviewer assignment */}
               {projectItem?.submissionExecutiveSku.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("Select Assignee", "reviewer", [
-                  {
-                    label: "Catalog Reviewer",
-                    value: "66ec0a73c8f2eda25bf0a81d",
-                  },
-                ])}
+                assign("Select Assignee", "reviewer", "CATALOG_REVIEWER")}
             </div>
           ) : null}
           {projectItem?.status == "ANALYSIS_SYN" ? (
@@ -1252,28 +1248,18 @@ export default function Create() {
               {projectItem?.analysisExecutiveSyn.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 projectItem.reviewedSku &&
-                assign("Select Assignee", "assignee", [
-                  {
-                    label: "Analysis Executive",
-                    value: "66ec0aabc8f2eda25bf0a821",
-                  },
-                ])}
+                assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVE")}
               {/* for Approval assignment */}
               {projectItem?.analysisExecutiveSyn.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 !projectItem.reviewedSku &&
-                assign("Select Assignee", "assignee", [
-                  {
-                    label: "Account Manager",
-                    value: "66ec091bc8f2eda25bf0a80d",
-                  },
-                ])}
+                assign("Select Assignee", "assignee", "ACCOUNT_MANAGER")}
             </div>
           ) : null}
           {projectItem?.status == "APPROVAL_WAITING" ? (
             <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
-               {/* req. download */}
-               {download(
+              {/* req. download */}
+              {download(
                 "Requirement Sheet",
                 location.state.data.requirementSheet
               )}
@@ -1284,20 +1270,15 @@ export default function Create() {
               {/* sku sheet download */}
               {download("Sku Sheet", location.state.data.sku)}
               {/* review sheet download */}
-              { location.state.data.reviewedSku && download("Review Sheet", location.state.data.sku)}            
+              {location.state.data.reviewedSku &&
+                download("Review Sheet", location.state.data.sku)}
               {/* account manager Approval*/}
               {projectItem?.accountManagerApproval.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 !projectItem.reviewedSku &&
-                assign("Approve by select Assignee", "assignee", [
-                  {
-                    label: "Analysis Executive",
-                    value: "66ec0aabc8f2eda25bf0a821",
-                  },
-                ])}
-             
+                assign("Approve by select Assignee", "assignee", "ANALYSIS_EXECUTIVE")}
             </div>
-          ) : null}          
+          ) : null}
           {projectItem?.status == "ANALYSIS_UPLOAD" ? (
             <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
               {/* req. download */}
@@ -1312,9 +1293,11 @@ export default function Create() {
               {/* sku sheet download */}
               {download("Sku Sheet", location.state.data.sku)}
               {/* review sheet download */}
-              { location.state.data.reviewedSku && download("Review Sheet", location.state.data.sku)} 
+              {location.state.data.reviewedSku &&
+                download("Review Sheet", location.state.data.sku)}
               {/* syn sheet download */}
-              { location.state.data.syn && download("Syn Sheet", location.state.data.syn)} 
+              {location.state.data.syn &&
+                download("Syn Sheet", location.state.data.syn)}
               {/* upload Upload */}
               {projectItem?.analysisExecutiveUpload.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
@@ -1326,22 +1309,17 @@ export default function Create() {
                   uploadFile,
                   uploadPreview,
                   setUploadPreview
-                )}           
+                )}
               {/* assign for live check*/}
               {projectItem?.analysisExecutiveUpload.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&                
-                assign("select Assignee", "assignee", [
-                  {
-                    label: "Analysis Executive",
-                    value: "66ec0aabc8f2eda25bf0a821",
-                  },
-                ])}
-             </div>
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                assign("select Assignee", "assignee", "ANALYSIS_EXECUTIVE")}
+            </div>
           ) : null}
           {projectItem?.status == "LIVE_CHECK" ? (
             <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
-               {/* req. download */}
-               {download(
+              {/* req. download */}
+              {download(
                 "Requirement Sheet",
                 location.state.data.requirementSheet
               )}
@@ -1352,11 +1330,14 @@ export default function Create() {
               {/* sku sheet download */}
               {download("Sku Sheet", location.state.data.sku)}
               {/* review sheet download */}
-              { location.state.data.reviewedSku && download("Review Sheet", location.state.data.sku)} 
+              {location.state.data.reviewedSku &&
+                download("Review Sheet", location.state.data.sku)}
               {/* syn sheet download */}
-              { location.state.data.syn && download("Syn Sheet", location.state.data.syn)} 
+              {location.state.data.syn &&
+                download("Syn Sheet", location.state.data.syn)}
               {/* upload Upload */}
-              { location.state.data.upload && download("Upload Sheet", location.state.data.upload)} 
+              {location.state.data.upload &&
+                download("Upload Sheet", location.state.data.upload)}
               {/* completion status change*/}
               {projectItem?.analysisExecutiveLiveCheck.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
@@ -1369,10 +1350,10 @@ export default function Create() {
                 ])}
             </div>
           ) : null}
-           {projectItem?.status == "COMPLETED" ? (
+          {projectItem?.status == "COMPLETED" ? (
             <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
-               {/* req. download */}
-               {download(
+              {/* req. download */}
+              {download(
                 "Requirement Sheet",
                 location.state.data.requirementSheet
               )}
@@ -1383,29 +1364,33 @@ export default function Create() {
               {/* sku sheet download */}
               {download("Sku Sheet", location.state.data.sku)}
               {/* review sheet download */}
-              { location.state.data.reviewedSku && download("Review Sheet", location.state.data.sku)} 
+              {location.state.data.reviewedSku &&
+                download("Review Sheet", location.state.data.sku)}
               {/* syn sheet download */}
-              { location.state.data.syn && download("Syn Sheet", location.state.data.syn)} 
+              {location.state.data.syn &&
+                download("Syn Sheet", location.state.data.syn)}
               {/* upload Upload */}
-              { location.state.data.upload && download("Upload Sheet", location.state.data.upload)} 
-             {"status indicator"}
-             <Typography variant="h4">Completed</Typography>
-              
+              {location.state.data.upload &&
+                download("Upload Sheet", location.state.data.upload)}
+              {"status indicator"}
+              <Typography variant="h4">Completed</Typography>
             </div>
           ) : null}
         </Card>
       </Grid>
       <div>
-        {!projectItem?.status == "COMPLETED" && <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          // disabled={imageShow || !formik.dirty || !formik.isValid}
-          onClick={formik.handleSubmit}
-          style={{ marginTop: "20px" }}
-        >
-          {type == "EDIT" ? "UPDATE" : "CREATE"}
-        </Button>}
+        {!projectItem?.status == "COMPLETED" && (
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            // disabled={imageShow || !formik.dirty || !formik.isValid}
+            onClick={formik.handleSubmit}
+            style={{ marginTop: "20px" }}
+          >
+            {type == "EDIT" ? "UPDATE" : "CREATE"}
+          </Button>
+        )}
       </div>
 
       <Backdrop className={classes.backdrop} open={openBackdrop}>
