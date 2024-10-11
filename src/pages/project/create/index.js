@@ -13,6 +13,21 @@ import excelImage from "../../../asserts/excel.svg";
 import imgImage from "../../../asserts/img.svg";
 import DateFnsUtils from "@date-io/date-fns";
 import utc from "dayjs/plugin/utc.js";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import CloseIcon from '@material-ui/icons/Close';
+import MenuItem from '@material-ui/core/MenuItem';
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import EditIcon from "@material-ui/icons/Edit";
+
 
 import {
   MuiPickersUtilsProvider,
@@ -37,8 +52,7 @@ import {
   Switch,
   Grid,
   InputLabel,
-  Select,
-  MenuItem,
+  Select,  
   Paper,
   Input,
   Checkbox,
@@ -204,6 +218,16 @@ export default function Create() {
   const [finalValues, setFinalValues] = useState({});
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const [user, setUser] = React.useState([]);
+  const [curatoropen, setCuratoropen] = React.useState(false);
+  const [submissionopen, setSubmissionopen] = React.useState(false);
+  const [analystopen, setAnalystopen] = React.useState(false);
+  const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+  const [person, setPerson] = React.useState({});
+  const [curatorData, setCuratorData] = React.useState([]);
+  const [submissionData, setSubmissionData] = React.useState([]);
+  const [analystData, setAnalystData] = React.useState([]);
+  const [moduleData, setModuleData] = React.useState([]);
+
 
   const getUser = async () => {
     console.log("initialTableData", user);
@@ -227,8 +251,6 @@ export default function Create() {
   useEffect(() => {
     getUser();
   }, []);
-
-
 
   let type = location?.state?.type;
   useEffect(() => {}, []);
@@ -646,6 +668,35 @@ export default function Create() {
         </div>
       </div>
     );
+  };
+
+  // curator
+  const opencurator = () => {
+    setCuratoropen(true);
+  };
+  const closecurator = () => {
+    setCuratoropen(false);
+  };
+  // submission
+  const opensubmission = () => {
+    setSubmissionopen(true);
+  };
+  const closesubmission = () => {
+    setSubmissionopen(false);
+  };
+  // analyst
+  const openanalyst = () => {
+    setAnalystopen(true);
+  };
+  const closeanalyst = () => {
+    setAnalystopen(false);
+  };
+  // handleChange
+  const handleChange = (index) => (event) => {
+    setPerson((prev) => ({
+      ...prev,
+      [index]: event.target.value,
+    }));
   };
 
   return (
@@ -1102,6 +1153,17 @@ export default function Create() {
               {projectItem?.leadOne.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 assign("Select Assignee", "assignee", "CATALOG_CURATOR")}
+              {/* curator Guide button */}
+              {projectItem?.leadOne.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => opencurator()}
+                >
+                  Curator
+                </Button>
+              )}
             </div>
           ) : null}
           {projectItem?.status == "CURATOR" ? (
@@ -1129,7 +1191,7 @@ export default function Create() {
               {/* again lead assignment */}
               {projectItem?.curator.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("Select Assignee", "assignee", "CATALOG_LEAD" )}
+                assign("Select Assignee", "assignee", "CATALOG_LEAD")}
             </div>
           ) : null}
           {projectItem?.status == "LEAD_TWO" ? (
@@ -1145,6 +1207,17 @@ export default function Create() {
               {projectItem?.leadTwo.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 assign("Select Assignee", "assignee", "CATALOG_EXCECUTIVE")}
+              {/* submission */}
+              {projectItem?.leadTwo.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => opensubmission()}
+                >
+                  submission
+                </Button>
+              )}
             </div>
           ) : null}
           {projectItem?.status == "EXECUTIVE_LISTING" ? (
@@ -1205,6 +1278,17 @@ export default function Create() {
               {projectItem?.submissionExecutiveSku.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 assign("Select Assignee", "reviewer", "CATALOG_REVIEWER")}
+              {/* analyst */}
+              {projectItem?.submissionExecutiveSku.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => openanalyst()}
+                >
+                  Analyst
+                </Button>
+              )}
             </div>
           ) : null}
           {projectItem?.status == "ANALYSIS_SYN" ? (
@@ -1276,7 +1360,11 @@ export default function Create() {
               {projectItem?.accountManagerApproval.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 !projectItem.reviewedSku &&
-                assign("Approve by select Assignee", "assignee", "ANALYSIS_EXECUTIVE")}
+                assign(
+                  "Approve by select Assignee",
+                  "assignee",
+                  "ANALYSIS_EXECUTIVE"
+                )}
             </div>
           ) : null}
           {projectItem?.status == "ANALYSIS_UPLOAD" ? (
@@ -1396,6 +1484,289 @@ export default function Create() {
       <Backdrop className={classes.backdrop} open={openBackdrop}>
         <CircularProgress color="inherit" />
       </Backdrop>
+
+      {/* curator executive */}
+      <div className={classes.curator}>
+        <Dialog
+          open={curatoropen}
+          onClose={closecurator}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          PaperProps={{
+            style: { width: "100%", maxWidth: "900px" },
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <DialogTitle id="alert-dialog-title">
+              {"Curator Executive"}
+            </DialogTitle>
+            <IconButton onClick={closecurator} color="primary">
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <DialogContent>
+            <TableContainer className={classes.mainContainer}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell className={classes.Cellhead}>
+                      Serial No
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Curator Name
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Count Of Parent Task
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Uncurator Style Count
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {curatorData.map((curator, index) => (
+                    <TableRow key={index}>
+                      <TableCell className={classes.Cell}>
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {curator["curator Name"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {curator["Count Of Parent Task"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {curator["Uncurator Style Count"]}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {/* curator executive end */}
+
+      {/* submission executive */}
+      <div className={classes.submission}>
+        <Dialog
+          open={submissionopen}
+          onClose={closesubmission}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          PaperProps={{
+            style: { width: "100%", maxWidth: "900px" },
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <DialogTitle id="alert-dialog-title">
+              {"Submission Executive"}
+            </DialogTitle>
+            <IconButton onClick={closesubmission} color="primary">
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <DialogContent>
+            <TableContainer className={classes.mainContainer}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell className={classes.Cellhead}>
+                      Serial No
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Executive Name
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Count Of Parent Task
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Count Of Child Task
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Unsubmitted Style Count
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {submissionData.map((submission, index) => (
+                    <TableRow key={index}>
+                      <TableCell className={classes.Cell}>
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {submission["Executive Name"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {submission["Count Of Parent Task"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {submission["Count Of Child Task"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {submission["Unsubmitted Style Count"]}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {/* submission executive end */}
+
+      {/* analyst */}
+      <div className={classes.analyst}>
+        <Dialog
+          open={analystopen}
+          onClose={closeanalyst}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          PaperProps={{
+            style: { width: "100%", maxWidth: "1000px" },
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <DialogTitle id="alert-dialog-title">
+              {"Analyst Executive"}
+            </DialogTitle>
+            <IconButton onClick={closeanalyst} color="primary">
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <DialogContent>
+            <TableContainer className={classes.mainContainer}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell className={classes.Cellhead}>
+                      Serial No
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Child Project Name
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Current status
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Current Assignee
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>Actions</TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Reassign Option
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {analystData.map((analyst, index) => (
+                    <TableRow key={index}>
+                      <TableCell className={classes.Cell}>
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {analyst["Child Project Name"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {analyst["Current status"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {analyst["Current Assignee"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        <EditIcon onClick={() => setEditDialogOpen(true)} />
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        <FormControl className={classes.formControl}>
+                          <InputLabel id={`demo-simple-select-label-${index}`}>
+                            Person {index + 1}
+                          </InputLabel>
+                          <Select
+                            labelId={`demo-simple-select-label-${index}`}
+                            id={`demo-simple-select-label-${index}`}
+                            value={person[index]}
+                            onChange={handleChange(index)}
+                          >
+                            <MenuItem value={10}>Ten</MenuItem>
+                            <MenuItem value={20}>Twenty</MenuItem>
+                            <MenuItem value={30}>Thirty</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {/* analyst end */}
+
+      {/* module screen */}
+      <div className={classes.module}>
+        <Dialog
+          open={editDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          PaperProps={{
+            style: { width: "100%", maxWidth: "800px" },
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <DialogTitle id="alert-dialog-title">{"Module Screen"}</DialogTitle>
+            <IconButton
+              onClick={() => setEditDialogOpen(false)}
+              color="primary"
+            >
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <DialogContent>
+            <TableContainer className={classes.mainContainer}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell className={classes.Cellhead}>
+                      Serial No
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Executive Name
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Task Type
+                    </TableCell>
+                    <TableCell className={classes.Cellhead}>
+                      Pending Style Count
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {moduleData.map((module, index) => (
+                    <TableRow key={index}>
+                      <TableCell className={classes.Cell}>
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {module["Executive Name"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {module["Task Type"]}
+                      </TableCell>
+                      <TableCell className={classes.Cell}>
+                        {module["Pending Style Count"]}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {/* module screen  end */}
     </Container>
   );
 }
