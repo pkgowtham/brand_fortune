@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
   },
   formControlSelect: {
     width: "100%",
-    // minWidth:'500px',
     marginTop: "20px",
     marginLeft: "20px",
   },
@@ -78,7 +77,6 @@ function Create() {
     mobile: /^[0-9]{1,10}$/,
     password:
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>\/?~`-]).{8,}$/,
-    // subrole:
   };
 
   const roleValues = [
@@ -335,9 +333,11 @@ function Create() {
             />
           </FormControl>
         </Grid>
-        <Grid item xs={6} style={{ margin: "10px auto 20px auto" }}>
+        <Grid item xs={6} s>
           <FormControl className={classes.formControl} fullWidth>
-            <InputLabel id="demo-mutiple-checkbox-label"> Role</InputLabel>
+            <InputLabel id="demo-mutiple-checkbox-label" style={{ left: 35, top: 15,cursor:'pointer' }}> 
+            Role
+            </InputLabel>
             <Select
               labelId="demo-mutiple-checkbox-label"
               id="demo-mutiple-checkbox"
@@ -377,7 +377,7 @@ function Create() {
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <FormControl className={classes.formControl} error={error.subrole}>
-              <InputLabel id="additional-dropdown-label">Sub Role</InputLabel>
+              <InputLabel id="additional-dropdown-label" style={{ left: 35,top:15 }}>Sub Role</InputLabel>
               <Select
                 labelId="additional-dropdown-label"
                 id="additional-dropdown"
