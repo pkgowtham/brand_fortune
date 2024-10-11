@@ -201,7 +201,12 @@ export default function Filter() {
           <Typography variant="h5" className={classes.TitleText}>
             Information Sheet List
           </Typography>
-
+          <NavLink to="/layout/create" state={{ type: "ADD" }}>
+              <Button variant="contained" color="primary" type="submit">
+                <ControlPointIcon style={{ maxWidth: 20, paddingRight: 3 }} />
+                Add
+              </Button>
+            </NavLink>
           {(auth?.payloadLogin?.payload?.data?.user?.role.includes(
             "ACCOUNT_MANAGER"
           ) ||

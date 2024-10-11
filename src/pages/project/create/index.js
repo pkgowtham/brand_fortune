@@ -185,6 +185,19 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     cursor: "pointer",
   },
+  tablebody:{
+    minHeight:'500px',
+  },
+  tableheight:{
+    minHeight:'400px',
+    border:'1px solid rgba(224, 224, 224, 1);',
+  },
+  tablecelldata:{
+    textAlign:'center',
+    padding:'20px',
+    colSpan:4,
+  }
+  
 }));
 
 export default function Create() {
@@ -228,8 +241,81 @@ export default function Create() {
   const [analystData, setAnalystData] = React.useState([]);
   const [moduleData, setModuleData] = React.useState([]);
 
+// getanalyst
+const getAnalystdata = async () => {
+  console.log("analystData", moduleData);
 
-  const getUser = async () => {
+  const token = localStorage.getItem("accessToken");
+
+  await axios
+    .get("http://3.108.100.249/api/v1/project/getlistcountanalyst", {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : null,
+      },
+    })
+    .then((analystresponse) => {
+      console.log("analystresponse", analystresponse);
+      setModuleData(analystresponse.data.payload.data);
+    })
+    .catch((err) => {
+      console.log("analystERR", err);
+    });
+};
+useEffect(() => {
+  getAnalystdata();
+
+}, []);
+  
+// getsubmission
+const getSubmissiondata = async () => {
+  console.log("submissionData", submissionData);
+
+  const token = localStorage.getItem("accessToken");
+
+  await axios
+    .get("http://3.108.100.249/api/v1/project/getlistcountsubmission", {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : null,
+      },
+    })
+    .then((submissionresponse) => {
+      console.log("submissionresponse", submissionresponse);
+      setSubmissionData(submissionresponse.data.payload.data);
+    })
+    .catch((err) => {
+      console.log("submissionERR", err);
+    });
+};
+useEffect(() => {
+  getSubmissiondata();
+}, []);
+
+// getcuratordata
+const getCuratordata = async () => {
+  console.log("curatorData", curatorData);
+
+  const token = localStorage.getItem("accessToken");
+
+  await axios
+    .get("http://3.108.100.249/api/v1/project/getlistcountcurator", {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : null,
+      },
+    })
+    .then((curatorresponse) => {
+      console.log("curatorresponse", curatorresponse);
+      setCuratorData(curatorresponse.data.payload.data);
+    })
+    .catch((err) => {
+      console.log("curatorERR", err);
+    });
+};
+useEffect(() => {
+  getCuratordata();
+}, []);
+
+// get user
+  const getUserdata = async () => {
     console.log("initialTableData", user);
 
     const token = localStorage.getItem("accessToken");
@@ -249,7 +335,7 @@ export default function Create() {
       });
   };
   useEffect(() => {
-    getUser();
+    getUserdata();
   }, []);
 
   let type = location?.state?.type;
@@ -706,6 +792,13 @@ export default function Create() {
           <Typography variant="h5" className={classes.TitleText}>
             {type === "ADD" ? "ADD PROJECT" : "EDIT PROJECT"}
           </Typography>
+          <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => opensubmission()}
+                >
+                  Curator
+                </Button>
           <NavLink to={"/layout/dashboard"}>
             <Button variant="contained" color="primary" type="submit">
               Go Back
@@ -1506,7 +1599,7 @@ export default function Create() {
           </div>
           <DialogContent>
             <TableContainer className={classes.mainContainer}>
-              <Table>
+              <Table className={classes.tableheight}>
                 <TableHead>
                   <TableRow>
                     <TableCell className={classes.Cellhead}>
@@ -1523,7 +1616,7 @@ export default function Create() {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                {curatorData.length<1?(<TableCell className={classes.tablecelldata}>NO DATA FOUND</TableCell>):<TableBody className={classes.tablebody}>
                   {curatorData.map((curator, index) => (
                     <TableRow key={index}>
                       <TableCell className={classes.Cell}>
@@ -1540,7 +1633,7 @@ export default function Create() {
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
+                </TableBody>}
               </Table>
             </TableContainer>
           </DialogContent>
@@ -1569,7 +1662,7 @@ export default function Create() {
           </div>
           <DialogContent>
             <TableContainer className={classes.mainContainer}>
-              <Table>
+              <Table className={classes.tableheight}>
                 <TableHead>
                   <TableRow>
                     <TableCell className={classes.Cellhead}>
@@ -1589,7 +1682,7 @@ export default function Create() {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                {submissionData.length<1?(<TableCell className={classes.tablecelldata}>NO DATA FOUND</TableCell>):<TableBody>
                   {submissionData.map((submission, index) => (
                     <TableRow key={index}>
                       <TableCell className={classes.Cell}>
@@ -1609,7 +1702,7 @@ export default function Create() {
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
+                </TableBody>}
               </Table>
             </TableContainer>
           </DialogContent>
@@ -1659,7 +1752,7 @@ export default function Create() {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                {analystData.length<1?(<div>NO DATA FOUND</div>):<TableBody>
                   {analystData.map((analyst, index) => (
                     <TableRow key={index}>
                       <TableCell className={classes.Cell}>
@@ -1696,7 +1789,7 @@ export default function Create() {
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
+                </TableBody>}
               </Table>
             </TableContainer>
           </DialogContent>
@@ -1743,7 +1836,7 @@ export default function Create() {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
+               {moduleData.length<1?(<div>No DATA FOUND</div>): <TableBody>
                   {moduleData.map((module, index) => (
                     <TableRow key={index}>
                       <TableCell className={classes.Cell}>
@@ -1760,7 +1853,7 @@ export default function Create() {
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
+                </TableBody>}
               </Table>
             </TableContainer>
           </DialogContent>
