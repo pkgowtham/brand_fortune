@@ -408,7 +408,7 @@ function Create() {
           onClick={handelSubmit}
           disabled={Object.values(error).includes(true)}
         >
-          {user ? "Submit" : "Update"}
+          {user ? "Update":"Submit" }
         </Button>
       </div>
     </Container>

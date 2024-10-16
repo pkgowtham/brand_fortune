@@ -795,9 +795,23 @@ useEffect(() => {
           <Button
                   variant="contained"
                   color="primary"
+                  onClick={() => opencurator()}
+                >
+                  submission
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
                   onClick={() => opensubmission()}
                 >
                   Curator
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => openanalyst()}
+                >
+                  Analyst
                 </Button>
           <NavLink to={"/layout/dashboard"}>
             <Button variant="contained" color="primary" type="submit">
@@ -1235,6 +1249,7 @@ useEffect(() => {
                 setRequirementSheetPreview
               )}
               {assign("Select Assignee", "assignee", "CATALOG_LEAD")}
+              
             </div>
           ) : null}
           {projectItem?.status == "LEAD_ONE" ? (

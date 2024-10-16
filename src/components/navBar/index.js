@@ -11,7 +11,7 @@ import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight"; 
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -38,7 +38,7 @@ import { Badge, Menu, MenuItem, Avatar } from "@material-ui/core";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ImageIcon from "@material-ui/icons/Image";
 import WorkIcon from "@material-ui/icons/Work";
-import PersonIcon from '@material-ui/icons/Person';
+import PersonIcon from "@material-ui/icons/Person";
 import BeachAccessIcon from "@material-ui/icons/BeachAccess";
 import { filterDataProject } from "../../service/internal/action";
 // import {axio} from "../../axios/index.js"
@@ -164,31 +164,27 @@ export default function NavBar() {
 
   const auth = useSelector((state) => state.auth);
 
-  const res = async()=>{
+  const res = async () => {
     const token = localStorage.getItem("accessToken");
-    await axios 
+    await axios
       .get("http://3.108.100.249/api/v1/notification/getlist", {
         headers: {
           Authorization: token ? `Bearer ${token}` : null,
         },
-
       })
       .then((data) => {
-        console.log("data",data)
+        console.log("data", data);
         setInitialData(data.data.payload);
       })
       .catch((err) => {
         console.log("ERR", err);
       });
-  }
+  };
 
-  useEffect( () => {
-    console.log("im running")
+  useEffect(() => {
+    console.log("im running");
     res();
   }, []);
-  
-
- 
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -222,28 +218,39 @@ export default function NavBar() {
     setRoleMenu(null);
   };
 
-  const navLinks = [
-    { label: "Dashboard", route: "Dashboard", icon: <DashboardIcon /> },
-    {
-      label: "Information Sheet",
-      route: "infosheet",
-      icon: <AccountTreeIcon />,
-    },
-    {
-      label: "Employee",
-      route: "employee",
-      icon: <PersonIcon />,  
-    },
-    // { text: "Category", icon: <AccountTreeIcon /> },
-    // { text: "Subcategory", icon: <DeviceHubIcon /> },
-    // { text: "Region", icon: <RegionIcon /> },
-    // { text: "Tag", icon: <TagIcon /> },
-    // { text: "Product", icon: <ProductIcon /> },
-    // { text: "Brand", icon: <EcoIcon /> },
-    // { text: "Customer", icon: <CustomerIcon /> },
-    // { text: "Orders", icon: <ShoppingBasketIcon /> },
-    // { text: "Offers", icon: <CardGiftcardIcon /> },
-  ];
+  const navLinks = auth?.payloadLogin?.payload?.data?.user?.role.includes(
+    "MANAGEMENT"
+  )
+    ? [
+        { label: "Dashboard", route: "Dashboard", icon: <DashboardIcon /> },
+        {
+          label: "Information Sheet",
+          route: "infosheet",
+          icon: <AccountTreeIcon />,
+        },
+        {
+          label: "Employee",
+          route: "employee",
+          icon: <PersonIcon />,
+        },
+        // { text: "Category", icon: <AccountTreeIcon /> },
+        // { text: "Subcategory", icon: <DeviceHubIcon /> },
+        // { text: "Region", icon: <RegionIcon /> },
+        // { text: "Tag", icon: <TagIcon /> },
+        // { text: "Product", icon: <ProductIcon /> },
+        // { text: "Brand", icon: <EcoIcon /> },
+        // { text: "Customer", icon: <CustomerIcon /> },
+        // { text: "Orders", icon: <ShoppingBasketIcon /> },
+        // { text: "Offers", icon: <CardGiftcardIcon /> },
+      ]
+    : [
+        { label: "Dashboard", route: "Dashboard", icon: <DashboardIcon /> },
+        {
+          label: "Information Sheet",
+          route: "infosheet",
+          icon: <AccountTreeIcon />,
+        },
+      ];
 
   return (
     <div className={classes.root}>
@@ -276,7 +283,11 @@ export default function NavBar() {
             </Typography>
           </NavLink>
           <div className={classes.logoutButton}>
-            <Badge badgeContent={initialData?.data.length} color="secondary" className={classes.badge}>
+            <Badge
+              badgeContent={initialData?.data.length}
+              color="secondary"
+              className={classes.badge}
+            >
               <IconButton
                 style={{ color: "white", padding: "5px " }}
                 aria-controls="simple-menu"
@@ -307,19 +318,20 @@ export default function NavBar() {
                 >
                   {initialData?.data.map((data) => {
                     return (
-                      <NavLink to={"/"} style={{textDecoration:'none'}}>
+                      <NavLink to={"/"} style={{ textDecoration: "none" }}>
                         <div>
                           <ListItem>
                             <ListItemAvatar>
                               <Avatar>
-                                N
-                                {/* <img src={data.avatar} /> */}
+                                N{/* <img src={data.avatar} /> */}
                               </Avatar>
                             </ListItemAvatar>
                             <ListItemText
                               style={{ padding: "6px" }}
                               primary={data.message}
-                              secondary={dayjs(data.createdAt).format("MMMM D, YYYY h:mm A")}
+                              secondary={dayjs(data.createdAt).format(
+                                "MMMM D, YYYY h:mm A"
+                              )}
                             />
                           </ListItem>
                           <Divider variant="inset" component="li" />
