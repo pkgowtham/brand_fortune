@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import { useFormik } from "formik";
 import { enqueueSnackbar } from "notistack";
 import * as Yup from "yup";
+import dayjs from "dayjs";
 import ClearIcon from "@material-ui/icons/Clear";
 import IconButton from "@material-ui/core/IconButton";
 import docImage from "../../../asserts/doc.svg";
@@ -12,14 +13,13 @@ import pdfImage from "../../../asserts/pdf.svg";
 import excelImage from "../../../asserts/excel.svg";
 import imgImage from "../../../asserts/img.svg";
 import DateFnsUtils from "@date-io/date-fns";
-import utc from "dayjs/plugin/utc.js";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import CloseIcon from '@material-ui/icons/Close';
-import MenuItem from '@material-ui/core/MenuItem';
+import CloseIcon from "@material-ui/icons/Close";
+import MenuItem from "@material-ui/core/MenuItem";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -27,7 +27,6 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import EditIcon from "@material-ui/icons/Edit";
-
 
 import {
   MuiPickersUtilsProvider,
@@ -52,7 +51,7 @@ import {
   Switch,
   Grid,
   InputLabel,
-  Select,  
+  Select,
   Paper,
   Input,
   Checkbox,
@@ -66,9 +65,11 @@ import {
   updatedProject,
 } from "../../../service/project/action";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import dayjs from "dayjs";
-import axios from "axios";
 
+import axios from "axios";
+import { axio } from "../../../axios";
+import utc from "dayjs/plugin/utc.js";
+dayjs.extend(utc);
 const useStyles = makeStyles((theme) => ({
   // container: {
   //   margin: 30,
@@ -185,19 +186,18 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     cursor: "pointer",
   },
-  tablebody:{
-    minHeight:'500px',
+  tablebody: {
+    minHeight: "500px",
   },
-  tableheight:{
-    minHeight:'400px',
-    border:'1px solid rgba(224, 224, 224, 1);',
+  tableheight: {
+    // minHeight: "400px",
+    border: "1px solid rgba(224, 224, 224, 1);",
   },
-  tablecelldata:{
-    textAlign:'center',
-    padding:'20px',
-    colSpan:4,
-  }
-  
+  tablecelldata: {
+    textAlign: "center",
+    padding: "20px",
+    colSpan: 4,
+  },
 }));
 
 export default function Create() {
@@ -241,87 +241,120 @@ export default function Create() {
   const [analystData, setAnalystData] = React.useState([]);
   const [moduleData, setModuleData] = React.useState([]);
 
-// getanalyst
-const getAnalystdata = async () => {
-  console.log("analystData", moduleData);
+  const [depressed, setDepressed] = useState(
+    (location?.state?.type == "EDIT")
+      ? (location?.state?.data?.status == "ANALYSIS_DISCOUNT_DEPRESSION" ||
+        location?.state?.data?.status == "ANALYSIS_SYN_DEPRESSION" ||
+        location?.state?.data?.status == "ANALYSIS_UPLOAD_DEPRESSION" ||
+        location?.state?.data?.status == "LIVE_CHECK_DEPRESSION")
+        ? "true"
+        : "false"
+      : null
+  );
 
-  const token = localStorage.getItem("accessToken");
+  useEffect(() => {
+    if (
+      (location?.state?.data?.status == "ANALYSIS_DISCOUNT_DEPRESSION" ||
+        location?.state?.data?.status == "ANALYSIS_SYN_DEPRESSION" ||
+        location?.state?.data?.status == "ANALYSIS_UPLOAD_DEPRESSION" ||
+        location?.state?.data?.status == "LIVE_CHECK_DEPRESSION") &&
+      depressed == "false"
+    ) {
+      formik.handleSubmit();
+    }
+    if (
+      !(
+        location?.state?.data?.status == "ANALYSIS_DISCOUNT_DEPRESSION" ||
+        location?.state?.data?.status == "ANALYSIS_SYN_DEPRESSION" ||
+        location?.state?.data?.status == "ANALYSIS_UPLOAD_DEPRESSION" ||
+        location?.state?.data?.status == "LIVE_CHECK_DEPRESSION"
+      ) &&
+      depressed == "true"
+    ) {
+      formik.handleSubmit();
+    }
+  }, [depressed]);
 
-  await axios
-    .get("http://3.108.100.249/api/v1/project/getlistcountanalyst", {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : null,
-      },
-    })
-    .then((analystresponse) => {
-      console.log("analystresponse", analystresponse);
-      setModuleData(analystresponse.data.payload.data);
-    })
-    .catch((err) => {
-      console.log("analystERR", err);
-    });
-};
-useEffect(() => {
-  getAnalystdata();
+  // getanalyst
+  const getAnalystdata = async () => {
+    console.log("analystData", moduleData);
 
-}, []);
-  
-// getsubmission
-const getSubmissiondata = async () => {
-  console.log("submissionData", submissionData);
+    const token = localStorage.getItem("accessToken");
 
-  const token = localStorage.getItem("accessToken");
+    await axio
+      .get("/project/getlistcountanalyst", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
+      .then((analystresponse) => {
+        console.log("analystresponse", analystresponse);
+        setModuleData(analystresponse.data.payload.data);
+      })
+      .catch((err) => {
+        console.log("analystERR", err);
+      });
+  };
+  useEffect(() => {
+    getAnalystdata();
+  }, []);
 
-  await axios
-    .get("http://3.108.100.249/api/v1/project/getlistcountsubmission", {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : null,
-      },
-    })
-    .then((submissionresponse) => {
-      console.log("submissionresponse", submissionresponse);
-      setSubmissionData(submissionresponse.data.payload.data);
-    })
-    .catch((err) => {
-      console.log("submissionERR", err);
-    });
-};
-useEffect(() => {
-  getSubmissiondata();
-}, []);
+  // getsubmission
+  const getSubmissiondata = async () => {
+    console.log("submissionData", submissionData);
 
-// getcuratordata
-const getCuratordata = async () => {
-  console.log("curatorData", curatorData);
+    const token = localStorage.getItem("accessToken");
 
-  const token = localStorage.getItem("accessToken");
+    await axio
+      .get("/project/getlistcountsubmission", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
+      .then((submissionresponse) => {
+        console.log("submissionresponse", submissionresponse);
+        setSubmissionData(submissionresponse.data.payload.data);
+      })
+      .catch((err) => {
+        console.log("submissionERR", err);
+      });
+  };
+  useEffect(() => {
+    getSubmissiondata();
+  }, []);
 
-  await axios
-    .get("http://3.108.100.249/api/v1/project/getlistcountcurator", {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : null,
-      },
-    })
-    .then((curatorresponse) => {
-      console.log("curatorresponse", curatorresponse);
-      setCuratorData(curatorresponse.data.payload.data);
-    })
-    .catch((err) => {
-      console.log("curatorERR", err);
-    });
-};
-useEffect(() => {
-  getCuratordata();
-}, []);
+  // getcuratordata
+  const getCuratordata = async () => {
+    console.log("curatorData", curatorData);
 
-// get user
+    const token = localStorage.getItem("accessToken");
+
+    await axio
+      .get("/project/getlistcountcurator", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
+      .then((curatorresponse) => {
+        console.log("curatorresponse", curatorresponse);
+        setCuratorData(curatorresponse.data.payload.data);
+      })
+      .catch((err) => {
+        console.log("curatorERR", err);
+      });
+  };
+  useEffect(() => {
+    getCuratordata();
+  }, []);
+
+  // get user
   const getUserdata = async () => {
     console.log("initialTableData", user);
 
     const token = localStorage.getItem("accessToken");
 
-    await axios
-      .get("http://3.108.100.249/api/v1/user/getlist", {
+    await axio
+      .get("/user/getlist", {
         headers: {
           Authorization: token ? `Bearer ${token}` : null,
         },
@@ -470,8 +503,34 @@ useEffect(() => {
         updateData.append("reviewer", values.reviewer);
         return updateData;
       }
+      case "ANALYSIS_DISCOUNT": {
+        let updateData = new FormData();
+        if (depressed == "true") {
+          updateData.append("depressed", "true");
+          return updateData;
+        }
+        if (
+          projectItem?.submissionExecutiveReview.userName ==
+          auth?.payloadLogin?.payload?.data?.user?._id
+        ) {
+          updateData.append("reviewedSku", values.reviewedSku);
+          return updateData;
+        }
+        if (
+          projectItem?.analysisExecutiveDiscount.userName ==
+          auth?.payloadLogin?.payload?.data?.user?._id
+        ) {
+          updateData.append("assignee", values.assignee);
+          updateData.append("discount", values.discount);
+          return updateData;
+        }
+      }
       case "ANALYSIS_SYN": {
         let updateData = new FormData();
+        if (depressed == "true") {
+          updateData.append("depressed", "true");
+          return updateData;
+        }
         if (
           projectItem?.submissionExecutiveReview.userName ==
           auth?.payloadLogin?.payload?.data?.user?._id
@@ -495,13 +554,41 @@ useEffect(() => {
       }
       case "ANALYSIS_UPLOAD": {
         let updateData = new FormData();
+        if (depressed == "true") {
+          updateData.append("depressed", "true");
+          return updateData;
+        }
         updateData.append("upload", values.upload);
         updateData.append("assignee", values.assignee);
         return updateData;
       }
       case "LIVE_CHECK": {
         let updateData = new FormData();
+        if (depressed) {
+          updateData.append("depressed", true);
+          return updateData;
+        }
         updateData.append("assignee", values.assignee);
+        return updateData;
+      }
+      case "ANALYSIS_DISCOUNT_DEPRESSION": {
+        let updateData = new FormData();
+        updateData.append("sku", values.sku);
+        return updateData;
+      }
+      case "ANALYSIS_SYN_DEPRESSION": {
+        let updateData = new FormData();
+        updateData.append("sku", values.sku);
+        return updateData;
+      }
+      case "ANALYSIS_UPLOAD_DEPRESSION": {
+        let updateData = new FormData();
+        updateData.append("sku", values.sku);
+        return updateData;
+      }
+      case "LIVE_CHECK_DEPRESSION": {
+        let updateData = new FormData();
+        updateData.append("sku", values.sku);
         return updateData;
       }
 
@@ -552,7 +639,7 @@ useEffect(() => {
             : "",
           baseSheet: projectItem.baseSheet ? projectItem.baseSheet : "",
           submission: projectItem.submission ? projectItem.submission : "",
-          sku: projectItem.sku ? projectItem.sku : "",
+          sku: projectItem.sku && !depressed ? projectItem.sku : "",
           reviewedSku: projectItem.reviewedSku ? projectItem.reviewedSku : "",
           syn: projectItem.syn ? projectItem.syn : "",
           upload: projectItem.upload ? projectItem.upload : "",
@@ -772,7 +859,7 @@ useEffect(() => {
   };
   // analyst
   const openanalyst = () => {
-    setAnalystopen(true);
+    setEditDialogOpen(true);
   };
   const closeanalyst = () => {
     setAnalystopen(false);
@@ -792,27 +879,6 @@ useEffect(() => {
           <Typography variant="h5" className={classes.TitleText}>
             {type === "ADD" ? "ADD PROJECT" : "EDIT PROJECT"}
           </Typography>
-          <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => opencurator()}
-                >
-                  submission
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => opensubmission()}
-                >
-                  Curator
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => openanalyst()}
-                >
-                  Analyst
-                </Button>
           <NavLink to={"/layout/dashboard"}>
             <Button variant="contained" color="primary" type="submit">
               Go Back
@@ -1249,7 +1315,15 @@ useEffect(() => {
                 setRequirementSheetPreview
               )}
               {assign("Select Assignee", "assignee", "CATALOG_LEAD")}
-              
+              <Button
+                variant="contained"
+                color="primary"
+                // disabled={imageShow || !formik.dirty || !formik.isValid}
+                onClick={formik.handleSubmit}
+                style={{ marginTop: "20px" }}
+              >
+                CREATE
+              </Button>
             </div>
           ) : null}
           {projectItem?.status == "LEAD_ONE" ? (
@@ -1264,13 +1338,29 @@ useEffect(() => {
               {/* curator Guide button */}
               {projectItem?.leadOne.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => opencurator()}
-                >
-                  Curator
-                </Button>
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => opencurator()}
+                  >
+                    Curator Pending Count
+                  </Button>
+                </div>
+              )}
+              {projectItem?.leadOne.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign Curator
+                  </Button>
+                </div>
               )}
             </div>
           ) : null}
@@ -1300,6 +1390,21 @@ useEffect(() => {
               {projectItem?.curator.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 assign("Select Assignee", "assignee", "CATALOG_LEAD")}
+              {/* Submit button */}
+              {projectItem?.curator.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign Catalog Lead
+                  </Button>
+                </div>
+              )}
             </div>
           ) : null}
           {projectItem?.status == "LEAD_TWO" ? (
@@ -1325,6 +1430,21 @@ useEffect(() => {
                 >
                   submission
                 </Button>
+              )}
+              {/* Submit button */}
+              {projectItem?.leadTwo.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign For Submission
+                  </Button>
+                </div>
               )}
             </div>
           ) : null}
@@ -1352,7 +1472,22 @@ useEffect(() => {
               {/* for executive assignment */}
               {projectItem?.submissionExecutiveListing.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("Select Assignee", "assignee", "CATALOG_EXECUTIVE")}
+                assign("Select Assignee", "assignee", "CATALOG_EXCECUTIVE")}
+              {/* Submit button */}
+              {projectItem?.submissionExecutiveListing.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign For SKU
+                  </Button>
+                </div>
+              )}
             </div>
           ) : null}
           {projectItem?.status == "EXECUTIVE_SKU" ? (
@@ -1381,25 +1516,86 @@ useEffect(() => {
               {/* for executive assignment */}
               {projectItem?.submissionExecutiveSku.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVE")}
+                assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVES")}
               {/* for reviewer assignment */}
               {projectItem?.submissionExecutiveSku.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 assign("Select Assignee", "reviewer", "CATALOG_REVIEWER")}
-              {/* analyst */}
+              {/* analyst count Button */}
               {projectItem?.submissionExecutiveSku.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => openanalyst()}
-                >
-                  Analyst
-                </Button>
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setEditDialogOpen(true)}
+                  >
+                    Analyst Pending Count
+                  </Button>
+                </div>
+              )}
+              {/* Submit Button */}
+              {projectItem?.submissionExecutiveSku.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign
+                  </Button>
+                </div>
               )}
             </div>
           ) : null}
-          {projectItem?.status == "ANALYSIS_SYN" ? (
+          {location?.state?.data?.status == "ANALYSIS_DISCOUNT_DEPRESSION" ||
+          location?.state?.data?.status == "ANALYSIS_SYN_DEPRESSION" ||
+          location?.state?.data?.status == "ANALYSIS_UPLOAD_DEPRESSION" ||
+          location?.state?.data?.status == "LIVE_CHECK_DEPRESSION" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+              {/* req. download */}
+              {download(
+                "Requirement Sheet",
+                location?.state?.data?.requirementSheet
+              )}
+              {/* base sheet download */}
+              {download("Base Sheet", location?.state?.data?.baseSheet)}
+              {/* submission sheet download */}
+              {download("Submission Sheet", location?.state?.data?.submission)}
+              {/* sku Upload */}
+              {projectItem?.submissionExecutiveSku.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                fileUpload(
+                  "sku Sheet",
+                  "sku Sheet",
+                  "sku",
+                  formik.values.sku,
+                  skuFile,
+                  skuPreview,
+                  setSkuPreview
+                )}
+
+              {/* Submit Button */}
+              {projectItem?.submissionExecutiveSku.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    De-depressed
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : null}
+          {projectItem?.status == "ANALYSIS_DISCOUNT" ? (
             <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
               {/* req. download */}
               {download(
@@ -1424,9 +1620,89 @@ useEffect(() => {
                   reviewedSkuPreview,
                   setReviewedSkuPreview
                 )}
+              {/* Discount Upload */}
+              {projectItem?.analysisExecutiveDiscount.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                fileUpload(
+                  "Discount Sheet",
+                  "Discount Sheet",
+                  "discount",
+                  formik.values.discount,
+                  discountFile,
+                  discountPreview,
+                  setDiscountPreview
+                )}
+              {/* for syn assignment */}
+              {projectItem?.analysisExecutiveDiscount.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVES")}
+              {/* Depression Button */}
+              {projectItem?.analysisExecutiveDiscount.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={() => setDepressed("true")}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Depression
+                  </Button>
+                </div>
+              )}
+              {/* {depressed == "true"?"true":"false"} */}
+              {/* Submit Button */}
+              {projectItem?.analysisExecutiveDiscount.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : null}
+          {projectItem?.status == "ANALYSIS_SYN" ? (
+            <div style={{ width: "90%", margin: "10px auto 20px auto" }}>
+              {/* req. download */}
+              {download(
+                "Requirement Sheet",
+                location.state.data.requirementSheet
+              )}
+              {/* base sheet download */}
+              {download("Base Sheet", location.state.data.baseSheet)}
+              {/* submission sheet download */}
+              {download("Submission Sheet", location.state.data.submission)}
+              {/* sku sheet download */}
+              {download("Sku Sheet", location.state.data.sku)}
+              {/* reviwer Upload */}
+              {projectItem?.submissionExecutiveReview.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id &&
+                !location?.state?.data?.reviewedSku &&
+                fileUpload(
+                  "Review Sheet",
+                  "Review Sheet",
+                  "reviewedSku",
+                  formik.values.reviewedSku,
+                  reviewedSkuFile,
+                  reviewedSkuPreview,
+                  setReviewedSkuPreview
+                )}
+              {location.state.data.discount &&
+                download("Discount Sheet", location.state.data.discount)}
+              {location.state.data.reviewedSku &&
+                download("Review Sheet", location.state.data.sku)}
               {/* syn Upload */}
               {projectItem?.analysisExecutiveSyn.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
+                !(depressed == "true") &&
                 fileUpload(
                   "Syn Sheet",
                   "Syn Sheet",
@@ -1440,12 +1716,45 @@ useEffect(() => {
               {projectItem?.analysisExecutiveSyn.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 projectItem.reviewedSku &&
+                !(depressed == "true") &&
                 assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVE")}
               {/* for Approval assignment */}
               {projectItem?.analysisExecutiveSyn.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 !projectItem.reviewedSku &&
+                !(depressed == "true") &&
                 assign("Select Assignee", "assignee", "ACCOUNT_MANAGER")}
+              {/* Depression Button */}
+              {projectItem?.analysisExecutiveSyn.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={() => setDepressed("true")}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Depression
+                  </Button>
+                </div>
+              )}
+              {/* {depressed == "true"?"true":"false"} */}
+              {/* Submit Button */}
+              {projectItem?.analysisExecutiveSyn.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign
+                  </Button>
+                </div>
+              )}
             </div>
           ) : null}
           {projectItem?.status == "APPROVAL_WAITING" ? (
@@ -1471,8 +1780,23 @@ useEffect(() => {
                 assign(
                   "Approve by select Assignee",
                   "assignee",
-                  "ANALYSIS_EXECUTIVE"
+                  "ANALYSIS_EXECUTIVES"
                 )}
+              {/* Submit Button */}
+              {projectItem?.accountManagerApproval.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign
+                  </Button>
+                </div>
+              )}
             </div>
           ) : null}
           {projectItem?.status == "ANALYSIS_UPLOAD" ? (
@@ -1509,7 +1833,37 @@ useEffect(() => {
               {/* assign for live check*/}
               {projectItem?.analysisExecutiveUpload.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                assign("select Assignee", "assignee", "ANALYSIS_EXECUTIVE")}
+                assign("select Assignee", "assignee", "ANALYSIS_EXECUTIVES")}
+              {/* Depression Button */}
+              {projectItem?.analysisExecutiveUpload.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={() => setDepressed("true")}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Depression
+                  </Button>
+                </div>
+              )}
+              {/* Submit Button */}
+              {projectItem?.analysisExecutiveUpload.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign
+                  </Button>
+                </div>
+              )}
             </div>
           ) : null}
           {projectItem?.status == "LIVE_CHECK" ? (
@@ -1525,6 +1879,8 @@ useEffect(() => {
               {download("Submission Sheet", location.state.data.submission)}
               {/* sku sheet download */}
               {download("Sku Sheet", location.state.data.sku)}
+              {/* Discount sheet download */}
+              {download("Discount Sheet", location.state.data.discount)}
               {/* review sheet download */}
               {location.state.data.reviewedSku &&
                 download("Review Sheet", location.state.data.sku)}
@@ -1535,15 +1891,27 @@ useEffect(() => {
               {location.state.data.upload &&
                 download("Upload Sheet", location.state.data.upload)}
               {/* completion status change*/}
+              <Typography variant="h4" style={{ margin: "30px" }}>
+                {" "}
+                Please wait till{" "}
+                {dayjs
+                  .utc(projectItem?.updatedAt)
+                  .add(3, "day")
+                  .format("dddd, MMMM D, YYYY h:mm A")}{" "}
+                to complete the project.
+              </Typography>
+
               {projectItem?.analysisExecutiveLiveCheck.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 !projectItem.reviewedSku &&
-                assign("Update Status", "assignee", [
-                  {
-                    label: "Completed",
-                    value: "66ec0aabc8f2eda25bf0a821",
-                  },
-                ])}
+                dayjs().isAfter(
+                  dayjs.utc(projectItem?.updatedAt).add(3, "day")
+                ) &&
+                assign(
+                  "Assign to Account Manager to Complete",
+                  "assignee",
+                  "ACCOUNT_MANAGER"
+                )}
             </div>
           ) : null}
           {projectItem?.status == "COMPLETED" ? (
@@ -1559,6 +1927,8 @@ useEffect(() => {
               {download("Submission Sheet", location.state.data.submission)}
               {/* sku sheet download */}
               {download("Sku Sheet", location.state.data.sku)}
+              {/* Discount sheet download */}
+              {download("Discount Sheet", location.state.data.discount)}
               {/* review sheet download */}
               {location.state.data.reviewedSku &&
                 download("Review Sheet", location.state.data.sku)}
@@ -1569,25 +1939,13 @@ useEffect(() => {
               {location.state.data.upload &&
                 download("Upload Sheet", location.state.data.upload)}
               {"status indicator"}
-              <Typography variant="h4">Completed</Typography>
+              <Typography variant="h4" style={{ margin: "30px" }}>
+                Completed
+              </Typography>
             </div>
           ) : null}
         </Card>
       </Grid>
-      <div>
-        {!projectItem?.status == "COMPLETED" && (
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            // disabled={imageShow || !formik.dirty || !formik.isValid}
-            onClick={formik.handleSubmit}
-            style={{ marginTop: "20px" }}
-          >
-            {type == "EDIT" ? "UPDATE" : "CREATE"}
-          </Button>
-        )}
-      </div>
 
       <Backdrop className={classes.backdrop} open={openBackdrop}>
         <CircularProgress color="inherit" />
@@ -1612,7 +1970,7 @@ useEffect(() => {
               <CloseIcon />
             </IconButton>
           </div>
-          <DialogContent>
+          <DialogContent style={{ minHeight: "400px" }}>
             <TableContainer className={classes.mainContainer}>
               <Table className={classes.tableheight}>
                 <TableHead>
@@ -1631,24 +1989,30 @@ useEffect(() => {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                {curatorData.length<1?(<TableCell className={classes.tablecelldata}>NO DATA FOUND</TableCell>):<TableBody className={classes.tablebody}>
-                  {curatorData.map((curator, index) => (
-                    <TableRow key={index}>
-                      <TableCell className={classes.Cell}>
-                        {index + 1}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {curator["curator Name"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {curator["Count Of Parent Task"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {curator["Uncurator Style Count"]}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>}
+                {curatorData.length < 1 ? (
+                  <TableCell className={classes.tablecelldata}>
+                    NO DATA FOUND
+                  </TableCell>
+                ) : (
+                  <TableBody className={classes.tablebody}>
+                    {curatorData.map((curator, index) => (
+                      <TableRow key={index}>
+                        <TableCell className={classes.Cell}>
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {curator._id.firstName}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {curator.countProject}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {curator.count}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
               </Table>
             </TableContainer>
           </DialogContent>
@@ -1675,7 +2039,7 @@ useEffect(() => {
               <CloseIcon />
             </IconButton>
           </div>
-          <DialogContent>
+          <DialogContent style={{ minHeight: "500px" }}>
             <TableContainer className={classes.mainContainer}>
               <Table className={classes.tableheight}>
                 <TableHead>
@@ -1686,9 +2050,9 @@ useEffect(() => {
                     <TableCell className={classes.Cellhead}>
                       Executive Name
                     </TableCell>
-                    <TableCell className={classes.Cellhead}>
+                    {/* <TableCell className={classes.Cellhead}>
                       Count Of Parent Task
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell className={classes.Cellhead}>
                       Count Of Child Task
                     </TableCell>
@@ -1697,27 +2061,33 @@ useEffect(() => {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                {submissionData.length<1?(<TableCell className={classes.tablecelldata}>NO DATA FOUND</TableCell>):<TableBody>
-                  {submissionData.map((submission, index) => (
-                    <TableRow key={index}>
-                      <TableCell className={classes.Cell}>
-                        {index + 1}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {submission["Executive Name"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {submission["Count Of Parent Task"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {submission["Count Of Child Task"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {submission["Unsubmitted Style Count"]}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>}
+                {submissionData.length < 1 ? (
+                  <TableCell className={classes.tablecelldata}>
+                    NO DATA FOUND
+                  </TableCell>
+                ) : (
+                  <TableBody>
+                    {submissionData.map((submission, index) => (
+                      <TableRow key={index}>
+                        <TableCell className={classes.Cell}>
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {submission._id.firstName}
+                        </TableCell>
+                        {/* <TableCell className={classes.Cell}>
+                          {submission["Count Of Parent Task"]}
+                        </TableCell> */}
+                        <TableCell className={classes.Cell}>
+                          {submission.countProject}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {submission.count}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
               </Table>
             </TableContainer>
           </DialogContent>
@@ -1726,7 +2096,7 @@ useEffect(() => {
       {/* submission executive end */}
 
       {/* analyst */}
-      <div className={classes.analyst}>
+      {/* <div className={classes.analyst}>
         <Dialog
           open={analystopen}
           onClose={closeanalyst}
@@ -1767,49 +2137,55 @@ useEffect(() => {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                {analystData.length<1?(<div>NO DATA FOUND</div>):<TableBody>
-                  {analystData.map((analyst, index) => (
-                    <TableRow key={index}>
-                      <TableCell className={classes.Cell}>
-                        {index + 1}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {analyst["Child Project Name"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {analyst["Current status"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {analyst["Current Assignee"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        <EditIcon onClick={() => setEditDialogOpen(true)} />
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        <FormControl className={classes.formControl}>
-                          <InputLabel id={`demo-simple-select-label-${index}`}>
-                            Person {index + 1}
-                          </InputLabel>
-                          <Select
-                            labelId={`demo-simple-select-label-${index}`}
-                            id={`demo-simple-select-label-${index}`}
-                            value={person[index]}
-                            onChange={handleChange(index)}
-                          >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>}
+                {analystData.length < 1 ? (
+                  <div>NO DATA FOUND</div>
+                ) : (
+                  <TableBody>
+                    {analystData.map((analyst, index) => (
+                      <TableRow key={index}>
+                        <TableCell className={classes.Cell}>
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {analyst["Child Project Name"]}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {analyst["Current status"]}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {analyst["Current Assignee"]}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          <EditIcon onClick={() => setEditDialogOpen(true)} />
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          <FormControl className={classes.formControl}>
+                            <InputLabel
+                              id={`demo-simple-select-label-${index}`}
+                            >
+                              Person {index + 1}
+                            </InputLabel>
+                            <Select
+                              labelId={`demo-simple-select-label-${index}`}
+                              id={`demo-simple-select-label-${index}`}
+                              value={person[index]}
+                              onChange={handleChange(index)}
+                            >
+                              <MenuItem value={10}>Ten</MenuItem>
+                              <MenuItem value={20}>Twenty</MenuItem>
+                              <MenuItem value={30}>Thirty</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
               </Table>
             </TableContainer>
           </DialogContent>
         </Dialog>
-      </div>
+      </div> */}
       {/* analyst end */}
 
       {/* module screen */}
@@ -1832,7 +2208,7 @@ useEffect(() => {
               <CloseIcon />
             </IconButton>
           </div>
-          <DialogContent>
+          <DialogContent style={{ minHeight: "500px" }}>
             <TableContainer className={classes.mainContainer}>
               <Table>
                 <TableHead>
@@ -1851,24 +2227,28 @@ useEffect(() => {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-               {moduleData.length<1?(<div>No DATA FOUND</div>): <TableBody>
-                  {moduleData.map((module, index) => (
-                    <TableRow key={index}>
-                      <TableCell className={classes.Cell}>
-                        {index + 1}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {module["Executive Name"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {module["Task Type"]}
-                      </TableCell>
-                      <TableCell className={classes.Cell}>
-                        {module["Pending Style Count"]}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>}
+                {moduleData.length < 1 ? (
+                  <div>No DATA FOUND</div>
+                ) : (
+                  <TableBody>
+                    {moduleData.map((module, index) => (
+                      <TableRow key={index}>
+                        <TableCell className={classes.Cell}>
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {module?.userNam?.firstName}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {module?._id}
+                        </TableCell>
+                        <TableCell className={classes.Cell}>
+                          {module?.styleCount}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
               </Table>
             </TableContainer>
           </DialogContent>

@@ -11,6 +11,7 @@ import SendIcon from "@material-ui/icons/Send";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
+import { axio } from "../../axios";
 
 const useStyles = makeStyles((theme) => ({
   chatMainContentCon: {
@@ -71,8 +72,8 @@ const ChatMain = ({ id }) => {
   const initialChatList = async () => {
     const token = localStorage.getItem("accessToken");
 
-    await axios
-      .get(`http://3.108.100.249/api/v1/comment/getlist?_id=${id}`, {
+    await axio
+      .get(`/comment/getlist?_id=${id}`, {
         headers: {
           Authorization: token ? `Bearer ${token}` : null,
         },
@@ -94,9 +95,9 @@ const ChatMain = ({ id }) => {
   const chatMessage = async () => {
     console.log("message", inputvalue);
     const token = localStorage.getItem("accessToken");
-    await axios
+    await axio
       .post(
-        "http://3.108.100.249/api/v1/comment/create",
+        "/comment/create",
         {
           message: `${inputvalue}`,
           project: `${id}`,

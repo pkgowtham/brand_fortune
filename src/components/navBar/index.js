@@ -45,7 +45,7 @@ import { filterDataProject } from "../../service/internal/action";
 import axios from "axios";
 import dayjs from "dayjs";
 import Tooltip from '@material-ui/core/Tooltip';
-
+import { axio } from "../../axios";
 
 const drawerWidth = 240;
 
@@ -168,8 +168,8 @@ export default function NavBar() {
 
   const res = async () => {
     const token = localStorage.getItem("accessToken");
-    await axios
-      .get("http://3.108.100.249/api/v1/notification/getlist", {
+    await axio
+      .get("/notification/getlist", {
         headers: {
           Authorization: token ? `Bearer ${token}` : null,
         },

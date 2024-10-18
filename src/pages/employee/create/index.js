@@ -17,6 +17,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { enqueueSnackbar } from "notistack";
+import { axio } from "../../../axios";
 
 const useStyles = makeStyles((theme) => ({
   mainContainer: {
@@ -96,9 +97,9 @@ function Create() {
     console.log("Formmessage", inputvalue);
     const token = localStorage.getItem("accessToken");
 
-    await axios
+    await axio
       .post(
-        "http://3.108.100.249/api/v1/user/create",
+        "/user/create",
         {
           firstName: `${inputvalue.firstname}`,
           lastName: `${inputvalue.lastname}`,
@@ -142,9 +143,9 @@ function Create() {
     console.log("Formupdate", inputvalue);
     const token = localStorage.getItem("accessToken");
 
-    await axios
+    await axio
       .put(
-        `http://3.108.100.249/api/v1/user/update`,
+        `/user/update`,
         {
           _id: user._id,
           firstName: `${inputvalue.firstname}`,

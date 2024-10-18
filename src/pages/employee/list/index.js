@@ -34,6 +34,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import MenuItem from '@material-ui/core/MenuItem';
 import Tooltip from '@material-ui/core/Tooltip';
 
+import { axio } from "../../../axios";
 
 const useStyles = makeStyles({
   table: {
@@ -107,8 +108,8 @@ const handeleClose = () => {
 
     const token = localStorage.getItem("accessToken");
 
-    await axios
-      .get("http://3.108.100.249/api/v1/user/getlist", {
+    await axio
+      .get("/user/getlist", {
         headers: {
           Authorization: token ? `Bearer ${token}` : null,
         },
@@ -132,8 +133,8 @@ const handeleClose = () => {
 
     const token = localStorage.getItem("accessToken");
 
-    await axios
-      .delete(`http://3.108.100.249/api/v1/user/delete`, {
+    await axio
+      .delete(`/user/delete`, {
         headers: {
           Authorization: token ? `Bearer ${token}` : null,
         },
