@@ -32,6 +32,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { enqueueSnackbar } from "notistack";
 import CloseIcon from '@material-ui/icons/Close';
 import MenuItem from '@material-ui/core/MenuItem';
+import Tooltip from '@material-ui/core/Tooltip';
+
 
 const useStyles = makeStyles({
   table: {
@@ -200,6 +202,8 @@ const handeleClose = () => {
                 <TableCell className={classes.Tablebody}>{row.role.join(" , ")}</TableCell>
                 <TableCell className={classes.Tablebody}>
                   {passwordVisible[index] ? row.password : ".........."}
+                  <Tooltip title="Password" placement="bottom">
+              
                   <IconButton onClick={() => togglePasswordVisibility(index)}>
                     {passwordVisible[index] ? (
                       <VisibilityOff />
@@ -207,8 +211,10 @@ const handeleClose = () => {
                       <Visibility />
                     )}
                   </IconButton>
+                 </Tooltip>
                 </TableCell>
                 <TableCell className={classes.Tablebody}>
+                <Tooltip title="Edit" placement="bottom-start">
                   <EditIcon
                     variant="contained"
                     color="rgba(0, 0, 0, 0.54);"
@@ -219,6 +225,8 @@ const handeleClose = () => {
                   >
                     Edit
                   </EditIcon>
+                 </Tooltip>
+                 <Tooltip title="Delete" placement="bottom">
                   <DeleteOutlineIcon
                     variant="contained"
                     color="rgba(0, 0, 0, 0.54);"
@@ -227,6 +235,7 @@ const handeleClose = () => {
                   >
                     Delete
                   </DeleteOutlineIcon>
+               </Tooltip>
                 </TableCell>
               </TableRow>
             ))}

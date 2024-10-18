@@ -58,7 +58,8 @@ function Create() {
     password: user?.password ? user.password : "",
     mobile: user?.mobile ? user.mobile : "",
     role: user?.role ? user.role : [],
-    subrole: "",
+    subrole: user?.subrole ? user.subrole : [],
+    
   });
   console.log(inputvalue);
   const [error, setError] = useState({
@@ -71,8 +72,8 @@ function Create() {
     subrole: false,
   });
   const regex = {
-    firstname: /^[a-zA-Z]*$/,
-    lastname: /^[a-zA-Z]*$/,
+    firstname: /^[A-Za-z\s]+$/,
+    lastname: /^[A-Za-z\s]+$/,
     email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
     mobile: /^[0-9]{1,10}$/,
     password:
@@ -135,10 +136,7 @@ function Create() {
       });
   };
 
-  // useEffect(() => {
-  //   console.log("runingformmessage");
-  //   formMessage();
-  // }, []);
+
 
   const formUpdate = async () => {
     console.log("Formupdate", inputvalue);
@@ -183,10 +181,6 @@ function Create() {
       });
   };
 
-  // useEffect(() => {
-  //   console.log("runing upate");
-  //   formUpdate();
-  // }, []);
 
   const handelTextinput = (e) => {
     const { name, value } = e.target;
@@ -217,7 +211,7 @@ function Create() {
         isError = !value.every((val) => roleValues.includes(val));
         break;
       case "subrole":
-        isError = !subroleValues.includes(value);
+        isError = !value.every((val) => subroleValues.includes(val));
         break;
 
       default:
@@ -338,7 +332,7 @@ function Create() {
             <InputLabel id="demo-mutiple-checkbox-label" style={{ left: 35, top: 15,cursor:'pointer' }}> 
             Role
             </InputLabel>
-            <Select
+            <Select  
               labelId="demo-mutiple-checkbox-label"
               id="demo-mutiple-checkbox"
               variant="outlined"
@@ -374,30 +368,43 @@ function Create() {
 
       {/* sub role */}
       {inputvalue.role.includes("ANALYSIS_EXECUTIVES") && (
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <FormControl className={classes.formControl} error={error.subrole}>
-              <InputLabel id="additional-dropdown-label" style={{ left: 35,top:15 }}>Sub Role</InputLabel>
-              <Select
-                labelId="additional-dropdown-label"
-                id="additional-dropdown"
-                variant="outlined"
-                name="subrole"
-                value={inputvalue.subrole}
-                onChange={handelTextinput}
-              >
-                {subroleValues.map((dat) => {
-                  return (
-                    <MenuItem value={dat}>{dat.toLocaleLowerCase()}</MenuItem>
-                  );
-                })}
-              </Select>
-              {error.subrole && (
-                <FormHelperText>Please select a subrole.</FormHelperText>
-              )}
-            </FormControl>
-          </Grid>
-        </Grid>
+        <Grid item xs={6} s>
+        <FormControl className={classes.formControl} fullWidth>
+          <InputLabel id="sub-role" style={{ left: 31, top: 15,cursor:'pointer' }}> 
+          SubRole
+          </InputLabel>
+          <Select
+            labelId="sub-role"
+            id="sub-role"
+            variant="outlined"
+            multiple
+            label="subrole"
+            name="subrole"
+            value={inputvalue.subrole}
+            onChange={handelTextinput}
+            inputProps={{
+              name: "subrole",
+              id: "sub-role",
+            }}
+            renderValue={(selected) => selected.join(",")}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 48 * 4.5 + 8,
+                  width: 250,
+                },
+              },
+            }}
+          >
+            {subroleValues.map((dat) => (
+              <MenuItem key={dat} value={dat}>{dat.toLocaleLowerCase}
+               <Checkbox checked={inputvalue.subrole.indexOf(dat) > -1} />
+               <ListItemText primary={dat} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
       )}
 
       <div className={classes.button}>

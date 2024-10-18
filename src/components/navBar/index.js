@@ -44,6 +44,8 @@ import { filterDataProject } from "../../service/internal/action";
 // import {axio} from "../../axios/index.js"
 import axios from "axios";
 import dayjs from "dayjs";
+import Tooltip from '@material-ui/core/Tooltip';
+
 
 const drawerWidth = 240;
 
@@ -293,7 +295,9 @@ export default function NavBar() {
                 aria-controls="simple-menu"
                 onClick={handleClick}
               >
+                <Tooltip title="Notification" placement="bottom">
                 <NotificationsActiveIcon />
+                </Tooltip>
               </IconButton>
             </Badge>
             <Menu
@@ -343,7 +347,9 @@ export default function NavBar() {
               </div>
             </Menu>
             <IconButton onClick={roleMenuOpen} color="inherit">
+            <Tooltip title="Assignment" placement="bottom">
               <AssignmentIndIcon />
+          </Tooltip>
             </IconButton>
             <Menu
               id="simple-menu"
@@ -393,7 +399,9 @@ export default function NavBar() {
               aria-label="logout"
               color="inherit"
             >
+                <Tooltip title="Logout" placement="bottom">
               <ExitToAppIcon />
+              </Tooltip>
             </IconButton>
           </div>
         </Toolbar>
@@ -432,16 +440,17 @@ export default function NavBar() {
         <Divider />
         <List>
           {navLinks.map((link) => (
-            <NavLink
-              to={`/layout/${link.route.toLowerCase()}`}
-              className={classes.anyLink}
-              key={link.label}
-            >
-              <ListItem button className={classes.listItem}>
-                <ListItemIcon>{link.icon}</ListItemIcon>
-                <ListItemText primary={link.label} />
-              </ListItem>
-            </NavLink>
+            <Tooltip title={link.toolTipText} placement="right" key={link.label}>
+              <NavLink
+                to={`/layout/${link.route.toLowerCase()}`}
+                className={classes.anyLink}
+              >
+                <ListItem button className={classes.listItem}>
+                  <ListItemIcon>{link.icon}</ListItemIcon>
+                  <ListItemText primary={link.label} />
+                </ListItem>
+              </NavLink>
+            </Tooltip>
           ))}
         </List>
       </Drawer>
