@@ -240,13 +240,14 @@ export default function Create() {
   const [submissionData, setSubmissionData] = React.useState([]);
   const [analystData, setAnalystData] = React.useState([]);
   const [moduleData, setModuleData] = React.useState([]);
+  const [brandList, setBrandList] = React.useState([]);
 
   const [depressed, setDepressed] = useState(
-    (location?.state?.type == "EDIT")
-      ? (location?.state?.data?.status == "ANALYSIS_DISCOUNT_DEPRESSION" ||
+    location?.state?.type == "EDIT"
+      ? location?.state?.data?.status == "ANALYSIS_DISCOUNT_DEPRESSION" ||
         location?.state?.data?.status == "ANALYSIS_SYN_DEPRESSION" ||
         location?.state?.data?.status == "ANALYSIS_UPLOAD_DEPRESSION" ||
-        location?.state?.data?.status == "LIVE_CHECK_DEPRESSION")
+        location?.state?.data?.status == "LIVE_CHECK_DEPRESSION"
         ? "true"
         : "false"
       : null
@@ -274,6 +275,33 @@ export default function Create() {
       formik.handleSubmit();
     }
   }, [depressed]);
+
+  // getbrandlist
+  const getBrandList = async () => {
+    console.log("analystData", moduleData);
+
+    const token = localStorage.getItem("accessToken");
+
+    await axio
+      .get(
+        `brand/getlist?_id=${auth?.payloadLogin?.payload?.data?.user?._id}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : null,
+          },
+        }
+      )
+      .then((brandResponse) => {
+        console.log("brandResponse", brandResponse);
+        setBrandList(brandResponse.data.payload.data);
+      })
+      .catch((err) => {
+        console.log("brandError", err);
+      });
+  };
+  useEffect(() => {
+    getBrandList();
+  }, []);
 
   // getanalyst
   const getAnalystdata = async () => {
@@ -1141,8 +1169,9 @@ export default function Create() {
                   error={Boolean(formik.errors.brand && formik.touched.brand)}
                   {...formik.getFieldProps("brand")}
                 >
-                  <MenuItem value="OTTO">Otto</MenuItem>
-                  <MenuItem value="MOTTO">Motto</MenuItem>
+                  {brandList?.map((brand) => {
+                    return <MenuItem value={brand._id}>{brand.label}</MenuItem>;
+                  })}
                 </Select>
               </FormControl>
             </Grid>
@@ -1428,7 +1457,7 @@ export default function Create() {
                   color="primary"
                   onClick={() => opensubmission()}
                 >
-                  submission
+                  Allocation
                 </Button>
               )}
               {/* Submit button */}
@@ -1636,7 +1665,7 @@ export default function Create() {
               {projectItem?.analysisExecutiveDiscount.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVES")}
-              {/* Depression Button */}
+              {/* pmr Button */}
               {projectItem?.analysisExecutiveDiscount.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id && (
                 <div>
@@ -1647,7 +1676,7 @@ export default function Create() {
                     onClick={() => setDepressed("true")}
                     style={{ marginTop: "20px" }}
                   >
-                    Depression
+                    PMR
                   </Button>
                 </div>
               )}
@@ -1735,7 +1764,7 @@ export default function Create() {
                     onClick={() => setDepressed("true")}
                     style={{ marginTop: "20px" }}
                   >
-                    Depression
+                    PMR
                   </Button>
                 </div>
               )}
@@ -1845,7 +1874,7 @@ export default function Create() {
                     onClick={() => setDepressed("true")}
                     style={{ marginTop: "20px" }}
                   >
-                    Depression
+                    PMR
                   </Button>
                 </div>
               )}

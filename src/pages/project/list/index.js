@@ -138,6 +138,7 @@ export default function List() {
       dispatch(initialStateGetListProject());
     }
   }, [project.isErrorGet]);
+  
 
   const emptyRows =
     rowsPerPage -
@@ -340,7 +341,7 @@ export default function List() {
                           scope="row"
                           className={classes.TablethZero}
                         >
-                          {row.brand}
+                          {row.brand?.label}
                         </TableCell>
                         <TableCell
                           component="th"

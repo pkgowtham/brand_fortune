@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -38,6 +38,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 
 import ControlPointIcon from "@material-ui/icons/ControlPoint";
 import { filterDataProject } from "../../../service/internal/action";
+import { axio } from "../../../axios";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -143,6 +144,8 @@ export default function Filter() {
   const auth = useSelector((store) => store.auth);
   const project = useSelector((state) => state.project);
   const internal = useSelector((state) => state.internal);
+  const [brandList, setBrandList] = React.useState([]);
+
 
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
 
@@ -190,6 +193,30 @@ export default function Filter() {
       formik.handleSubmit();
     }
   };
+   // getbrandlist
+   const getBrandList = async () => {    
+    const token = localStorage.getItem("accessToken");
+
+    await axio
+      .get(
+        `brand/getlist?_id=${auth?.payloadLogin?.payload?.data?.user?._id}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : null,
+          },
+        }
+      )
+      .then((brandResponse) => {
+        console.log("brandResponse", brandResponse);
+        setBrandList(brandResponse.data.payload.data);
+      })
+      .catch((err) => {
+        console.log("brandError", err);
+      });
+  };
+  useEffect(() => {
+    getBrandList();
+  }, []);
 
   return (
     <Container
@@ -320,8 +347,9 @@ export default function Filter() {
                   error={Boolean(formik.errors.brand && formik.touched.brand)}
                   {...formik.getFieldProps("brand")}
                 >
-                  <MenuItem value="OTTO">Otto</MenuItem>
-                  <MenuItem value="MOTTO">Motto</MenuItem>
+                  {brandList?.map((brand) => {
+                    return <MenuItem value={brand._id}>{brand.label}</MenuItem>;
+                  })}
                 </Select>
               </FormControl>
             </Grid>
