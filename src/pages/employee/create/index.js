@@ -90,6 +90,7 @@ function Create() {
     "CATALOG_REVIEWER",
     "ANALYSIS_EXECUTIVES",
     "ANALYSIS_LEAD",
+    "ADMIN"
   ];
   const subroleValues = ["DISCOUNT", "LIVE_CHECK", "SYN", "UPLOAD"];
 

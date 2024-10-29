@@ -44,7 +44,7 @@ import { filterDataProject } from "../../service/internal/action";
 // import {axio} from "../../axios/index.js"
 import axios from "axios";
 import dayjs from "dayjs";
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from "@material-ui/core/Tooltip";
 import { axio } from "../../axios";
 
 const drawerWidth = 240;
@@ -235,7 +235,9 @@ export default function NavBar() {
           route: "employee",
           icon: <PersonIcon />,
         },
-        // { text: "Category", icon: <AccountTreeIcon /> },
+        { label: "Brand", route: "brand", icon: <DeviceHubIcon /> },
+        { label: "Article Type", route: "articletype", icon: <RegionIcon /> },
+        // { label: "Category", icon: <AccountTreeIcon /> },
         // { text: "Subcategory", icon: <DeviceHubIcon /> },
         // { text: "Region", icon: <RegionIcon /> },
         // { text: "Tag", icon: <TagIcon /> },
@@ -244,6 +246,16 @@ export default function NavBar() {
         // { text: "Customer", icon: <CustomerIcon /> },
         // { text: "Orders", icon: <ShoppingBasketIcon /> },
         // { text: "Offers", icon: <CardGiftcardIcon /> },
+      ]
+    : auth?.payloadLogin?.payload?.data?.user?.role.includes("ADMIN")
+    ? [
+        {
+          label: "Employee",
+          route: "employee",
+          icon: <PersonIcon />,
+        },
+        { label: "Brand", route: "brand", icon: <DeviceHubIcon /> },
+        { label: "Article Type", route: "articletype", icon: <RegionIcon /> },
       ]
     : [
         { label: "Dashboard", route: "Dashboard", icon: <DashboardIcon /> },
@@ -296,7 +308,7 @@ export default function NavBar() {
                 onClick={handleClick}
               >
                 <Tooltip title="Notification" placement="bottom">
-                <NotificationsActiveIcon />
+                  <NotificationsActiveIcon />
                 </Tooltip>
               </IconButton>
             </Badge>
@@ -347,9 +359,9 @@ export default function NavBar() {
               </div>
             </Menu>
             <IconButton onClick={roleMenuOpen} color="inherit">
-            <Tooltip title="Assignment" placement="bottom">
-              <AssignmentIndIcon />
-          </Tooltip>
+              <Tooltip title="Assignment" placement="bottom">
+                <AssignmentIndIcon />
+              </Tooltip>
             </IconButton>
             <Menu
               id="simple-menu"
@@ -399,8 +411,8 @@ export default function NavBar() {
               aria-label="logout"
               color="inherit"
             >
-                <Tooltip title="Logout" placement="bottom">
-              <ExitToAppIcon />
+              <Tooltip title="Logout" placement="bottom">
+                <ExitToAppIcon />
               </Tooltip>
             </IconButton>
           </div>
@@ -440,7 +452,11 @@ export default function NavBar() {
         <Divider />
         <List>
           {navLinks.map((link) => (
-            <Tooltip title={link.toolTipText} placement="right" key={link.label}>
+            <Tooltip
+              title={link.toolTipText}
+              placement="right"
+              key={link.label}
+            >
               <NavLink
                 to={`/layout/${link.route.toLowerCase()}`}
                 className={classes.anyLink}

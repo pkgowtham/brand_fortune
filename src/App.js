@@ -16,6 +16,11 @@ import   Comment  from './pages/comment';
 import { default as ProjectCreate } from './pages/project/create';
 import Create from './pages/employee/create';
 import Employee from './pages/employee';
+import Brand from './pages/brand';
+import { default as BrandCreate } from './pages/brand/create';
+
+import Articletype from './pages/articleType';
+import { default as ArticletypeCreate } from './pages/articleType/create';
 
 
 
@@ -31,10 +36,10 @@ function App() {
               <Route
                 path="/layout"
                 element={
-                  <Layout/>
-                  // <ProtectedRoute>
-                  //   <Layout />
-                  // </ProtectedRoute>
+                  // <Layout/>
+                  <ProtectedRoute>
+                    <Layout />
+                  </ProtectedRoute>
                 }
                 
               >
@@ -43,6 +48,10 @@ function App() {
                 <Route path="create" element={<ProjectCreate />} />
                 <Route path='comment' element={<Comment/>}/>
                 <Route path='user' element={<Create/>}/>
+                <Route path="brand" element={<Brand />} />
+                <Route path="brandcreate" element={<BrandCreate />} />
+                <Route path="articletype" element={<Articletype />} />
+                <Route path="articletypecreate" element={<ArticletypeCreate />} />
                
               </Route>
             </Routes>

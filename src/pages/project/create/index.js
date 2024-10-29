@@ -241,6 +241,10 @@ export default function Create() {
   const [analystData, setAnalystData] = React.useState([]);
   const [moduleData, setModuleData] = React.useState([]);
   const [brandList, setBrandList] = React.useState([]);
+  const [articleTypeList, setArticleTypeList] = React.useState([]);
+  const [refinedArticleList, setRefinedArticleList] = React.useState([]);
+
+
 
   const [depressed, setDepressed] = useState(
     location?.state?.type == "EDIT"
@@ -397,6 +401,30 @@ export default function Create() {
   };
   useEffect(() => {
     getUserdata();
+  }, []);
+
+   // get articleType
+   const getArticleTypedata = async () => {
+    console.log("initialTableData", user);
+
+    const token = localStorage.getItem("accessToken");
+
+    await axio
+      .get("/articletype/getlist", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
+      .then((tableresponse) => {
+        console.log("tableresponse", tableresponse);
+        setArticleTypeList(tableresponse.data.payload.data);
+      })
+      .catch((err) => {
+        console.log("tableERR", err);
+      });
+  };
+  useEffect(() => {
+    getArticleTypedata();
   }, []);
 
   let type = location?.state?.type;
@@ -899,6 +927,15 @@ export default function Create() {
       [index]: event.target.value,
     }));
   };
+  useEffect(() => {
+    if(articleTypeList.length){
+      setRefinedArticleList(articleTypeList?.filter(articleType=>articleType.brand.map((bran)=>bran._id).includes(formik.values.brand)))
+
+    }
+  
+    
+  }, [formik.values.brand])
+  
 
   return (
     <Container disableGutters>
@@ -1207,8 +1244,10 @@ export default function Create() {
                   )}
                   {...formik.getFieldProps("articleType")}
                 >
-                  <MenuItem value="ARTICLE1">Article Type - 1 </MenuItem>
-                  <MenuItem value="ARTICLE2">Article Type - 2</MenuItem>
+                   {refinedArticleList.map((articleType) => {
+                    return <MenuItem value={articleType._id}>{articleType.label}</MenuItem>;
+                  })}
+                  {/* <MenuItem value="ARTICLE2">Article Type - 2</MenuItem> */}
                 </Select>
               </FormControl>
             </Grid>
