@@ -244,8 +244,6 @@ export default function Create() {
   const [articleTypeList, setArticleTypeList] = React.useState([]);
   const [refinedArticleList, setRefinedArticleList] = React.useState([]);
 
-
-
   const [depressed, setDepressed] = useState(
     location?.state?.type == "EDIT"
       ? location?.state?.data?.status == "ANALYSIS_DISCOUNT_DEPRESSION" ||
@@ -403,8 +401,8 @@ export default function Create() {
     getUserdata();
   }, []);
 
-   // get articleType
-   const getArticleTypedata = async () => {
+  // get articleType
+  const getArticleTypedata = async () => {
     console.log("initialTableData", user);
 
     const token = localStorage.getItem("accessToken");
@@ -928,14 +926,16 @@ export default function Create() {
     }));
   };
   useEffect(() => {
-    if(articleTypeList.length){
-      setRefinedArticleList(articleTypeList?.filter(articleType=>articleType.brand.map((bran)=>bran._id).includes(formik.values.brand)))
-
+    if (articleTypeList.length) {
+      setRefinedArticleList(
+        articleTypeList?.filter((articleType) =>
+          articleType.brand
+            .map((bran) => bran._id)
+            .includes(formik.values.brand)
+        )
+      );
     }
-  
-    
-  }, [formik.values.brand])
-  
+  }, [formik.values.brand]);
 
   return (
     <Container disableGutters>
@@ -1244,8 +1244,12 @@ export default function Create() {
                   )}
                   {...formik.getFieldProps("articleType")}
                 >
-                   {refinedArticleList.map((articleType) => {
-                    return <MenuItem value={articleType._id}>{articleType.label}</MenuItem>;
+                  {refinedArticleList.map((articleType) => {
+                    return (
+                      <MenuItem value={articleType._id}>
+                        {articleType.label}
+                      </MenuItem>
+                    );
                   })}
                   {/* <MenuItem value="ARTICLE2">Article Type - 2</MenuItem> */}
                 </Select>
@@ -1688,6 +1692,21 @@ export default function Create() {
                   reviewedSkuPreview,
                   setReviewedSkuPreview
                 )}
+              {/* reviwer Button */}
+              {projectItem?.submissionExecutiveReview.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign
+                  </Button>
+                </div>
+              )}
               {/* Discount Upload */}
               {projectItem?.analysisExecutiveDiscount.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
@@ -1763,6 +1782,21 @@ export default function Create() {
                   reviewedSkuPreview,
                   setReviewedSkuPreview
                 )}
+                {/* reviwer Button */}
+              {projectItem?.submissionExecutiveReview.userName ==
+                auth?.payloadLogin?.payload?.data?.user?._id && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    // disabled={imageShow || !formik.dirty || !formik.isValid}
+                    onClick={formik.handleSubmit}
+                    style={{ marginTop: "20px" }}
+                  >
+                    Assign
+                  </Button>
+                </div>
+              )}
               {location.state.data.discount &&
                 download("Discount Sheet", location.state.data.discount)}
               {location.state.data.reviewedSku &&

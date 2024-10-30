@@ -348,7 +348,7 @@ export default function List() {
                           scope="row"
                           className={classes.TablethZero}
                         >
-                          {row.articleType}
+                          {row.articleType?.label}
                         </TableCell>
                         <TableCell
                           component="th"
