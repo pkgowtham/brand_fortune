@@ -481,31 +481,31 @@ export default function Create() {
   const objectUrl = (extension) => {
     switch (extension) {
       case "image/jpeg":
-        return imgImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/img.svg";
       case "jpeg":
-        return imgImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/img.svg";
       case "image/jpg":
-        return imgImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/img.svg";
       case "jpg":
-        return imgImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/img.svg";
       case "image/png":
-        return imgImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/img.svg";
       case "png":
-        return imgImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/img.svg";
       case "application/pdf":
-        return pdfImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/pdf.svg";
       case "pdf":
-        return pdfImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/pdf.svg";
       case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-        return excelImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/excel.svg";
       case "xls":
-        return excelImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/excel.svg";
       case "xlsx":
-        return excelImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/excel.svg";
       case "docx":
-        return docImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/doc.svg";
       case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        return docImage;
+        return "https://hexaproject.s3.ap-south-1.amazonaws.com/public/doc.svg";
 
       default:
         break;
@@ -1782,7 +1782,7 @@ export default function Create() {
                   reviewedSkuPreview,
                   setReviewedSkuPreview
                 )}
-                {/* reviwer Button */}
+              {/* reviwer Button */}
               {projectItem?.submissionExecutiveReview.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id && (
                 <div>
