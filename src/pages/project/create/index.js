@@ -1086,7 +1086,7 @@ export default function Create() {
                       },
                     }}
                   >
-                    {["AMAZON", "FLIPKART", "MYNTHRA"].map((name) => (
+                    {["AJIO", "NYKAA", "NYKAA_FASHION", "MEESHO", "TATACLIQ", "AMAZON", "FLIPKART", "MYNTRA"].map((name) => (
                       <MenuItem key={name} value={name}>
                         <Checkbox
                           checked={formik.values.marketPlace.indexOf(name) > -1}
@@ -1130,7 +1130,7 @@ export default function Create() {
                       },
                     }}
                   >
-                    {["AMAZON", "FLIPKART", "MYNTHRA"].map((name) => (
+                    {["AJIO", "NYKAA", "NYKAA_FASHION", "MEESHO", "TATACLIQ", "AMAZON", "FLIPKART", "MYNTRA"].map((name) => (
                       <MenuItem key={name} value={name}>
                         <Checkbox
                           checked={formik.values.marketPlace.indexOf(name) > -1}
@@ -1290,6 +1290,7 @@ export default function Create() {
                   <MenuItem value="LISTING">Listing</MenuItem>
                   <MenuItem value="RELISTING">Relisting</MenuItem>
                   <MenuItem value="CORRECTION">Correction request</MenuItem>
+                  <MenuItem value="ENHANCEMENT">Content Enhancement</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -1327,13 +1328,16 @@ export default function Create() {
                   {...formik.getFieldProps("informationType")}
                 >
                   <MenuItem value="L1">
-                    Level 1 – Information sheet and images available{" "}
+                  Level 1- Information Sheet and Images available{" "}
                   </MenuItem>
                   <MenuItem value="L2">
-                    Level 2 - Already listed style only relisting code available
+                  Level 2- To Get Information from the Portal
                   </MenuItem>
                   <MenuItem value="L3">
-                    Level 3 – Only image is available
+                  Level 3- Images only available
+                  </MenuItem>
+                  <MenuItem value="L4">
+                  Level 4- Combo Listing with Existing Styles
                   </MenuItem>
                 </Select>
               </FormControl>
