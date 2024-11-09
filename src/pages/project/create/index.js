@@ -255,6 +255,20 @@ export default function Create() {
       : null
   );
 
+  const marketPlaces = [
+    { label: "AJIO", value: "AJIO" },
+    { label: "NYKAA", value: "NYKAA" },
+    { label: "NYKAA FASHION", value: "NYKAA_FASHION" },
+    { label: "MEESHO", value: "MEESHO" },
+    { label: "TATA CLIQ", value: "TATA_CLIQ" },
+    { label: "AMAZON", value: "AMAZON" },
+    { label: "FLIPKART", value: "FLIPKART" },
+    { label: "MYNTRA", value: "MYNTHRA" },
+    { label: "JIO MART", value: "JIO_MART" },
+    { label: "FYND", value: "FYND" }
+  ];
+  
+
   useEffect(() => {
     if (
       (location?.state?.data?.status == "ANALYSIS_DISCOUNT_DEPRESSION" ||
@@ -1054,94 +1068,93 @@ export default function Create() {
               </FormControl>
             </Grid>
             {projectItem?.marketPlaceSingle ? (
-              <Grid
-                item
-                xs={5}
-                spacing={2}
-                style={{ margin: "10px auto 20px auto" }}
-              >
-                <FormControl className={classes.formControl} fullWidth>
-                  <InputLabel id="demo-mutiple-checkbox-label">
-                    {" "}
-                    Market Place
-                  </InputLabel>
-                  <Select
-                    labelId="demo-mutiple-checkbox-label"
-                    id="demo-mutiple-checkbox"
-                    variant="outlined"
-                    multiple
-                    value={[projectItem.marketPlaceSingle]}
-                    onChange={(e) =>
-                      formik.setFieldValue("marketPlace", e.target.value)
-                    }
-                    disabled={type == "EDIT" ? true : false}
-                    input={<Input variant="outlined" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 48 * 4.5 + 8,
-                          width: 250,
-                        },
-                      },
-                    }}
-                  >
-                    {["AJIO", "NYKAA", "NYKAA_FASHION", "MEESHO", "TATACLIQ", "AMAZON", "FLIPKART", "MYNTRA"].map((name) => (
-                      <MenuItem key={name} value={name}>
-                        <Checkbox
-                          checked={formik.values.marketPlace.indexOf(name) > -1}
-                        />
-                        <ListItemText primary={name} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-            ) : (
-              <Grid
-                item
-                xs={5}
-                spacing={2}
-                style={{ margin: "10px auto 20px auto" }}
-              >
-                <FormControl className={classes.formControl} fullWidth>
-                  <InputLabel id="demo-mutiple-checkbox-label">
-                    {" "}
-                    Market Place
-                  </InputLabel>
-                  <Select
-                    labelId="demo-mutiple-checkbox-label"
-                    id="demo-mutiple-checkbox"
-                    variant="outlined"
-                    multiple
-                    value={formik.values.marketPlace}
-                    onChange={(e) =>
-                      formik.setFieldValue("marketPlace", e.target.value)
-                    }
-                    disabled={type == "EDIT" ? true : false}
-                    input={<Input variant="outlined" />}
-                    renderValue={(selected) => selected.join(", ")}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 48 * 4.5 + 8,
-                          width: 250,
-                        },
-                      },
-                    }}
-                  >
-                    {["AJIO", "NYKAA", "NYKAA_FASHION", "MEESHO", "TATACLIQ", "AMAZON", "FLIPKART", "MYNTRA"].map((name) => (
-                      <MenuItem key={name} value={name}>
-                        <Checkbox
-                          checked={formik.values.marketPlace.indexOf(name) > -1}
-                        />
-                        <ListItemText primary={name} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-            )}
+  <Grid
+    item
+    xs={5}
+    spacing={2}
+    style={{ margin: "10px auto 20px auto" }}
+  >
+    <FormControl className={classes.formControl} fullWidth>
+      <InputLabel id="demo-mutiple-checkbox-label">
+        Market Place
+      </InputLabel>
+      <Select
+        labelId="demo-mutiple-checkbox-label"
+        id="demo-mutiple-checkbox"
+        variant="outlined"
+        multiple
+        value={[projectItem.marketPlaceSingle]}
+        onChange={(e) =>
+          formik.setFieldValue("marketPlace", e.target.value)
+        }
+        disabled={type === "EDIT"}
+        input={<Input variant="outlined" />}
+        renderValue={(selected) => selected.join(", ")}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 48 * 4.5 + 8,
+              width: 250,
+            },
+          },
+        }}
+      >
+        {marketPlaces.map((marketPlace) => (
+          <MenuItem key={marketPlace.value} value={marketPlace.value}>
+            <Checkbox
+              checked={formik.values.marketPlace.indexOf(marketPlace.value) > -1}
+            />
+            <ListItemText primary={marketPlace.label} />
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  </Grid>
+) : (
+  <Grid
+    item
+    xs={5}
+    spacing={2}
+    style={{ margin: "10px auto 20px auto" }}
+  >
+    <FormControl className={classes.formControl} fullWidth>
+      <InputLabel id="demo-mutiple-checkbox-label">
+        Market Place
+      </InputLabel>
+      <Select
+        labelId="demo-mutiple-checkbox-label"
+        id="demo-mutiple-checkbox"
+        variant="outlined"
+        multiple
+        value={formik.values.marketPlace}
+        onChange={(e) =>
+          formik.setFieldValue("marketPlace", e.target.value)
+        }
+        disabled={type === "EDIT"}
+        input={<Input variant="outlined" />}
+        renderValue={(selected) => selected.join(", ")}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 48 * 4.5 + 8,
+              width: 250,
+            },
+          },
+        }}
+      >
+        {marketPlaces.map((marketPlace) => (
+          <MenuItem key={marketPlace.value} value={marketPlace.value}>
+            <Checkbox
+              checked={formik.values.marketPlace.indexOf(marketPlace.value) > -1}
+            />
+            <ListItemText primary={marketPlace.label} />
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  </Grid>
+)}
+
             <Grid
               item
               xs={5}
