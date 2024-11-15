@@ -77,12 +77,14 @@ function Create() {
     // description: false,
     userId: false,
   });
+  // const regex = {
+  //   label: /^[A-Za-z\s]+$/,
+  //   // value: /^[A-Za-z\s]+$/,
+  //   // description: /^[A-Za-z\s]+$/,
+  // };
   const regex = {
-    label: /^[A-Za-z\s]+$/,
-    // value: /^[A-Za-z\s]+$/,
-    // description: /^[A-Za-z\s]+$/,
+    label: /^[A-Za-z\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/,
   };
-
   const initialTableData = async () => {
     console.log("initialTableData", deleterows);
 

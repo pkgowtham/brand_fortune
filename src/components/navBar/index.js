@@ -20,6 +20,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import DeviceHubIcon from "@material-ui/icons/DeviceHub";
+import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
 import RegionIcon from "@material-ui/icons/Public";
 import TagIcon from "@material-ui/icons/LocalOffer";
 import CardGiftcardIcon from "@material-ui/icons/CardGiftcard";
@@ -237,6 +238,7 @@ export default function NavBar() {
         },
         { label: "Brand", route: "brand", icon: <DeviceHubIcon /> },
         { label: "Article Type", route: "articletype", icon: <RegionIcon /> },
+       // { label: "Queries", route: "Queries", icon: <QueryBuilderIcon /> },
         // { label: "Category", icon: <AccountTreeIcon /> },
         // { text: "Subcategory", icon: <DeviceHubIcon /> },
         // { text: "Region", icon: <RegionIcon /> },

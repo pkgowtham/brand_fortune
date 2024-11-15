@@ -10,6 +10,9 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import AddCommentIcon from '@material-ui/icons/AddComment';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import {
   Paper,
   Button,
@@ -71,6 +74,30 @@ const useStyles = makeStyles((theme) => ({
   TablethZero: {
     padding: "0 10px",
     border: "None",
+  },
+  countBadge: {
+    position: 'absolute',
+    top: 0,    // Adjust to align the badge properly
+    right: 4,  // Adjust to align the badge properly
+    padding: '2px 6px', // Padding inside the badge
+    fontSize: '12px',    // Font size of the count number
+    backgroundColor: '#808080', // Gray background color
+    color: 'white',       // White text color
+    borderRadius: '12px', // Circular badge
+    fontWeight: 'bold',   // Make the count bold
+    minWidth: '16px',     // Ensure the badge has a minimum width
+    textAlign: 'center',  // Center the text
+    lineHeight: '16px',   // Center the text vertically
+  },
+  redDot: {
+
+    color: 'red',
+
+  },
+  greenDot: {
+
+    color: 'green',
+
   },
 }));
 
@@ -138,7 +165,7 @@ export default function List() {
       dispatch(initialStateGetListProject());
     }
   }, [project.isErrorGet]);
-  
+
 
   const emptyRows =
     rowsPerPage -
@@ -181,40 +208,40 @@ export default function List() {
           <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
-                <TableRow>                 
+                <TableRow>
                   <TableCell
                     className={classes.tableCell}
                     align="center"
                     style={{ minWidth: "43px" }}
                     onClick={() => handleSort("mailSubject")}
                   >
-                   Task Id{" "}
+                    Task Id{" "}
                     {orderBy === "mailSubject" && (
                       <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
-                  </TableCell>  
+                  </TableCell>
                   <TableCell
                     className={classes.tableCell}
                     align="center"
                     style={{ minWidth: "43px" }}
                     onClick={() => handleSort("mailSubject")}
                   >
-                   Subtask Id{" "}
+                    Subtask Id{" "}
                     {orderBy === "mailSubject" && (
                       <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
-                  </TableCell>   
+                  </TableCell>
                   <TableCell
                     className={classes.tableCell}
                     align="center"
                     style={{ minWidth: "43px" }}
                     onClick={() => handleSort("mailSubject")}
                   >
-                   Market Place{" "}
+                    Market Place{" "}
                     {orderBy === "mailSubject" && (
                       <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
-                  </TableCell>                
+                  </TableCell>
                   <TableCell
                     align="left"
                     className={classes.tableCell}
@@ -286,7 +313,9 @@ export default function List() {
                       <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
-                  
+                  <TableCell align="center" className={classes.tableCell}>
+                    Queries
+                  </TableCell>
                   <TableCell align="center" className={classes.tableCell}>
                     Actions
                   </TableCell>
@@ -303,7 +332,7 @@ export default function List() {
                           index % 2 === 0 ? classes.evenRow : classes.oddRow
                         }
                       >
-                        
+
                         <TableCell
                           align="center"
                           className={classes.TablethZero}
@@ -314,21 +343,21 @@ export default function List() {
                           align="center"
                           className={classes.TablethZero}
                         >
-                          {row.subtaskId?row.subtaskId:'-'}
+                          {row.subtaskId ? row.subtaskId : '-'}
                         </TableCell>
-                       { row.marketPlaceSingle? <TableCell
+                        {row.marketPlaceSingle ? <TableCell
                           align="center"
                           className={classes.TablethZero}
                         >
                           {row.marketPlaceSingle}
-                        </TableCell>:
-                        <TableCell
-                        align="center"
-                        className={classes.TablethZero}
-                      >
-                        {row?.marketPlace?.join()}
-                      </TableCell>
-                       }
+                        </TableCell> :
+                          <TableCell
+                            align="center"
+                            className={classes.TablethZero}
+                          >
+                            {row?.marketPlace?.join()}
+                          </TableCell>
+                        }
                         <TableCell
                           component="th"
                           scope="row"
@@ -378,8 +407,37 @@ export default function List() {
                         >
                           {row.status}
                         </TableCell>
-                       
-                        <TableCell
+                        <TableCell align="center" className={classes.TablethZero}>
+  <IconButton>
+    {/* Conditional rendering */}
+    {row.query ? (
+      <FiberManualRecordIcon className={classes.redDot} />
+    ) : (
+      <FiberManualRecordIcon className={classes.redDot} />
+    )}
+  </IconButton>
+  
+  {/* Add Comment Button */}
+  <NavLink to="/layout/QueriesCreate" state={{ type: "ADD", data: { ...row } }}>
+    <IconButton>
+      <AddCommentIcon />
+    </IconButton>
+  </NavLink>
+
+  {/* View Details Button */}
+  <NavLink to="/layout/queries" state={{ _id: row._id }}>
+    <IconButton style={{ position: 'relative' }}>
+      <VisibilityIcon />
+      {/* Count Badge */}
+      <span className={classes.countBadge}>1</span> {/* Assuming `commentCount` is the value */}
+    </IconButton>
+  </NavLink>
+
+  {/* Row Status */}
+  <Typography style={{fontSize:'12px', marginBottom:10}}>Hold with {row.status}</Typography>
+</TableCell>
+
+                                              <TableCell
                           align="center"
                           className={classes.TablethZero}
                         >
@@ -390,20 +448,20 @@ export default function List() {
                             <IconButton>
                               <EditIcon />
                             </IconButton>
-                            
+
                           </NavLink>
-                          { <NavLink
+                          {<NavLink
                             to="/layout/comment"
-                            state={{ _id:row._id }}
+                            state={{ _id: row._id }}
                           >
                             <IconButton>
                               <QueryBuilderIcon />
                             </IconButton>
-                            
+
                           </NavLink>}
                         </TableCell>
                       </TableRow>
-                      
+
                     </>
                   ))}
                 {emptyRows > 0 && (

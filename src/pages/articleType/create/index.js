@@ -73,8 +73,11 @@ function Create() {
       setInputvalue({ label: articleType.label, brand: temp });
     }
   }, []);
+  // const regex = {
+  //   label: /^[A-Za-z\s]+$/,
+  // };
   const regex = {
-    label: /^[A-Za-z\s]+$/,
+    label: /^[A-Za-z\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/,
   };
   const initialTableData = async () => {
     console.log("initialTableData", deleterows);
