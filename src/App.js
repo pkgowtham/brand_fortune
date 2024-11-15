@@ -21,6 +21,12 @@ import { default as BrandCreate } from './pages/brand/create';
 
 import Articletype from './pages/articleType';
 import { default as ArticletypeCreate } from './pages/articleType/create';
+import FileDoc from './pages/file';
+import { default as FileDocCreate } from './pages/file/create';
+import FileCategory from './pages/fileCategory';
+import { default as FileCategoryCreate } from './pages/fileCategory/create';
+
+
 
 
 
@@ -52,6 +58,10 @@ function App() {
                 <Route path="brandcreate" element={<BrandCreate />} />
                 <Route path="articletype" element={<Articletype />} />
                 <Route path="articletypecreate" element={<ArticletypeCreate />} />
+                <Route path="filedoc" element={<FileDoc />} />
+                <Route path="filedoccreate" element={<FileDocCreate />} />
+                <Route path="filecategory" element={<FileCategory />} />
+                <Route path="Filecategorycreate" element={<FileCategoryCreate />} />           
                
               </Route>
             </Routes>

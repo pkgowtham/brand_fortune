@@ -237,13 +237,14 @@ export default function NavBar() {
         },
         { label: "Brand", route: "brand", icon: <DeviceHubIcon /> },
         { label: "Article Type", route: "articletype", icon: <RegionIcon /> },
+        { label: "File Category", route: "filecategory",icon: <EcoIcon /> },
+        { label: "File",route: "filedoc", icon: <TagIcon /> },
         // { label: "Category", icon: <AccountTreeIcon /> },
         // { text: "Subcategory", icon: <DeviceHubIcon /> },
         // { text: "Region", icon: <RegionIcon /> },
         // { text: "Tag", icon: <TagIcon /> },
         // { text: "Product", icon: <ProductIcon /> },
-        // { text: "Brand", icon: <EcoIcon /> },
-        // { text: "Customer", icon: <CustomerIcon /> },
+        
         // { text: "Orders", icon: <ShoppingBasketIcon /> },
         // { text: "Offers", icon: <CardGiftcardIcon /> },
       ]
@@ -256,6 +257,8 @@ export default function NavBar() {
         },
         { label: "Brand", route: "brand", icon: <DeviceHubIcon /> },
         { label: "Article Type", route: "articletype", icon: <RegionIcon /> },
+        { text: "File Category", route: "filecategory",icon: <EcoIcon /> },
+        { text: "File",route: "filedoc", icon: <TagIcon /> },
       ]
     : [
         { label: "Dashboard", route: "Dashboard", icon: <DashboardIcon /> },
@@ -453,7 +456,7 @@ export default function NavBar() {
         <List>
           {navLinks.map((link) => (
             <Tooltip
-              title={link.toolTipText}
+              title={link.label}
               placement="right"
               key={link.label}
             >
