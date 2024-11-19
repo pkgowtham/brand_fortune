@@ -1422,11 +1422,11 @@ export default function Create() {
                 location.state.data.requirementSheet
               )}
               {projectItem?.leadOne.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 assign("Select Assignee", "assignee", "CATALOG_CURATOR")}
               {/* curator Guide button */}
               {projectItem?.leadOne.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1438,7 +1438,7 @@ export default function Create() {
                 </div>
               )}
               {projectItem?.leadOne.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&(
                 <div>
                   <Button
                     variant="contained"
@@ -1463,7 +1463,7 @@ export default function Create() {
               )}
 
               {/* base sheet upload */}
-              {projectItem?.curator.userName ==
+              {!projectItem?.query && projectItem?.curator.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 fileUpload(
                   "Base Sheet",
@@ -1476,11 +1476,11 @@ export default function Create() {
                 )}
 
               {/* again lead assignment */}
-              {projectItem?.curator.userName ==
+              {!projectItem?.query && projectItem?.curator.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
                 assign("Select Assignee", "assignee", "CATALOG_LEAD")}
               {/* Submit button */}
-              {projectItem?.curator.userName ==
+              {!projectItem?.query && projectItem?.curator.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id && (
                 <div>
                   <Button
@@ -1507,11 +1507,11 @@ export default function Create() {
               {download("Base Sheet", location.state.data.baseSheet)}
               {/* for executive assignment */}
               {projectItem?.leadTwo.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 assign("Select Assignee", "assignee", "CATALOG_EXCECUTIVE")}
               {/* submission */}
               {projectItem?.leadTwo.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <Button
                   variant="contained"
                   color="primary"
@@ -1522,7 +1522,7 @@ export default function Create() {
               )}
               {/* Submit button */}
               {projectItem?.leadTwo.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1548,7 +1548,7 @@ export default function Create() {
               {download("Base Sheet", location.state.data.baseSheet)}
               {/* Listing Upload */}
               {projectItem?.submissionExecutiveListing.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 fileUpload(
                   "submission Sheet",
                   "submission Sheet",
@@ -1560,11 +1560,11 @@ export default function Create() {
                 )}
               {/* for executive assignment */}
               {projectItem?.submissionExecutiveListing.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 assign("Select Assignee", "assignee", "CATALOG_EXCECUTIVE")}
               {/* Submit button */}
               {projectItem?.submissionExecutiveListing.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1592,7 +1592,7 @@ export default function Create() {
               {download("Submission Sheet", location.state.data.submission)}
               {/* sku Upload */}
               {projectItem?.submissionExecutiveSku.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 fileUpload(
                   "sku Sheet",
                   "sku Sheet",
@@ -1604,15 +1604,15 @@ export default function Create() {
                 )}
               {/* for executive assignment */}
               {projectItem?.submissionExecutiveSku.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVES")}
               {/* for reviewer assignment */}
               {projectItem?.submissionExecutiveSku.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 assign("Select Assignee", "reviewer", "CATALOG_REVIEWER")}
               {/* analyst count Button */}
               {projectItem?.submissionExecutiveSku.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1625,7 +1625,7 @@ export default function Create() {
               )}
               {/* Submit Button */}
               {projectItem?.submissionExecutiveSku.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1656,7 +1656,7 @@ export default function Create() {
               {download("Submission Sheet", location?.state?.data?.submission)}
               {/* sku Upload */}
               {projectItem?.submissionExecutiveSku.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 fileUpload(
                   "sku Sheet",
                   "sku Sheet",
@@ -1669,7 +1669,7 @@ export default function Create() {
 
               {/* Submit Button */}
               {projectItem?.submissionExecutiveSku.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1699,7 +1699,7 @@ export default function Create() {
               {download("Sku Sheet", location.state.data.sku)}
               {/* reviwer Upload */}
               {projectItem?.submissionExecutiveReview.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 fileUpload(
                   "Review Sheet",
                   "Review Sheet",
@@ -1711,7 +1711,7 @@ export default function Create() {
                 )}
               {/* reviwer Button */}
               {projectItem?.submissionExecutiveReview.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1726,7 +1726,7 @@ export default function Create() {
               )}
               {/* Discount Upload */}
               {projectItem?.analysisExecutiveDiscount.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 fileUpload(
                   "Discount Sheet",
                   "Discount Sheet",
@@ -1738,11 +1738,11 @@ export default function Create() {
                 )}
               {/* for syn assignment */}
               {projectItem?.analysisExecutiveDiscount.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVES")}
               {/* pmr Button */}
               {projectItem?.analysisExecutiveDiscount.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1758,7 +1758,7 @@ export default function Create() {
               {/* {depressed == "true"?"true":"false"} */}
               {/* Submit Button */}
               {projectItem?.analysisExecutiveDiscount.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1789,7 +1789,7 @@ export default function Create() {
               {/* reviwer Upload */}
               {projectItem?.submissionExecutiveReview.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                !location?.state?.data?.reviewedSku &&
+                !location?.state?.data?.reviewedSku && !projectItem?.query &&
                 fileUpload(
                   "Review Sheet",
                   "Review Sheet",
@@ -1801,7 +1801,7 @@ export default function Create() {
                 )}
               {/* reviwer Button */}
               {projectItem?.submissionExecutiveReview.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id &&  !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1821,7 +1821,7 @@ export default function Create() {
               {/* syn Upload */}
               {projectItem?.analysisExecutiveSyn.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                !(depressed == "true") &&
+                !(depressed == "true") && !projectItem?.query &&
                 fileUpload(
                   "Syn Sheet",
                   "Syn Sheet",
@@ -1834,18 +1834,18 @@ export default function Create() {
               {/* for Upload assignment */}
               {projectItem?.analysisExecutiveSyn.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                projectItem.reviewedSku &&
+                projectItem.reviewedSku && !projectItem?.query &&
                 !(depressed == "true") &&
                 assign("Select Assignee", "assignee", "ANALYSIS_EXECUTIVE")}
               {/* for Approval assignment */}
               {projectItem?.analysisExecutiveSyn.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                !projectItem.reviewedSku &&
+                !projectItem.reviewedSku && !projectItem?.query &&
                 !(depressed == "true") &&
                 assign("Select Assignee", "assignee", "ACCOUNT_MANAGER")}
               {/* Depression Button */}
               {projectItem?.analysisExecutiveSyn.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1861,7 +1861,7 @@ export default function Create() {
               {/* {depressed == "true"?"true":"false"} */}
               {/* Submit Button */}
               {projectItem?.analysisExecutiveSyn.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1895,7 +1895,7 @@ export default function Create() {
               {/* account manager Approval*/}
               {projectItem?.accountManagerApproval.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                !projectItem.reviewedSku &&
+                !projectItem.reviewedSku && !projectItem?.query &&
                 assign(
                   "Approve by select Assignee",
                   "assignee",
@@ -1903,7 +1903,7 @@ export default function Create() {
                 )}
               {/* Submit Button */}
               {projectItem?.accountManagerApproval.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1939,7 +1939,7 @@ export default function Create() {
                 download("Syn Sheet", location.state.data.syn)}
               {/* upload Upload */}
               {projectItem?.analysisExecutiveUpload.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 fileUpload(
                   "upload Sheet",
                   "upload Sheet",
@@ -1951,11 +1951,11 @@ export default function Create() {
                 )}
               {/* assign for live check*/}
               {projectItem?.analysisExecutiveUpload.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id &&
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query &&
                 assign("select Assignee", "assignee", "ANALYSIS_EXECUTIVES")}
               {/* Depression Button */}
               {projectItem?.analysisExecutiveUpload.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -1970,7 +1970,7 @@ export default function Create() {
               )}
               {/* Submit Button */}
               {projectItem?.analysisExecutiveUpload.userName ==
-                auth?.payloadLogin?.payload?.data?.user?._id && (
+                auth?.payloadLogin?.payload?.data?.user?._id && !projectItem?.query && (
                 <div>
                   <Button
                     variant="contained"
@@ -2022,7 +2022,7 @@ export default function Create() {
 
               {projectItem?.analysisExecutiveLiveCheck.userName ==
                 auth?.payloadLogin?.payload?.data?.user?._id &&
-                !projectItem.reviewedSku &&
+                !projectItem.reviewedSku && !projectItem?.query &&
                 dayjs().isAfter(
                   dayjs.utc(projectItem?.updatedAt).add(3, "day")
                 ) &&
@@ -2059,7 +2059,7 @@ export default function Create() {
                 download("Upload Sheet", location.state.data.upload)}
               {"status indicator"}
               <Typography variant="h4" style={{ margin: "30px" }}>
-                Completed
+               {projectItem?.query ? "Query Pending" :'Completed'} 
               </Typography>
             </div>
           ) : null}

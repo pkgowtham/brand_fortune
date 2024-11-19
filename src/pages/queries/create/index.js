@@ -109,7 +109,7 @@ function Create() {
         },
       })
       .then((tableresponse) => {
-        console.log("tableresponse", tableresponse);
+        console.log("tableresponse", tableresponse.data.payload.data);
         setDeleterows(tableresponse.data.payload.data);
       })
       .catch((err) => {
@@ -122,9 +122,7 @@ function Create() {
     initialTableData();
   }, []);
 
-  useEffect(() => {
-    console.log("tableruning", deleterows);    
-  }, [deleterows]);
+
   
   // const formCreate = async () => {
   //   console.log("Formmessage", inputvalue);
@@ -380,7 +378,7 @@ function Create() {
                 userList.forEach((userName) => uniqueUserNames.add(userName));
                 return [...uniqueUserNames].map((userName) => ( 
                   <MenuItem key={userName} value={userName}>
-                    <ListItemText primary={deleterows.find((row)=>row._id == userName).firstName} />
+                    <ListItemText primary={deleterows?.find((row)=>row._id == userName)?.firstName} />
                   </MenuItem>
                 ));
               })()}
