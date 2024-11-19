@@ -413,12 +413,12 @@ export default function List() {
     {row.query ? (
       <FiberManualRecordIcon className={classes.redDot} />
     ) : (
-      <FiberManualRecordIcon className={classes.redDot} />
+      <FiberManualRecordIcon className={classes.greenDot} />
     )}
   </IconButton>
   
   {/* Add Comment Button */}
-  <NavLink to="/layout/QueriesCreate" state={{ type: "ADD", data: { ...row } }}>
+  <NavLink to="/layout/QueriesCreate" state={{ _id: row._id  }}>
     <IconButton>
       <AddCommentIcon />
     </IconButton>

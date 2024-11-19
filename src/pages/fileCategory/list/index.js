@@ -5,7 +5,6 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import { NavLink, useLocation } from "react-router-dom";
 import {
   makeStyles,
   TablePagination,
@@ -34,7 +33,6 @@ import { enqueueSnackbar } from "notistack";
 import CloseIcon from '@material-ui/icons/Close';
 import MenuItem from '@material-ui/core/MenuItem';
 import Tooltip from '@material-ui/core/Tooltip';
-import VisibilityIcon from '@material-ui/icons/Visibility';
 
 import { axio } from "../../../axios";
 
@@ -91,10 +89,7 @@ function Index() {
   const [open, setOpen] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState(false);
   
-  const location = useLocation();
-  const { _id } = location.state || {}; // Get the _id passed via NavLink
 
-  console.log(_id); // You can use the _id here to fetch or display data
 
 // delete confirmation
 const handeleOpen = (id) => {
@@ -114,7 +109,7 @@ const handeleClose = () => {
     const token = localStorage.getItem("accessToken");
 
     await axio
-    .get(`quering/getlist?projectId=${_id}`, {
+      .get("/filecategory/getlist", {
         headers: {
           Authorization: token ? `Bearer ${token}` : null,
         },
@@ -133,31 +128,31 @@ const handeleClose = () => {
     initialTableData();
   }, []);
 
-  // const handeleDelete = async () => {
-  //   console.log("handeleDelete", deleterows);
+  const handeleDelete = async () => {
+    console.log("handeleDelete", deleterows);
 
-  //   const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
 
-  //   await axio
-  //     .delete(`/articletype/destroy`, {
-  //       headers: {
-  //         Authorization: token ? `Bearer ${token}` : null,
-  //       },
-  //       params: {
-  //         _id: `${deleteId}`,
-  //       },
-  //     })
-  //     .then((deleteresponse) => {
-  //       console.log("deleteresponse", deleteresponse);
-  //       enqueueSnackbar("Successfully Deleted", { variant: "success" });
-  //       initialTableData();
-  //       setOpen(false);
-  //     })
-  //     .catch((err) => {
-  //       console.log("deleteERR", err);
-  //       setOpen(false);
-  //     });
-  // };
+    await axio
+      .delete(`/filecategory/destroy`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+        params: {
+          _id: `${deleteId}`,
+        },
+      })
+      .then((deleteresponse) => {
+        console.log("deleteresponse", deleteresponse);
+        enqueueSnackbar("Successfully Deleted", { variant: "success" });
+        initialTableData();
+        setOpen(false);
+      })
+      .catch((err) => {
+        console.log("deleteERR", err);
+        setOpen(false);
+      });
+  };
 
   const togglePasswordVisibility = (index) => {
     setPasswordVisible((prev) => ({
@@ -168,38 +163,59 @@ const handeleClose = () => {
 
   return (
     <div className={classes.tablebutton}>
-     
+      <div className={classes.buttonContainer}>
+      
+        {/* add new button */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/layout/filecategorycreate")}
+        >
+          Add New
+        </Button>
+      </div>
       <TableContainer className={classes.tablecontainer} component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell className={classes.Tablecell}>Title</TableCell>
-              <TableCell className={classes.Tablecell}>Task Id</TableCell>              
-              <TableCell className={classes.Tablecell}>Status</TableCell>
-              <TableCell className={classes.tableCell}> Queries   </TableCell>
+              <TableCell className={classes.Tablecell}>Name</TableCell>
+                
+              <TableCell className={classes.Tablecell}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {deleterows?.data?.map((row, index) => (
               <TableRow key={row._id}>
                 <TableCell className={classes.Tablebody}>
-                  {row.title}
+                  {row.label}
                 </TableCell>
                 
-                <TableCell className={classes.Tablebody}>{row.projectId.taskId}</TableCell>
-                <TableCell className={classes.Tablebody}>{row.projectId.status}</TableCell>
+            
                
-                <TableCell align="center" className={classes.TablethZero}>
-                    <NavLink
-                            to="/layout/QueryDetails" state={{ _id: row._id }}
-                            
-                          >
-                      <IconButton>
-                        <VisibilityIcon />
-                      </IconButton>
-                      </NavLink>
-                    </TableCell>
-
+                <TableCell className={classes.Tablebody}>
+                <Tooltip title="Edit" placement="bottom-start">
+                  <EditIcon
+                    variant="contained"
+                    color="rgba(0, 0, 0, 0.54);"
+                    cursor='pointer'
+                    onClick={() =>
+                      navigate("/layout/filecategorycreate", { state: { ...row } })
+                    }
+                  >
+                    Edit
+                  </EditIcon>
+                 </Tooltip>
+                 <Tooltip title="Delete" placement="bottom">
+                  <DeleteOutlineIcon
+                    variant="contained"
+                    color="rgba(0, 0, 0, 0.54);"
+                    cursor='pointer'
+                    onClick={() => handeleOpen(row._id)}
+                  >
+                    Delete
+                  </DeleteOutlineIcon>
+               </Tooltip>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -227,9 +243,9 @@ const handeleClose = () => {
             <Button onClick={handeleClose} color="primary">
               Cancel
             </Button>
-            {/* <Button onClick={handeleDelete} color="primary">
+            <Button onClick={handeleDelete} color="primary">
               Ok
-            </Button> */}
+            </Button>
           </DialogActions>
         </Dialog>
       </div>
