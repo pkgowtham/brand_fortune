@@ -11,7 +11,7 @@ import {
   Select,
   MenuItem,
   Input,
-  InputLabel,Box,
+  InputLabel, Box,
   Checkbox,
   ListItemText,
   FormHelperText,
@@ -28,6 +28,7 @@ import {
 } from "../../../service/project/action";
 import { INTERNAL } from "../../../constant/internal";
 import { filterDataProject } from "../../../service/internal/action";
+import { format } from 'date-fns';
 
 const useStyles = makeStyles((theme) => ({
   mainContainer: {
@@ -94,16 +95,16 @@ const useStyles = makeStyles((theme) => ({
   chatContainer: {
     marginTop: "20px",
     padding: "30px",
-    borderRadius:10,
-    backgroundColor:"#f0f4fb",
-    margin:20,
+    borderRadius: 10,
+    backgroundColor: "#f0f4fb",
+    margin: 20,
 
   },
   message: {
     margin: "10px 0",
     padding: "10px",
     borderRadius: "8px",
-    maxWidth: "70%",
+    maxWidth: "50%",
   },
   senderMessage: {
     backgroundColor: "#e3f2fd",
@@ -128,8 +129,22 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
     margin: "0 25px",
     padding: "10px 0",
-    
+
   },
+  imagePreview: {
+    width: '20%', // Ensures the image is responsive and fits the container width
+    height: 'auto',
+    borderRadius: '4px', // Optional: adds rounded corners to the image
+    
+    marginTop: theme.spacing(1),
+  },
+  downloadLink: {
+    textDecoration: 'none',
+    color: theme.palette.primary.main, // Style the link as per your design
+    marginTop: theme.spacing(1),
+    textAlign:"left",
+  },
+
 }));
 
 function Create() {
@@ -147,14 +162,15 @@ function Create() {
   const [openBackdrop, setOpenBackdrop] = useState(false);
   const [selectedUser, setSelectedUser] = useState("");
   const [file, setFile] = useState(null);
+  const [query, setQuery] = useState(null);
+  const [setMessages] = useState([]);
+
 
   console.log("articleTypes", articleType);
 
   const [inputvalue, setInputvalue] = useState({
-    title: "",
-    question: "",
-    projectRole: "", // Ensure this is initialized as an empty string
-    assignId: "",
+
+    answer: "",
     _id: "",
   });
   const [deleterows, setDeleterows] = useState([]);
@@ -165,48 +181,47 @@ function Create() {
     brand: false,
   });
 
-  
+
   const regex = {
     label: /^[A-Za-z\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/,
   };
-   
+
 
   const { _id: locationProjectId } = location.state || {};
-  console.log(locationProjectId);
+  const { title_id } = location.state || {};
 
-   
+  console.log("Main Product Id", locationProjectId);
+
+
+
+
+
   const formCreate = async () => {
-    console.log("Formmessage", inputvalue);
+
     const token = localStorage.getItem("accessToken");
-    const projectId = locationProjectId || inputvalue._id;
-    const senderId = inputvalue._id || auth?.payloadLogin?.payload?.data?.user?._id;
-
-    console.log("Project Id", projectId);
-
+    console.log("Token 2", token)
     // Create an object for the form data
+
+
     const data = {
-        title: inputvalue.title,
-        question: inputvalue.question,
-        projectRole: selectedRole,
-        projectId: projectId,
-        senderId: senderId,
-        assignId: selectedUser,
+      answer: inputvalue.answer,
+      _id: title_id,
     };
 
-    // Create a new FormData object
+
     const formData = new FormData();
 
     // Append the 'data' object as a JSON string
     formData.append("data", JSON.stringify(data));
 
-    if (file) {
-      formData.append("attachment", file); // Append the file as 'attachment'
-    }
+    // if (file) {
+    //   formData.append("attachment", file); 
+    // }
 
     // Make the POST request with the FormData containing the JSON string
     await axio
-      .post(
-        "/quering/create",
+      .put(
+        "/quering/update",
         formData,
         {
           headers: {
@@ -216,16 +231,42 @@ function Create() {
       )
       .then((response) => {
         console.log("formmessage", response);
-        enqueueSnackbar("Successfully Created", { variant: "success" });
-        navigate("/layout/dashboard");
+        enqueueSnackbar("Successfully Answered", { variant: "success" });
+        navigate("/layout/queries", { state: { _id: query?.projectId?._id } });
       })
       .catch((err) => {
         enqueueSnackbar("Please Fill the Form", { variant: "error" });
         console.log("formErrr message", err);
       });
-};
+  };
 
- 
+
+
+  const initialTableData = async () => {
+    console.log("initialTableData", deleterows);
+    const token = localStorage.getItem("accessToken");
+
+    console.log("Token 11", token)
+
+    await axio
+      .get("/user/getlist", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
+      .then((tableresponse) => {
+        console.log("tableresponse", tableresponse.data.payload.data);
+        setDeleterows(tableresponse.data.payload.data);
+      })
+      .catch((err) => {
+        console.log("tableERR", err);
+      });
+  };
+
+  useEffect(() => {
+    
+    initialTableData();
+  }, []);
 
   const getProjectDispatchFunc = (
     offset = INTERNAL.DEFAULT_INITIAL_PAGE_AFTER_SIDE_EFFECTS,
@@ -292,7 +333,7 @@ function Create() {
     setError({ ...error, [name]: isError });
   };
 
-  
+
   const handelSubmit = (e) => {
     e.preventDefault();
 
@@ -309,9 +350,9 @@ function Create() {
     );
   console.log("Assignto:", uniqueUsers);
 
- 
 
-  
+
+
   const handelTextinputAssign = (event) => {
     const { name, value } = event.target;
     setInputvalue({
@@ -326,11 +367,53 @@ function Create() {
       setFile(selectedFile); // Store the file in state
     }
   };
-  
+
 
   // Message Display
 
-  
+  const getQueryList = async () => {
+
+
+    const token = localStorage.getItem("accessToken");
+    const projectId = locationProjectId || inputvalue._id;
+
+    console.log("analystData", projectId);
+    await axio
+      .get(
+        `quering/getlist?projectId=${projectId}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : null,
+          },
+        }
+      )
+      .then((queryResponse) => {
+        const data = queryResponse.data.payload.data;
+
+        // Find the query matching the title_id
+        const matchedItem = data.find((item) => item._id === title_id);
+        console.log("Item ID:", data._id);
+
+        if (matchedItem) {
+          setQuery(matchedItem);
+          setMessages(matchedItem.data || []); // Assuming messages are inside the query item
+        } else {
+          console.log("No matching data found for title_id");
+        }
+      })
+      .catch((err) => {
+        console.log("queryError", err);
+      });
+  };
+
+  useEffect(() => {
+    if (title_id) {
+      getQueryList();
+    }
+  }, [title_id]);
+
+
+
 
   const messages = [
     {
@@ -340,25 +423,26 @@ function Create() {
       type: "sender", // Type can be 'sender' or 'receiver'
     },
     {
-      sender: "Jane Smith",
-      description: "This is a response from the receiver to the sender's query.",
-      date: "2024-11-14 10:35 AM",
-      type: "receiver",
+      sender: "John Doe",
+      description: "This is a sample message from the sender.",
+      date: "2024-11-14 10:30 AM",
+      type: "sender", // Type can be 'sender' or 'receiver'
     },
-  
+
+
   ];
 
 
   return (
-    
+
 
     <Container >
-       <Grid container spacing={2}>
+      <Grid container spacing={2}>
         <Grid item xs={12} className={classes.TitleCard}>
           <Typography variant="h5" className={classes.TitleText}>
-            Query Details - Project Name
+            Query Details 
           </Typography>
-          <NavLink to={"/layout/queries"}>
+          <NavLink to="/layout/queries" state={{ _id: query?.projectId?._id }}>
             <Button variant="contained" color="primary">
               Go Back
             </Button>
@@ -366,177 +450,147 @@ function Create() {
         </Grid>
       </Grid>
 
-       <div className={classes.mainContainer}>
-       <div className={classes.queryHeader} style={{marginBottom:20}}>
-              <Box style={{display:'flex'}}>
-                <Typography variant="body1" style={{lineHeight: 0,}}>Query Title:</Typography>
-                <Typography variant="h6" style={{lineHeight: 0,paddingLeft:10}}> Sample Query Title</Typography>
-              </Box>
-              <Box style={{display:'flex'}}>
-                <Typography variant="body1" style={{lineHeight: 0,}}>Query Status:</Typography>
-                <Typography variant="h6" style={{ color: "green", lineHeight: 0,paddingLeft:10 }}>
-                   Success
-                </Typography>
-              </Box>
-            </div>
-
-            <div className={classes.chatContainer}>
-              <Typography variant="h6">Chat Conversation</Typography>
-              {messages.map((message, index) => (
-                <Box
-                  key={index}
-                  className={`${classes.message} ${message.type === "sender" ? classes.senderMessage : classes.receiverMessage}`}
-                >
-                  <div className={classes.messageHeader}>
-                    <Typography variant="body2">{message.sender}</Typography>
-                    <Typography variant="body2">{message.date}</Typography>
-                  </div>
-                  <Typography variant="body2" className={classes.messageBody}>
-                    {message.description}
+      <div className={classes.mainContainer}>
+        <div>
+          {query && (
+            <>
+              {/* Query Header */}
+              <div className={classes.queryHeader} style={{ marginBottom: 20 }}>
+                <Box style={{ display: 'flex' }}>
+                  <Typography variant="body1" style={{ lineHeight: 0 }}>Query Title:</Typography>
+                  <Typography variant="h6" style={{ lineHeight: 0, paddingLeft: 10 }}>
+                    {query.title}
                   </Typography>
                 </Box>
-              ))}
-            </div>
+                <Box style={{ display: 'flex' }}>
+                  <Typography variant="body1" style={{ lineHeight: 0 }}>Query Status:</Typography>
+                  <Typography
+  variant="h6"
+  style={{    color: query.status === 'COMPLETE' ? 'green' : 'red',    lineHeight: 0,    paddingLeft: 10,  }}
+>  {query.status}  </Typography>
+                </Box>
+              </div>
 
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <FormControl className={classes.formControl}>
-            <TextField
-              id="senderId"
-              label={
-                auth?.payloadLogin?.payload?.data?.user?.firstName || "User"
-              } // Display the first name if available
-              variant="outlined"
-              name="senderId"
-              value={inputvalue._id} // Assuming inputvalue._id contains the user ID
-              onChange={handelTextinputAssign} // This function should handle updates for _id or other fields
-              error={error.senderId}
-              helperText={error.senderId ? "Enter a valid name" : ""}
-            />
-          </FormControl>
-        </Grid>
+              {/* Chat Section */}
+              <div className={classes.chatContainer}>
+                <Typography variant="h6">Chat Conversation</Typography>
+                {query ? (
+                  <>
+                    {/* Sender message */}
+                    {query.senderId && (
+                      <Box className={`${classes.message} ${classes.senderMessage}`}>
+                        <div className={classes.messageHeader}>
+                          <Typography variant="body2">
+                            {query.senderId.firstName} {/* Display sender's first name */}
+                          </Typography>
+                          <Typography variant="body2">{format(new Date(query.createdAt), 'MM/dd/yyyy')}</Typography>
+                        </div>
+                        <Typography variant="body2" className={classes.messageBody}>
+                          {query.question} {/* Display sender's question */}
+                        </Typography>
 
-        <Grid item xs={6}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel id="assign-to-label">Select Assign to</InputLabel>
-            <Select
-              labelId="assign-to-label"
-              id="assign-to"
-              value={selectedUser}
-              onChange={handleUserChange}
-              label="Select Assign to"
-              input={<Input />}
-            >
-              {(() => {
-                const uniqueUserNames = new Set();
-                const userList = (
-                  project?.payloadGetList?.payload?.data || []
-                ).flatMap((row) =>
-                  ["accountManager", "leadOne", "leadTwo", "curator"]
-                    .map((role) => row[role]?.userName)
-                    .filter(Boolean)
-                );
-                userList.forEach((userName) => uniqueUserNames.add(userName));
-                return [...uniqueUserNames].map((userName) => (
-                  <MenuItem key={userName} value={userName}>
-                    <ListItemText primary={userName} />
-                  </MenuItem>
-                ));
-              })()}
-            </Select>
-          </FormControl>
-        </Grid>
+                        {query.attachment && (
+          <Box className={classes.attachment}>
+            {/* <Typography variant="body2">Attachment:</Typography> */}
 
-        {/* Project Role Dropdown */}
-        <Grid item xs={6}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel id="project-role-label">Select Project Role</InputLabel>
-            <Select
-              labelId="project-role-label"
-              id="project-role"
-              value={selectedRole}
-              onChange={handleProjectRoleChange} // Use new handler
-              label="Select Project Role"
-              input={<Input />}
-              disabled={!selectedUser} // Disable if no username is selected
-            >
-              {(project?.payloadGetList?.payload?.data || []).flatMap((row) => {
-                // Filter roles based on selected user
-                return ["accountManager", "leadOne", "leadTwo", "curator"].map(
-                  (role) => {
-                    const userName = row[role]?.userName;
-                    if (userName === selectedUser) {
-                      return (
-                        <MenuItem key={`${role}-${userName}`} value={role}>
-                          <ListItemText primary={role} />
-                        </MenuItem>
-                      );
-                    }
-                    return null;
-                  }
-                );
-              })}
-            </Select>
-          </FormControl>
-        </Grid>
+            {/* Check if attachment is an image by URL */}
+            {query.attachment.endsWith('.jpg') || query.attachment.endsWith('.jpeg') || query.attachment.endsWith('.png') ? (
+              <Box>
+                <img 
+                  src={query.attachment} 
+                  alt="Attachment" 
+                  className={classes.imagePreview} 
+                />
+                
+                <a 
+                  href={query.attachment} 
+                  download
+                  className={classes.downloadLink}
+                >
+                <Typography>  Download Attachment</Typography>
+                </a>
+              </Box>
+            ) : (
+              <Box>
+                <a 
+                  href={query.attachment} 
+                  download
+                  className={classes.downloadLink}
+                >
+                  Download Attachment
+                </a>
+              </Box>
+            )}
+          </Box>
+        )}
 
-        <Grid item xs={6}>
-          <FormControl className={classes.formControl}>
-            <TextField
-              id="title"
-              label="Title of Query *"
-              variant="outlined"
-              name="title"
-              value={inputvalue.title}
-              onChange={handelTextinput}
-              error={error.title}
-              helperText={error.title ? "Enter a valid title" : ""}
-            />
-          </FormControl>
-        </Grid>
+                      </Box>
+                    )}
 
-        <Grid item xs={12}>
-          <FormControl className={classes.formControl}>
-            <TextField
-              id="question"
-              label="Question"
-              variant="outlined"
-              name="question"
-              row={5}
-              value={inputvalue.question}
-              onChange={handelTextinput}
-              error={error.question}
-              helperText={error.question ? "Enter a valid question" : ""}
-            />
-          </FormControl>
-        </Grid>
+                    {/* Receiver message */}
+                    {query.answer && (
+                      <Box className={`${classes.message} ${classes.receiverMessage}`}>
+                        <div className={classes.messageHeader}>
+                          <Typography variant="body2">{query.assignId.firstName}</Typography> {/* Display "Receiver" for the receiver message */}
+                          <Typography variant="body2">{format(new Date(query.createdAt), 'MM/dd/yyyy')}</Typography>
+                        </div>
+                        <Typography variant="body2" className={classes.messageBody}>
+                          {query.answer} {/* Display receiver's answer */}
+                        </Typography>
+                      </Box>
+                    )}
+                  </>
+                ) : (
+                  <Typography variant="body2">No messages yet.</Typography>
+                )}
+              </div>
 
-        <Grid item xs={12}>
-  <FormControl className={classes.formControl}>
-    <input
-      type="file"
-      id="attachment"
-      name="attachment"
-      onChange={handleFileChange} // Handle file change
-      accept="image/*,application/pdf,.docx,.xlsx,.txt" // Adjust the accepted file types as needed
-    />
-  </FormControl>
+            </>
+          )}
+        </div>
+
+        <Grid container spacing={2}>
+        {query && query.status === 'PENDING' ? (
+          <Typography variant="h6" style={{ lineHeight: 0, paddingLeft: 25, marginTop: 20, }}> Response Message:</Typography>
+          
+        ): null }
+        
+          <Grid item xs={12}>
+  {query && query.status === 'PENDING' ? (
+    <FormControl className={classes.formControl}>
+      <TextField
+        id="answer"
+        label="Answer"
+        variant="outlined"
+        name="answer"
+        multiline
+        rows={5} // Sets the number of visible rows for the text area
+        value={inputvalue.answer}
+        onChange={handelTextinput}
+        error={error.answer}
+        helperText={error.answer ? "Enter a valid answer" : ""}
+      />
+    </FormControl>
+  ): null}
 </Grid>
 
-      </Grid>
+        
 
-      <div className={classes.button}>
-        <Button
-          variant="contained"
-          color="primary"
-          type="submit"
-          onClick={handelSubmit}
-          disabled={Object.values(error).includes(true)}
-        >
-          Create
-        </Button>
-      </div>
+        </Grid>
 
+       <div className={classes.button}>
+       {query && query.status === 'PENDING' ? (
+    <Button
+      variant="contained"
+      color="primary"
+      type="submit"
+      onClick={handelSubmit}
+      disabled={Object.values(error).includes(true)}
+    >
+      Update
+    </Button>
+ ): null}
+</div>
       </div>
     </Container>
   );

@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from "react";
-import { NavLink } from "react-router-dom";
+ 
 import { useDispatch, useSelector } from "react-redux";
-
+import { useLocation, useNavigate, NavLink } from "react-router-dom";
 import { useFormik } from "formik";
 
 import * as Yup from "yup";
@@ -140,7 +140,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Filter() {
   const classes = useStyles();
   const dispatch = useDispatch();
-
+  const location = useLocation();
   const auth = useSelector((store) => store.auth);
   const project = useSelector((state) => state.project);
   const internal = useSelector((state) => state.internal);
@@ -182,6 +182,10 @@ export default function Filter() {
       );
     },
   });
+
+  const { _id: locationProjectId } = location.state || {};
+
+console.log("Location Id", locationProjectId)
 
   const handleClearButton = () => {
     formik.setValues(initialValues);
@@ -228,249 +232,31 @@ export default function Filter() {
           <Typography variant="h5" className={classes.TitleText}>
           Queries
           </Typography>
-         
+
+         <div >
           {(auth?.payloadLogin?.payload?.data?.user?.role.includes(
             "ACCOUNT_MANAGER"
           ) ||
             auth?.payloadLogin?.payload?.data?.user?.role.includes(
               "MANAGEMENT"
             )) && (
-            <NavLink to="/layout/createquery" state={{ type: "ADD" }}>
+            <NavLink to="/layout/QueriesCreate" state={{ type: "ADD",_id:locationProjectId }}>
               <Button variant="contained" color="primary" type="submit">
                 <ControlPointIcon style={{ maxWidth: 20, paddingRight: 3 }} />
                 Add
               </Button>
             </NavLink>
           )}
+
+          <NavLink to="/layout/dashboard"  >
+            <Button variant="contained" color="primary" style={{marginLeft:5}}>
+              Go Back
+            </Button>
+          </NavLink>
+          </div>
         </Grid>
       </Grid>
-      <Card className={"${classes.card} "}>
-        <div>
-          <Grid
-            container
-            spacing={3}
-            style={{
-              padding: "10px 10px",
-              marginBottom: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Grid item xs={3}>
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <TextField
-                  className={classes.textField}
-                  id="taskId"
-                  label="Task Id"
-                  variant="outlined"
-                  InputLabelProps={{
-                    style: { fontSize: "14px", top: "-5px", textAlign: "left" },
-                  }}
-                  helperText={
-                    formik.errors.taskId &&
-                    formik.touched.taskId &&
-                    String(formik.errors.taskId)
-                  }
-                  error={Boolean(
-                    formik.errors.taskId && formik.touched.taskId
-                  )}
-                  {...formik.getFieldProps("taskId")}
-                  inputProps={{ style: { height: "5px" } }}
-                  onKeyDown={handleKeyDown}
-                />
-              </FormControl>
-            </Grid>  
-            <Grid
-              item
-              xs={3}              
-              style={{ margin: "10px auto 10px auto" }}
-            >
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <KeyboardDatePicker
-                  disableToolbar                 
-                  format="dd/MM/yyyy"
-                  variant="outlined"
-                  margin="normal"
-                  id="reqDate"
-                  label="Request Date"
-                  value={formik.values.reqDate}                  
-                  onChange={(e) => formik.setFieldValue("reqDate", e)}
-                  KeyboardButtonProps={{
-                    "aria-label": "change date",
-                  }}
-                 
-                />
-              </MuiPickersUtilsProvider>
-            </Grid>  
-            <Grid
-              item
-              xs={3}              
-              style={{ margin: "10px auto 10px auto" }}
-            >
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <KeyboardDatePicker
-                  disableToolbar                 
-                  format="dd/MM/yyyy"
-                  variant="outlined"
-                  margin="normal"
-                  id="createdDate"
-                  label="Created Date"
-                  value={formik.values.createdDate}                  
-                  onChange={(e) => formik.setFieldValue("createdDate", e)}
-                  KeyboardButtonProps={{
-                    "aria-label": "change date",
-                  }}
-                  
-                />
-              </MuiPickersUtilsProvider>
-            </Grid> 
-           
-            <Grid item xs={3}>
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel id="brand-label" style={{ left: 12, top: -10 }}>
-                  Select Brand
-                </InputLabel>
-                <Select
-                  id="brand"
-                  labelId="brand-label"
-                  variant="outlined"
-                  label="Select Brand"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
-                  }}
-                  value={formik.values.brand}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(formik.errors.brand && formik.touched.brand)}
-                  {...formik.getFieldProps("brand")}
-                >
-                  {brandList?.map((brand) => {
-                    return <MenuItem value={brand._id}>{brand.label}</MenuItem>;
-                  })}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={3}>
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel id="proirity-label" style={{ left: 12, top: -10 }}>
-                  Select Proirity
-                </InputLabel>
-                <Select
-                  id="proirity"
-                  labelId="proirity-label"
-                  variant="outlined"
-                  label="Select Proirity"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
-                  }}
-                  value={formik.values.proirity}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(
-                    formik.errors.proirity && formik.touched.proirity
-                  )}
-                  {...formik.getFieldProps("proirity")}
-                >
-                  <MenuItem value="CRITICAL">Critical</MenuItem>
-                  <MenuItem value="HIGH">High</MenuItem>
-                  <MenuItem value="MEDIUM">Medium</MenuItem>
-                  <MenuItem value="LOW">Low</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={3}>
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel id="status-label" style={{ left: 12, top: -10 }}>
-                  Select Status
-                </InputLabel>
-                <Select
-                  id="status"
-                  labelId="status-label"
-                  variant="outlined"
-                  label="Select Status"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
-                  }}
-                  value={formik.values.status}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(formik.errors.status && formik.touched.status)}
-                  {...formik.getFieldProps("status")}
-                >
-                  <MenuItem value="LEAD_ONE">CREATED</MenuItem>
-                  <MenuItem value="ASSIGNED_FOR_CURATION">
-                    ASSIGNED_FOR_CURATION
-                  </MenuItem>
-                  <MenuItem value="ASSIGNED_FOR_ALLOCATION">
-                    ASSIGNED_FOR_ALLOCATION
-                  </MenuItem>
-                  <MenuItem value="ASSIGNED_FOR_SUBMISSION">
-                    ASSIGNED_FOR_SUBMISSION
-                  </MenuItem>
-                  <MenuItem value="LISTING_SUBMITTED">
-                    LISTING_SUBMITTED
-                  </MenuItem>
-                  <MenuItem value="SKU_SUBMITTED">SKU_SUBMITTED</MenuItem>
-                  <MenuItem value="REVIEWED_SKU_SUBMITTED">
-                    REVIEWED_SKU_SUBMITTED
-                  </MenuItem>
-                  <MenuItem value="DISCOUNT_SUBMITTED">
-                    DISCOUNT_SUBMITTED
-                  </MenuItem>
-                  <MenuItem value="SYN_SUBMITTED">SYN_SUBMITTED</MenuItem>
-                  <MenuItem value="APPROVED_WITHOUT_REVIEWED">
-                    APPROVED_WITHOUT_REVIEWED
-                  </MenuItem>
-                  <MenuItem value="APPROVED_WITH_REVIEWED">
-                    APPROVED_WITH_REVIEWED
-                  </MenuItem>
-                  <MenuItem value="UPLOAD_SUBMITTED">UPLOAD_SUBMITTED</MenuItem>
-                  <MenuItem value="LIVE_WITHOUT_REVIEWED">
-                    LIVE_WITHOUT_REVIEWED
-                  </MenuItem>
-                  <MenuItem value="LIVE_WITH_REVIEWED">
-                    LIVE_WITH_REVIEWED
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              item
-              xs={1}
-              style={{
-                display: "flex",
-                paddingLeft: 5,
-                justifyContent: "space-around",
-              }}
-            >
-              <IconButton
-                className={classes.button}
-                color="primary"
-                disabled={formik.isValid ? false : true}
-                type="submit"
-                onClick={formik.handleSubmit}
-              >
-                <FilterListIcon />
-              </IconButton>
-
-              <IconButton
-                className={classes.button}
-                color="primary"
-                onClick={() => handleClearButton()}
-              >
-                <ClearIcon />
-              </IconButton>
-            </Grid>
-          </Grid>
-        </div>
-      </Card>
+     
       <Backdrop className={classes.backdrop} open={openBackdrop}>
         <CircularProgress color="inherit" />
       </Backdrop>

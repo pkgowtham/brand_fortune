@@ -174,9 +174,9 @@ const handeleClose = () => {
           <TableHead>
             <TableRow>
               <TableCell className={classes.Tablecell}>Title</TableCell>
-              <TableCell className={classes.Tablecell}>Task Id</TableCell>              
+              <TableCell className={classes.Tablecell}>Questions</TableCell>              
               <TableCell className={classes.Tablecell}>Status</TableCell>
-              <TableCell className={classes.tableCell}> Queries   </TableCell>
+              <TableCell className={classes.tableCell} align="center">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -186,25 +186,31 @@ const handeleClose = () => {
                   {row.title}
                 </TableCell>
                 
-                <TableCell className={classes.Tablebody}>{row.projectId.taskId}</TableCell>
-                <TableCell className={classes.Tablebody}>{row.projectId.status}</TableCell>
+                <TableCell className={classes.Tablebody}>{row.question}</TableCell>
+                <TableCell className={classes.Tablebody}>{row.status}</TableCell>
                
                 <TableCell align="center" className={classes.TablethZero}>
                     <NavLink
-                            to="/layout/QueryDetails" state={{ _id: row._id }}
+                            to="/layout/QueryDetails" state={{ _id: row.projectId._id, title_id:row._id }}
                             
-                          >
+                          > 
                       <IconButton>
+                        {row.status === "COMPLETE" ?(
                         <VisibilityIcon />
+                        ):
+                        (
+                        <EditIcon />
+                        )}
                       </IconButton>
                       </NavLink>
+                      
                     </TableCell>
 
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <TablePagination rowsPerPage={[5, 10, 25]} component="div" />
+        
       </TableContainer>
       {/* delete confirmation */}
       <div>

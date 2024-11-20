@@ -12,6 +12,7 @@ import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import AddCommentIcon from '@material-ui/icons/AddComment';
+import { axio } from "../../../axios";
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import {
   Paper,
@@ -116,6 +117,7 @@ export default function List() {
   const [orderBy, setOrderBy] = useState("createdAt");
   const [order, setOrder] = useState("dec");
   const [selectedRow, setSelectedRow] = useState(null);
+  const [deleterows, setDeleterows] = React.useState([]);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -200,6 +202,34 @@ export default function List() {
       return a[orderBy] < b[orderBy] ? 1 : -1;
     }
   };
+
+
+  const initialTableData = async () => {
+    console.log("initialTableData", deleterows);
+    const token = localStorage.getItem("accessToken");
+
+    
+
+    await axio
+      .get("/user/getlist", {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
+      .then((tableresponse) => {
+        console.log("tableresponse", tableresponse.data.payload.data);
+        setDeleterows(tableresponse.data.payload.data);
+      })
+      .catch((err) => {
+        console.log("tableERR", err);
+      });
+  };
+
+  useEffect(() => {
+    console.log("tableruning");
+    initialTableData();
+  }, []);
+
 
   return (
     <Paper className={classes.paper}>
@@ -429,12 +459,22 @@ export default function List() {
     <IconButton style={{ position: 'relative' }}>
       <VisibilityIcon />
       {/* Count Badge */}
-      <span className={classes.countBadge}>1</span> {/* Assuming `commentCount` is the value */}
+     
     </IconButton>
   </NavLink>
 
   {/* Row Status */}
-  <Typography style={{fontSize:'12px', marginBottom:10}}>Hold with {row.status}</Typography>
+  <Typography style={{fontSize:'12px', marginBottom:10}}>Hold with {row.accountManager?.dep?.userName ||
+row.leadOne?.dep?.userName ||
+row.curator?.dep?.userName ||
+row.leadTwo?.dep?.userName ||
+row.submissionExecutiveListing?.dep?.userName ||
+row.submissionExecutiveSku?.dep?.userName ||
+row.submissionExecutiveReview?.dep?.userName ||
+row.analysisExecutiveDiscount?.dep?.userName ||
+row.analysisExecutiveSyn?.dep?.userName ||
+row.analysisExecutiveUpload?.dep?.userName ||
+row.analysisExecutiveLiveCheck?.dep?.userName}</Typography>
 </TableCell>
 
                                               <TableCell
