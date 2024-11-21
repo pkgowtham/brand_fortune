@@ -9,11 +9,11 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import AddCommentIcon from '@material-ui/icons/AddComment';
+import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import AddCommentIcon from "@material-ui/icons/AddComment";
 import { axio } from "../../../axios";
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import {
   Paper,
   Button,
@@ -34,7 +34,7 @@ import {
   Backdrop,
   CircularProgress,
   Collapse,
-  Box
+  Box,
 } from "@material-ui/core";
 
 import {
@@ -77,28 +77,24 @@ const useStyles = makeStyles((theme) => ({
     border: "None",
   },
   countBadge: {
-    position: 'absolute',
-    top: 0,    // Adjust to align the badge properly
-    right: 4,  // Adjust to align the badge properly
-    padding: '2px 6px', // Padding inside the badge
-    fontSize: '12px',    // Font size of the count number
-    backgroundColor: '#808080', // Gray background color
-    color: 'white',       // White text color
-    borderRadius: '12px', // Circular badge
-    fontWeight: 'bold',   // Make the count bold
-    minWidth: '16px',     // Ensure the badge has a minimum width
-    textAlign: 'center',  // Center the text
-    lineHeight: '16px',   // Center the text vertically
+    position: "absolute",
+    top: 0, // Adjust to align the badge properly
+    right: 4, // Adjust to align the badge properly
+    padding: "2px 6px", // Padding inside the badge
+    fontSize: "12px", // Font size of the count number
+    backgroundColor: "#808080", // Gray background color
+    color: "white", // White text color
+    borderRadius: "12px", // Circular badge
+    fontWeight: "bold", // Make the count bold
+    minWidth: "16px", // Ensure the badge has a minimum width
+    textAlign: "center", // Center the text
+    lineHeight: "16px", // Center the text vertically
   },
   redDot: {
-
-    color: 'red',
-
+    color: "red",
   },
   greenDot: {
-
-    color: 'green',
-
+    color: "green",
   },
 }));
 
@@ -168,7 +164,6 @@ export default function List() {
     }
   }, [project.isErrorGet]);
 
-
   const emptyRows =
     rowsPerPage -
     Math.min(
@@ -203,12 +198,9 @@ export default function List() {
     }
   };
 
-
   const initialTableData = async () => {
     console.log("initialTableData", deleterows);
     const token = localStorage.getItem("accessToken");
-
-    
 
     await axio
       .get("/user/getlist", {
@@ -229,7 +221,6 @@ export default function List() {
     console.log("tableruning");
     initialTableData();
   }, []);
-
 
   return (
     <Paper className={classes.paper}>
@@ -362,7 +353,6 @@ export default function List() {
                           index % 2 === 0 ? classes.evenRow : classes.oddRow
                         }
                       >
-
                         <TableCell
                           align="center"
                           className={classes.TablethZero}
@@ -373,21 +363,23 @@ export default function List() {
                           align="center"
                           className={classes.TablethZero}
                         >
-                          {row.subtaskId ? row.subtaskId : '-'}
+                          {row.subtaskId ? row.subtaskId : "-"}
                         </TableCell>
-                        {row.marketPlaceSingle ? <TableCell
-                          align="center"
-                          className={classes.TablethZero}
-                        >
-                          {row.marketPlaceSingle}
-                        </TableCell> :
+                        {row.marketPlaceSingle ? (
+                          <TableCell
+                            align="center"
+                            className={classes.TablethZero}
+                          >
+                            {row.marketPlaceSingle}
+                          </TableCell>
+                        ) : (
                           <TableCell
                             align="center"
                             className={classes.TablethZero}
                           >
                             {row?.marketPlace?.join()}
                           </TableCell>
-                        }
+                        )}
                         <TableCell
                           component="th"
                           scope="row"
@@ -437,47 +429,75 @@ export default function List() {
                         >
                           {row.status}
                         </TableCell>
-                        <TableCell align="center" className={classes.TablethZero}>
-  <IconButton>
-    {/* Conditional rendering */}
-    {row.query ? (
-      <FiberManualRecordIcon className={classes.redDot} />
-    ) : (
-      <FiberManualRecordIcon className={classes.greenDot} />
-    )}
-  </IconButton>
-  
-  {/* Add Comment Button */}
-  <NavLink to="/layout/QueriesCreate" state={{ _id: row._id  }}>
-    <IconButton>
-      <AddCommentIcon />
-    </IconButton>
-  </NavLink>
+                        <TableCell
+                          align="center"
+                          className={classes.TablethZero}
+                        >
+                          <IconButton>
+                            {/* Conditional rendering */}
+                            {row.query ? (
+                              <FiberManualRecordIcon
+                                className={classes.redDot}
+                              />
+                            ) : (
+                              <FiberManualRecordIcon
+                                className={classes.greenDot}
+                              />
+                            )}
+                          </IconButton>
 
-  {/* View Details Button */}
-  <NavLink to="/layout/queries" state={{ _id: row._id }}>
-    <IconButton style={{ position: 'relative' }}>
-      <VisibilityIcon />
-      {/* Count Badge */}
-     
-    </IconButton>
-  </NavLink>
+                          {/* Add Comment Button */}
+                          <NavLink
+                            to="/layout/QueriesCreate"
+                            state={{ _id: row._id }}
+                          >
+                            <IconButton>
+                              <AddCommentIcon />
+                            </IconButton>
+                          </NavLink>
 
-  {/* Row Status */}
-  <Typography style={{fontSize:'12px', marginBottom:10}}>Hold with {row.accountManager?.dep?.userName ||
-row.leadOne?.dep?.userName ||
-row.curator?.dep?.userName ||
-row.leadTwo?.dep?.userName ||
-row.submissionExecutiveListing?.dep?.userName ||
-row.submissionExecutiveSku?.dep?.userName ||
-row.submissionExecutiveReview?.dep?.userName ||
-row.analysisExecutiveDiscount?.dep?.userName ||
-row.analysisExecutiveSyn?.dep?.userName ||
-row.analysisExecutiveUpload?.dep?.userName ||
-row.analysisExecutiveLiveCheck?.dep?.userName}</Typography>
-</TableCell>
+                          {/* View Details Button */}
+                          <NavLink
+                            to="/layout/queries"
+                            state={{ _id: row._id }}
+                          >
+                            <IconButton style={{ position: "relative" }}>
+                              <VisibilityIcon />
+                              {/* Count Badge */}
+                            </IconButton>
+                          </NavLink>
 
-                                              <TableCell
+                          {/* Row Status */}
+                          <Typography
+                            style={{ fontSize: "12px", marginBottom: 10 }}
+                          >
+                            Hold with{" "}
+                            {
+                              deleterows?.find(
+                                (user) =>
+                                  user._id ==
+                                  (row.accountManager?.dep?.userName ||
+                                    row.leadOne?.dep?.userName ||
+                                    row.curator?.dep?.userName ||
+                                    row.leadTwo?.dep?.userName ||
+                                    row.submissionExecutiveListing?.dep
+                                      ?.userName ||
+                                    row.submissionExecutiveSku?.dep?.userName ||
+                                    row.submissionExecutiveReview?.dep
+                                      ?.userName ||
+                                    row.analysisExecutiveDiscount?.dep
+                                      ?.userName ||
+                                    row.analysisExecutiveSyn?.dep?.userName ||
+                                    row.analysisExecutiveUpload?.dep
+                                      ?.userName ||
+                                    row.analysisExecutiveLiveCheck?.dep
+                                      ?.userName)
+                              )?.firstName
+                            }
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell
                           align="center"
                           className={classes.TablethZero}
                         >
@@ -488,20 +508,19 @@ row.analysisExecutiveLiveCheck?.dep?.userName}</Typography>
                             <IconButton>
                               <EditIcon />
                             </IconButton>
-
                           </NavLink>
-                          {<NavLink
-                            to="/layout/comment"
-                            state={{ _id: row._id }}
-                          >
-                            <IconButton>
-                              <QueryBuilderIcon />
-                            </IconButton>
-
-                          </NavLink>}
+                          {
+                            <NavLink
+                              to="/layout/comment"
+                              state={{ _id: row._id }}
+                            >
+                              <IconButton>
+                                <QueryBuilderIcon />
+                              </IconButton>
+                            </NavLink>
+                          }
                         </TableCell>
                       </TableRow>
-
                     </>
                   ))}
                 {emptyRows > 0 && (
@@ -540,3 +559,5 @@ row.analysisExecutiveLiveCheck?.dep?.userName}</Typography>
     </Paper>
   );
 }
+
+
