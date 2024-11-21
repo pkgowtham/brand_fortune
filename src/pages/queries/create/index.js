@@ -329,8 +329,9 @@ function Create() {
             variant="contained"
             color="primary"
             type="submit"
-            onClick={() => navigate("/layout/articletype")}
+            onClick={() => navigate("/layout/dashboard")}
           >
+           
             Go Back
           </Button>
         </Grid>
@@ -356,7 +357,7 @@ function Create() {
 
 
         <Grid item xs={6}>
-          <FormControl fullWidth variant="outlined">
+          <FormControl className={classes.formControl} variant="outlined">
             <InputLabel id="assign-to-label">Select Assign to</InputLabel>
             <Select
               labelId="assign-to-label"
@@ -371,7 +372,8 @@ function Create() {
                 const userList = (
                   project?.payloadGetList?.payload?.data || []
                 ).flatMap((row) =>
-                  ["accountManager", "leadOne", "leadTwo", "curator"]
+                  ["accountManager", "leadOne", "curator", "leadTwo", "submissionExecutiveListing", "submissionExecutiveSku", "submissionExecutiveReview",
+                  "analysisExecutiveDiscount", "analysisExecutiveSyn", "analysisExecutiveUpload", "analysisExecutiveLiveCheck"]
                     .map((role) => row[role]?.userName)
                     .filter(Boolean)
                 );
@@ -388,36 +390,44 @@ function Create() {
 
         {/* Project Role Dropdown */}
         <Grid item xs={6}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel id="project-role-label">Select Project Role</InputLabel>
-            <Select
-              labelId="project-role-label"
-              id="project-role"
-              value={selectedRole}
-              onChange={handleProjectRoleChange} // Use new handler
-              label="Select Project Role"
-              input={<Input />}
-              disabled={!selectedUser} // Disable if no username is selected
-            >
-              {(project?.payloadGetList?.payload?.data || []).flatMap((row) => {
-                // Filter roles based on selected user
-                return ["accountManager", "leadOne", "leadTwo", "curator"].map(
-                  (role) => {
-                    const userName = row[role]?.userName;
-                    if (userName === selectedUser) {
-                      return (
-                        <MenuItem key={`${role}-${userName}`} value={role}>
-                          <ListItemText primary={role} />
-                        </MenuItem>
-                      );
-                    }
-                    return null;
+  <FormControl className={classes.formControl} variant="outlined">
+    <InputLabel id="project-role-label">Select Project Role</InputLabel>
+    <Select
+      labelId="project-role-label"
+      id="project-role"
+      value={selectedRole}
+      onChange={handleProjectRoleChange} // Use new handler
+      label="Select Project Role"
+      input={<Input />}
+      disabled={!selectedUser} // Disable if no username is selected
+    >
+      {Array.from(
+        new Set(
+          (project?.payloadGetList?.payload?.data || [])
+            .flatMap((row) => {
+              return ["accountManager", "leadOne", "curator", "leadTwo", "submissionExecutiveListing", "submissionExecutiveSku", "submissionExecutiveReview",
+                "analysisExecutiveDiscount", "analysisExecutiveSyn", "analysisExecutiveUpload", "analysisExecutiveLiveCheck"].map(
+                (role) => {
+                  const userName = row[role]?.userName;
+                  if (userName === selectedUser) {
+                    return role; // Return the role for the matching user
                   }
-                );
-              })}
-            </Select>
-          </FormControl>
-        </Grid>
+                  return null; // Return null if no match
+                }
+              );
+            })
+            .filter(Boolean) // Remove null values
+        )
+      ).map((role) => (
+        <MenuItem key={role} value={role}>
+          <ListItemText primary={role} />
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</Grid>
+
+
 
         <Grid item xs={6}>
           <FormControl className={classes.formControl}>
@@ -455,6 +465,8 @@ function Create() {
     <input
       type="file"
       id="attachment"
+      multiline
+      rows={5} // Sets the number of visible rows for the text area
       name="attachment"
       onChange={handleFileChange} // Handle file change
       accept="image/*,application/pdf,.docx,.xlsx,.txt" // Adjust the accepted file types as needed
