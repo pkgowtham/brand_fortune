@@ -396,7 +396,19 @@ function Create() {
       type: "sender", // Type can be 'sender' or 'receiver'
     },
   ];
-
+  const roleLabels = {
+    accountManager: "ACCOUNT_MANAGER",
+    leadOne: "CATALOG_LEAD",
+    curator: "CATALOG_CURATOR",
+    leadTwo: "CATALOG_LEAD",
+    submissionExecutiveListing: "CATALOG_EXCECUTIVE",
+    submissionExecutiveSku: "CATALOG_EXCECUTIVE",
+    submissionExecutiveReview: "Submission Executive Review",
+    analysisExecutiveDiscount: "ANALYSIS_EXECUTIVES",
+    analysisExecutiveSyn: "ANALYSIS_EXECUTIVES",
+    analysisExecutiveUpload: "ANALYSIS_EXECUTIVES",
+    analysisExecutiveLiveCheck: "ANALYSIS_EXECUTIVES",
+  };
   return (
     <Container>
       <Grid container spacing={2}>

@@ -984,7 +984,7 @@ export default function Create() {
                   label="Mail Date"
                   value={
                     type == "EDIT"
-                      ? Date(formik.values.mailDate)
+                      ? formik.values.mailDate
                       : formik.values.mailDate
                   }
                   onChange={(e) => formik.setFieldValue("mailDate", e)}

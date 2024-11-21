@@ -404,39 +404,43 @@ export default function Filter() {
                   error={Boolean(formik.errors.status && formik.touched.status)}
                   {...formik.getFieldProps("status")}
                 >
-                  <MenuItem value="LEAD_ONE">CREATED</MenuItem>
-                  <MenuItem value="ASSIGNED_FOR_CURATION">
-                    ASSIGNED_FOR_CURATION
+                  <MenuItem value="LEAD_ONE">Task created</MenuItem>
+                  <MenuItem value="CURATOR">
+                  Assigned for Curation
                   </MenuItem>
-                  <MenuItem value="ASSIGNED_FOR_ALLOCATION">
-                    ASSIGNED_FOR_ALLOCATION
+                  <MenuItem value="LEAD_TWO">
+                  Assigned for submission
                   </MenuItem>
-                  <MenuItem value="ASSIGNED_FOR_SUBMISSION">
-                    ASSIGNED_FOR_SUBMISSION
+                  <MenuItem value="EXECUTIVE_LISTING">
+                  Submission executive Listing Submitted
                   </MenuItem>
-                  <MenuItem value="LISTING_SUBMITTED">
-                    LISTING_SUBMITTED
+                  <MenuItem value="EXECUTIVE_SKU">
+                  Submission executive SKU created
                   </MenuItem>
-                  <MenuItem value="SKU_SUBMITTED">SKU_SUBMITTED</MenuItem>
-                  <MenuItem value="REVIEWED_SKU_SUBMITTED">
-                    REVIEWED_SKU_SUBMITTED
+                  <MenuItem value="ANALYSIS_DISCOUNT_DEPRESSION">Assigned for Inventory Discount-depression</MenuItem>
+
+                  <MenuItem value="ANALYSIS_SYN_DEPRESSION">
+                  Assigned for Inventory Sync-depression
                   </MenuItem>
-                  <MenuItem value="DISCOUNT_SUBMITTED">
-                    DISCOUNT_SUBMITTED
+                  <MenuItem value="ANALYSIS_UPLOAD_DEPRESSION">
+                  Assigned for Inventory upload-depression
                   </MenuItem>
-                  <MenuItem value="SYN_SUBMITTED">SYN_SUBMITTED</MenuItem>
-                  <MenuItem value="APPROVED_WITHOUT_REVIEWED">
-                    APPROVED_WITHOUT_REVIEWED
+                  <MenuItem value="LIVE_CHECK_DEPRESSION">Assigned for Live check-depression</MenuItem>
+                  <MenuItem value="ANALYSIS_DISCOUNT">
+                  Assigned for Inventory Discount
                   </MenuItem>
-                  <MenuItem value="APPROVED_WITH_REVIEWED">
-                    APPROVED_WITH_REVIEWED
+                  <MenuItem value="ANALYSIS_SYN">
+                  Assigned for Inventory Sync
                   </MenuItem>
-                  <MenuItem value="UPLOAD_SUBMITTED">UPLOAD_SUBMITTED</MenuItem>
-                  <MenuItem value="LIVE_WITHOUT_REVIEWED">
-                    LIVE_WITHOUT_REVIEWED
+                  <MenuItem value="ANALYSIS_UPLOAD">Assigned for Inventory upload</MenuItem>
+                  <MenuItem value="APPROVAL_WAITING">
+                  Waiting for approval
                   </MenuItem>
-                  <MenuItem value="LIVE_WITH_REVIEWED">
-                    LIVE_WITH_REVIEWED
+                  <MenuItem value="LIVE_CHECK">
+                  Assigned for Live check
+                  </MenuItem>
+                  <MenuItem value="COMPLETED">
+                  Completed
                   </MenuItem>
                 </Select>
               </FormControl>

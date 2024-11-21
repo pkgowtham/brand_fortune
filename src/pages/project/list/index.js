@@ -222,6 +222,43 @@ export default function List() {
     initialTableData();
   }, []);
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'LEAD_ONE':
+        return 'Task created';
+      case 'CURATOR':
+        return 'Assigned for Curation';
+      case 'LEAD_TWO':
+        return 'Assigned for submission';
+      case 'EXECUTIVE_LISTING':
+        return 'Submission executive Listing Submitted';
+      case 'EXECUTIVE_SKU':
+        return 'Submission executive SKU created';
+      case 'ANALYSIS_DISCOUNT_DEPRESSION':
+        return 'Assigned for Inventory Discount-depression';
+      case 'ANALYSIS_SYN_DEPRESSION':
+        return 'Assigned for Inventory Sync-depression';
+      case 'ANALYSIS_UPLOAD_DEPRESSION':
+        return 'Assigned for Inventory upload-depression';
+      case 'LIVE_CHECK_DEPRESSION':
+        return 'Assigned for Live check-depression';
+      case 'ANALYSIS_DISCOUNT':
+        return 'Assigned for Inventory Discount';
+      case 'ANALYSIS_SYN':
+        return 'Assigned for Inventory Sync';
+      case 'ANALYSIS_UPLOAD':
+        return 'Assigned for Inventory upload';
+      case 'APPROVAL_WAITING':
+        return 'Waiting for approval';
+      case 'LIVE_CHECK':
+        return 'Assigned for Live check';
+      case 'COMPLETED':
+        return 'Completed';
+      default:
+        return 'Unknown';
+    }
+  };
+
   return (
     <Paper className={classes.paper}>
       {project?.payloadGetList?.payload?.data?.length > 0 ? (
@@ -423,11 +460,10 @@ export default function List() {
                           {row.proirity}
                         </TableCell>
                         <TableCell
-                          component="th"
-                          scope="row"
+                          align="left"
                           className={classes.TablethZero}
                         >
-                          {row.status}
+                        {getStatusLabel(row.status)}
                         </TableCell>
                         <TableCell
                           align="center"

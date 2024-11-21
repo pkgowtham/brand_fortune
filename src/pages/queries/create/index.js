@@ -302,6 +302,21 @@ function Create() {
     }
   };
 
+
+  const roleLabels = {
+    accountManager: "ACCOUNT_MANAGER",
+    leadOne: "CATALOG_LEAD",
+    curator: "CATALOG_CURATOR",
+    leadTwo: "CATALOG_LEAD",
+    submissionExecutiveListing: "CATALOG_EXCECUTIVE",
+    submissionExecutiveSku: "CATALOG_EXCECUTIVE",
+    submissionExecutiveReview: "Submission Executive Review",
+    analysisExecutiveDiscount: "ANALYSIS_EXECUTIVES",
+    analysisExecutiveSyn: "ANALYSIS_EXECUTIVES",
+    analysisExecutiveUpload: "ANALYSIS_EXECUTIVES",
+    analysisExecutiveLiveCheck: "ANALYSIS_EXECUTIVES",
+  };
+
   return (
     <Container className={classes.mainContainer}>
       <Grid container spacing={2}>
@@ -333,10 +348,15 @@ function Create() {
               } // Display the first name if available
               variant="outlined"
               name="senderId"
+              
               value={inputvalue._id} // Assuming inputvalue._id contains the user ID
               onChange={handelTextinputAssign} // This function should handle updates for _id or other fields
               error={error.senderId}
               helperText={error.senderId ? "Enter a valid name" : ""}
+              InputProps={{
+                readOnly: true, // Makes it readonly
+              }}
+              disabled
             />
           </FormControl>
         </Grid>
@@ -410,7 +430,7 @@ function Create() {
         )
       ).map((role) => (
         <MenuItem key={role} value={role}>
-          <ListItemText primary={role} />
+          <ListItemText primary={roleLabels[role] || role} />
         </MenuItem>
       ))}
     </Select>
@@ -436,7 +456,7 @@ function Create() {
         </Grid>
 
         <Grid item xs={12}>
-          <Typography variant="h6">Question</Typography>
+          <Typography variant="body" style={{paddingLeft:20}}>Question</Typography>
           <FormControl className={classes.formControl}>         
             <TextareaAutosize
               id="question"
