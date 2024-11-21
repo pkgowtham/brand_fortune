@@ -11,7 +11,8 @@ import {
   Select,
   MenuItem,
   Input,
-  InputLabel, Box,
+  InputLabel,
+  Box,
   Checkbox,
   ListItemText,
   FormHelperText,
@@ -28,7 +29,7 @@ import {
 } from "../../../service/project/action";
 import { INTERNAL } from "../../../constant/internal";
 import { filterDataProject } from "../../../service/internal/action";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 
 const useStyles = makeStyles((theme) => ({
   mainContainer: {
@@ -98,7 +99,6 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 10,
     backgroundColor: "#f0f4fb",
     margin: 20,
-
   },
   message: {
     margin: "10px 0",
@@ -129,22 +129,20 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
     margin: "0 25px",
     padding: "10px 0",
-
   },
   imagePreview: {
-    width: '20%', // Ensures the image is responsive and fits the container width
-    height: 'auto',
-    borderRadius: '4px', // Optional: adds rounded corners to the image
-    
+    width: "20%", // Ensures the image is responsive and fits the container width
+    height: "auto",
+    borderRadius: "4px", // Optional: adds rounded corners to the image
+
     marginTop: theme.spacing(1),
   },
   downloadLink: {
-    textDecoration: 'none',
+    textDecoration: "none",
     color: theme.palette.primary.main, // Style the link as per your design
     marginTop: theme.spacing(1),
-    textAlign:"left",
+    textAlign: "left",
   },
-
 }));
 
 function Create() {
@@ -165,11 +163,9 @@ function Create() {
   const [query, setQuery] = useState(null);
   const [setMessages] = useState([]);
 
-
   console.log("articleTypes", articleType);
 
   const [inputvalue, setInputvalue] = useState({
-
     answer: "",
     _id: "",
   });
@@ -181,33 +177,24 @@ function Create() {
     brand: false,
   });
 
-
   const regex = {
     label: /^[A-Za-z\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/,
   };
-
 
   const { _id: locationProjectId } = location.state || {};
   const { title_id } = location.state || {};
 
   console.log("Main Product Id", locationProjectId);
 
-
-
-
-
   const formCreate = async () => {
-
     const token = localStorage.getItem("accessToken");
-    console.log("Token 2", token)
+    console.log("Token 2", token);
     // Create an object for the form data
-
 
     const data = {
       answer: inputvalue.answer,
       _id: title_id,
     };
-
 
     const formData = new FormData();
 
@@ -215,20 +202,16 @@ function Create() {
     formData.append("data", JSON.stringify(data));
 
     // if (file) {
-    //   formData.append("attachment", file); 
+    //   formData.append("attachment", file);
     // }
 
     // Make the POST request with the FormData containing the JSON string
     await axio
-      .put(
-        "/quering/update",
-        formData,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : null,
-          },
-        }
-      )
+      .put("/quering/update", formData, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
       .then((response) => {
         console.log("formmessage", response);
         enqueueSnackbar("Successfully Answered", { variant: "success" });
@@ -240,13 +223,11 @@ function Create() {
       });
   };
 
-
-
   const initialTableData = async () => {
     console.log("initialTableData", deleterows);
     const token = localStorage.getItem("accessToken");
 
-    console.log("Token 11", token)
+    console.log("Token 11", token);
 
     await axio
       .get("/user/getlist", {
@@ -264,7 +245,6 @@ function Create() {
   };
 
   useEffect(() => {
-    
     initialTableData();
   }, []);
 
@@ -333,7 +313,6 @@ function Create() {
     setError({ ...error, [name]: isError });
   };
 
-
   const handelSubmit = (e) => {
     e.preventDefault();
 
@@ -350,9 +329,6 @@ function Create() {
     );
   console.log("Assignto:", uniqueUsers);
 
-
-
-
   const handelTextinputAssign = (event) => {
     const { name, value } = event.target;
     setInputvalue({
@@ -368,25 +344,19 @@ function Create() {
     }
   };
 
-
   // Message Display
 
   const getQueryList = async () => {
-
-
     const token = localStorage.getItem("accessToken");
     const projectId = locationProjectId || inputvalue._id;
 
     console.log("analystData", projectId);
     await axio
-      .get(
-        `quering/getlist?projectId=${projectId}`,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : null,
-          },
-        }
-      )
+      .get(`quering/getlist?projectId=${projectId}`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
       .then((queryResponse) => {
         const data = queryResponse.data.payload.data;
 
@@ -412,9 +382,6 @@ function Create() {
     }
   }, [title_id]);
 
-
-
-
   const messages = [
     {
       sender: "John Doe",
@@ -428,19 +395,14 @@ function Create() {
       date: "2024-11-14 10:30 AM",
       type: "sender", // Type can be 'sender' or 'receiver'
     },
-
-
   ];
 
-
   return (
-
-
-    <Container >
+    <Container>
       <Grid container spacing={2}>
         <Grid item xs={12} className={classes.TitleCard}>
           <Typography variant="h5" className={classes.TitleText}>
-            Query Details 
+            Query Details
           </Typography>
           <NavLink to="/layout/queries" state={{ _id: query?.projectId?._id }}>
             <Button variant="contained" color="primary">
@@ -456,18 +418,32 @@ function Create() {
             <>
               {/* Query Header */}
               <div className={classes.queryHeader} style={{ marginBottom: 20 }}>
-                <Box style={{ display: 'flex' }}>
-                  <Typography variant="body1" style={{ lineHeight: 0 }}>Query Title:</Typography>
-                  <Typography variant="h6" style={{ lineHeight: 0, paddingLeft: 10 }}>
+                <Box style={{ display: "flex" }}>
+                  <Typography variant="body1" style={{ lineHeight: 0 }}>
+                    Query Title:
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    style={{ lineHeight: 0, paddingLeft: 10 }}
+                  >
                     {query.title}
                   </Typography>
                 </Box>
-                <Box style={{ display: 'flex' }}>
-                  <Typography variant="body1" style={{ lineHeight: 0 }}>Query Status:</Typography>
+                <Box style={{ display: "flex" }}>
+                  <Typography variant="body1" style={{ lineHeight: 0 }}>
+                    Query Status:
+                  </Typography>
                   <Typography
-  variant="h6"
-  style={{    color: query.status === 'COMPLETE' ? 'green' : 'red',    lineHeight: 0,    paddingLeft: 10,  }}
->  {query.status}  </Typography>
+                    variant="h6"
+                    style={{
+                      color: query.status === "COMPLETE" ? "green" : "red",
+                      lineHeight: 0,
+                      paddingLeft: 10,
+                    }}
+                  >
+                    {" "}
+                    {query.status}{" "}
+                  </Typography>
                 </Box>
               </div>
 
@@ -478,63 +454,82 @@ function Create() {
                   <>
                     {/* Sender message */}
                     {query.senderId && (
-                      <Box className={`${classes.message} ${classes.senderMessage}`}>
+                      <Box
+                        className={`${classes.message} ${classes.senderMessage}`}
+                      >
                         <div className={classes.messageHeader}>
                           <Typography variant="body2">
-                            {query.senderId.firstName} {/* Display sender's first name */}
+                            {query.senderId.firstName}{" "}
+                            {/* Display sender's first name */}
                           </Typography>
-                          <Typography variant="body2">{format(new Date(query.createdAt), 'MM/dd/yyyy')}</Typography>
+                          <Typography variant="body2">
+                            {format(new Date(query.createdAt), "MM/dd/yyyy")}
+                          </Typography>
                         </div>
-                        <Typography variant="body2" className={classes.messageBody}>
+                        <Typography
+                          variant="body2"
+                          className={classes.messageBody}
+                        >
                           {query.question} {/* Display sender's question */}
                         </Typography>
 
                         {query.attachment && (
-          <Box className={classes.attachment}>
-            {/* <Typography variant="body2">Attachment:</Typography> */}
+                          <Box className={classes.attachment}>
+                            {/* <Typography variant="body2">Attachment:</Typography> */}
 
-            {/* Check if attachment is an image by URL */}
-            {query.attachment.endsWith('.jpg') || query.attachment.endsWith('.jpeg') || query.attachment.endsWith('.png') ? (
-              <Box>
-                <img 
-                  src={query.attachment} 
-                  alt="Attachment" 
-                  className={classes.imagePreview} 
-                />
-                
-                <a 
-                  href={query.attachment} 
-                  download
-                  className={classes.downloadLink}
-                >
-                <Typography>  Download Attachment</Typography>
-                </a>
-              </Box>
-            ) : (
-              <Box>
-                <a 
-                  href={query.attachment} 
-                  download
-                  className={classes.downloadLink}
-                >
-                  Download Attachment
-                </a>
-              </Box>
-            )}
-          </Box>
-        )}
+                            {/* Check if attachment is an image by URL */}
+                            {query.attachment.endsWith(".jpg") ||
+                            query.attachment.endsWith(".jpeg") ||
+                            query.attachment.endsWith(".png") ? (
+                              <Box>
+                                <img
+                                  src={query.attachment}
+                                  alt="Attachment"
+                                  className={classes.imagePreview}
+                                />
 
+                                <a
+                                  href={query.attachment}
+                                  download
+                                  className={classes.downloadLink}
+                                >
+                                  <Typography> Download Attachment</Typography>
+                                </a>
+                              </Box>
+                            ) : (
+                              <Box>
+                                <a
+                                  href={query.attachment}
+                                  download
+                                  className={classes.downloadLink}
+                                >
+                                  Download Attachment
+                                </a>
+                              </Box>
+                            )}
+                          </Box>
+                        )}
                       </Box>
                     )}
 
                     {/* Receiver message */}
                     {query.answer && (
-                      <Box className={`${classes.message} ${classes.receiverMessage}`}>
+                      <Box
+                        className={`${classes.message} ${classes.receiverMessage}`}
+                      >
                         <div className={classes.messageHeader}>
-                          <Typography variant="body2">{query.assignId.firstName}</Typography> {/* Display "Receiver" for the receiver message */}
-                          <Typography variant="body2">{format(new Date(query.createdAt), 'MM/dd/yyyy')}</Typography>
+                          <Typography variant="body2">
+                            {query.assignId.firstName}
+                          </Typography>{" "}
+                          {/* Display "Receiver" for the receiver message */}
+                          <Typography variant="body2">
+                            {format(new Date(query.createdAt), "MM/dd/yyyy")}
+                          </Typography>
                         </div>
-                        <Typography variant="body2" className={classes.messageBody}>
+                        <Typography
+                          variant="body2"
+                          className={classes.messageBody}
+                        >
                           {query.answer} {/* Display receiver's answer */}
                         </Typography>
                       </Box>
@@ -544,53 +539,54 @@ function Create() {
                   <Typography variant="body2">No messages yet.</Typography>
                 )}
               </div>
-
             </>
           )}
         </div>
 
         <Grid container spacing={2}>
-        {query && query.status === 'PENDING' ? (
-          <Typography variant="h6" style={{ lineHeight: 0, paddingLeft: 25, marginTop: 20, }}> Response Message:</Typography>
-          
-        ): null }
-        
+          {query && query.status === "PENDING" ? (
+            <Typography
+              variant="h6"
+              style={{ lineHeight: 0, paddingLeft: 25, marginTop: 20 }}
+            >
+              {" "}
+              Response Message:
+            </Typography>
+          ) : null}
+
           <Grid item xs={12}>
-  {query && query.status === 'PENDING' ? (
-    <FormControl className={classes.formControl}>
-      <TextField
-        id="answer"
-        label="Answer"
-        variant="outlined"
-        name="answer"
-        multiline
-        rows={5} // Sets the number of visible rows for the text area
-        value={inputvalue.answer}
-        onChange={handelTextinput}
-        error={error.answer}
-        helperText={error.answer ? "Enter a valid answer" : ""}
-      />
-    </FormControl>
-  ): null}
-</Grid>
-
-        
-
+            {query && query.status === "PENDING" ? (
+              <FormControl className={classes.formControl}>
+                <TextField
+                  id="answer"
+                  label="Answer"
+                  variant="outlined"
+                  name="answer"
+                  multiline
+                  rows={5} // Sets the number of visible rows for the text area
+                  value={inputvalue.answer}
+                  onChange={handelTextinput}
+                  error={error.answer}
+                  helperText={error.answer ? "Enter a valid answer" : ""}
+                />
+              </FormControl>
+            ) : null}
+          </Grid>
         </Grid>
 
-       <div className={classes.button}>
-       {query && query.status === 'PENDING' ? (
-    <Button
-      variant="contained"
-      color="primary"
-      type="submit"
-      onClick={handelSubmit}
-      disabled={Object.values(error).includes(true)}
-    >
-      Update
-    </Button>
- ): null}
-</div>
+        <div className={classes.button}>
+          {query && query.status === "PENDING" ? (
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              onClick={handelSubmit}
+              disabled={Object.values(error).includes(true)}
+            >
+              Update
+            </Button>
+          ) : null}
+        </div>
       </div>
     </Container>
   );

@@ -15,6 +15,7 @@ import {
   Checkbox,
   ListItemText,
   FormHelperText,
+  TextareaAutosize,
 } from "@material-ui/core";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -87,15 +88,12 @@ function Create() {
     brand: false,
   });
 
-  
   const regex = {
     label: /^[A-Za-z\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/,
   };
-   
 
   const { _id: locationProjectId } = location.state || {};
   console.log(locationProjectId);
-
 
   const initialTableData = async () => {
     console.log("initialTableData", deleterows);
@@ -122,17 +120,15 @@ function Create() {
     initialTableData();
   }, []);
 
-
-  
   // const formCreate = async () => {
   //   console.log("Formmessage", inputvalue);
   //   const token = localStorage.getItem("accessToken");
   //   const projectId = locationProjectId || inputvalue._id;
   //   const senderId =
   //     inputvalue._id || auth?.payloadLogin?.payload?.data?.user?._id;
-  
+
   //   console.log("Project Id", projectId);
-  
+
   //   const data = {
   //     title: inputvalue.title,
   //     question: inputvalue.question,
@@ -141,7 +137,7 @@ function Create() {
   //     senderId: senderId,
   //     assignId: selectedUser,
   //   };
-  
+
   //   await axio
   //     .post(
   //       "/quering/create",
@@ -162,23 +158,24 @@ function Create() {
   //       console.log("formErrr message", err);
   //     });
   // };
-  
+
   const formCreate = async () => {
     console.log("Formmessage", inputvalue);
     const token = localStorage.getItem("accessToken");
     const projectId = locationProjectId || inputvalue._id;
-    const senderId = inputvalue._id || auth?.payloadLogin?.payload?.data?.user?._id;
+    const senderId =
+      inputvalue._id || auth?.payloadLogin?.payload?.data?.user?._id;
 
     console.log("Project Id", projectId);
 
     // Create an object for the form data
     const data = {
-        title: inputvalue.title,
-        question: inputvalue.question,
-        projectRole: selectedRole,
-        projectId: projectId,
-        senderId: senderId,
-        assignId: selectedUser,
+      title: inputvalue.title,
+      question: inputvalue.question,
+      projectRole: selectedRole,
+      projectId: projectId,
+      senderId: senderId,
+      assignId: selectedUser,
     };
 
     // Create a new FormData object
@@ -193,15 +190,11 @@ function Create() {
 
     // Make the POST request with the FormData containing the JSON string
     await axio
-      .post(
-        "/quering/create",
-        formData,
-        {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : null,
-          },
-        }
-      )
+      .post("/quering/create", formData, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
       .then((response) => {
         console.log("formmessage", response);
         enqueueSnackbar("Successfully Created", { variant: "success" });
@@ -211,9 +204,7 @@ function Create() {
         enqueueSnackbar("Please Fill the Form", { variant: "error" });
         console.log("formErrr message", err);
       });
-};
-
- 
+  };
 
   const getProjectDispatchFunc = (
     offset = INTERNAL.DEFAULT_INITIAL_PAGE_AFTER_SIDE_EFFECTS,
@@ -280,7 +271,6 @@ function Create() {
     setError({ ...error, [name]: isError });
   };
 
-  
   const handelSubmit = (e) => {
     e.preventDefault();
 
@@ -297,9 +287,6 @@ function Create() {
     );
   console.log("Assignto:", uniqueUsers);
 
- 
-
-  
   const handelTextinputAssign = (event) => {
     const { name, value } = event.target;
     setInputvalue({
@@ -314,7 +301,6 @@ function Create() {
       setFile(selectedFile); // Store the file in state
     }
   };
-  
 
   return (
     <Container className={classes.mainContainer}>
@@ -355,7 +341,6 @@ function Create() {
           </FormControl>
         </Grid>
 
-
         <Grid item xs={6}>
           <FormControl className={classes.formControl} variant="outlined">
             <InputLabel id="assign-to-label">Select Assign to</InputLabel>
@@ -378,9 +363,14 @@ function Create() {
                     .filter(Boolean)
                 );
                 userList.forEach((userName) => uniqueUserNames.add(userName));
-                return [...uniqueUserNames].map((userName) => ( 
+                return [...uniqueUserNames].map((userName) => (
                   <MenuItem key={userName} value={userName}>
-                    <ListItemText primary={deleterows?.find((row)=>row._id == userName)?.firstName} />
+                    <ListItemText
+                      primary={
+                        deleterows?.find((row) => row._id == userName)
+                          ?.firstName
+                      }
+                    />
                   </MenuItem>
                 ));
               })()}
@@ -431,6 +421,7 @@ function Create() {
 
         <Grid item xs={6}>
           <FormControl className={classes.formControl}>
+            
             <TextField
               id="title"
               label="Title of Query *"
@@ -445,35 +436,34 @@ function Create() {
         </Grid>
 
         <Grid item xs={12}>
-          <FormControl className={classes.formControl}>
-            <TextField
+          <Typography variant="h6">Question</Typography>
+          <FormControl className={classes.formControl}>         
+            <TextareaAutosize
               id="question"
               label="Question"
               variant="outlined"
               name="question"
-              row={5}
               value={inputvalue.question}
               onChange={handelTextinput}
               error={error.question}
               helperText={error.question ? "Enter a valid question" : ""}
-            />
+              minRows={4}
+              maxRows={10}
+            />           
           </FormControl>
         </Grid>
 
         <Grid item xs={12}>
-  <FormControl className={classes.formControl}>
-    <input
-      type="file"
-      id="attachment"
-      multiline
-      rows={5} // Sets the number of visible rows for the text area
-      name="attachment"
-      onChange={handleFileChange} // Handle file change
-      accept="image/*,application/pdf,.docx,.xlsx,.txt" // Adjust the accepted file types as needed
-    />
-  </FormControl>
-</Grid>
-
+          <FormControl className={classes.formControl}>
+            <input
+              type="file"
+              id="attachment"
+              name="attachment"
+              onChange={handleFileChange} // Handle file change
+              accept="image/*" // Adjust the accepted file types as needed
+            />
+          </FormControl>
+        </Grid>
       </Grid>
 
       <div className={classes.button}>
