@@ -409,6 +409,23 @@ function Create() {
       </Grid>
       )}
 
+<Grid item xs={12}>
+        <FormControl fullWidth style={{padding: '10px 20px'}}>
+           
+          <TextField
+            id="description"
+            label="Description"
+            name="description"
+            value={inputvalue.description}
+            onChange={handelTextinput}
+            multiline
+            
+            rows={4}  // Number of visible text rows
+            variant="outlined"
+          />
+        </FormControl>
+      </Grid>
+
       <div className={classes.button}>
         <Button
           variant="contained"

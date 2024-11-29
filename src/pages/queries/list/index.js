@@ -5,6 +5,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import { format } from "date-fns";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   makeStyles,
@@ -174,7 +175,10 @@ const handeleClose = () => {
           <TableHead>
             <TableRow>
               <TableCell className={classes.Tablecell}>Title</TableCell>
-              <TableCell className={classes.Tablecell}>Questions</TableCell>              
+              <TableCell className={classes.Tablecell}>Raised by</TableCell> 
+              <TableCell className={classes.Tablecell}>Raised Date</TableCell> 
+              <TableCell className={classes.Tablecell}>Resoved by</TableCell>
+              <TableCell className={classes.Tablecell}>Resoved Date</TableCell>              
               <TableCell className={classes.Tablecell}>Status</TableCell>
               <TableCell className={classes.tableCell} align="center">Action</TableCell>
             </TableRow>
@@ -186,7 +190,15 @@ const handeleClose = () => {
                   {row.title}
                 </TableCell>
                 
-                <TableCell className={classes.Tablebody}>{row.question}</TableCell>
+                <TableCell className={classes.Tablebody}>{row.senderId?.firstName}</TableCell>
+                <TableCell className={classes.Tablebody}>
+  {row.createdAt ? format(new Date(row.createdAt), "MM/dd/yyyy") : 'N/A'}
+</TableCell>
+                <TableCell className={classes.Tablebody}>{row.assignId?.firstName}</TableCell>
+               
+                <TableCell className={classes.Tablebody}>
+  {row.updatedAt ? format(new Date(row.updatedAt), "MM/dd/yyyy") : 'N/A'}
+</TableCell>
                 <TableCell className={classes.Tablebody}>{row.status}</TableCell>
                
                 <TableCell align="center" className={classes.TablethZero}>

@@ -535,7 +535,7 @@ function Create() {
                           </Typography>{" "}
                           {/* Display "Receiver" for the receiver message */}
                           <Typography variant="body2">
-                            {format(new Date(query.createdAt), "MM/dd/yyyy")}
+                            {format(new Date(query.updatedAt), "MM/dd/yyyy")}
                           </Typography>
                         </div>
                         <Typography

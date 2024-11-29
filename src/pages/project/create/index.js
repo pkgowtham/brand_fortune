@@ -1192,40 +1192,54 @@ export default function Create() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid
-              item
-              xs={5}
-              spacing={2}
-              style={{ margin: "10px auto 20px auto" }}
-            >
-              <FormControl style={{ marginTop: 5 }} fullWidth>
-                <InputLabel id="brand-label" style={{ left: 12, top: -10 }}>
-                  Select Brand
-                </InputLabel>
-                <Select
-                  id="brand"
-                  labelId="brand-label"
-                  variant="outlined"
-                  label="Select Brand"
-                  inputProps={{
-                    classes: {
-                      root: classes.selectInput,
-                    },
-                  }}
-                  disabled={type == "EDIT" ? true : false}
-                  value={formik.values.brand}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={Boolean(formik.errors.brand && formik.touched.brand)}
-                  {...formik.getFieldProps("brand")}
-                >
-                  {brandList?.map((brand) => {
-                    return <MenuItem value={brand._id}>{brand.label}</MenuItem>;
-                  })}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
+            <Grid item xs={5} spacing={2} style={{ margin: "10px auto 20px auto" }}>
+ <FormControl style={{ marginTop: 5 }} fullWidth>
+  {type === "EDIT" ? (
+    <>
+    <InputLabel id="brand-label" style={{ left: 12, top: -30 }}>
+    Select Brand
+  </InputLabel>
+    
+    <TextField
+      id="brand"
+      value={formik.values.brand?.label || ''}
+      variant="outlined"
+      fullWidth
+      disabled
+      InputProps={{
+        readOnly: true,
+      }}
+    />
+    </>
+  ) : (
+    <>
+      <InputLabel id="brand-label" style={{ left: 12, top: -10 }}>
+        Select Brand
+      </InputLabel>
+      <Select
+        id="brand"
+        labelId="brand-label"
+        variant="outlined"
+        label="Select Brand"
+        value={formik.values.brand || ''}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        error={Boolean(formik.errors.brand && formik.touched.brand)}
+        {...formik.getFieldProps("brand")}
+      >
+        {brandList?.map((brand) => (
+          <MenuItem key={brand._id} value={brand._id}>
+            {brand.label}
+          </MenuItem>
+        ))}
+      </Select>
+    </>
+  )}
+</FormControl>
+
+</Grid>
+
+            {/* <Grid
               item
               xs={5}
               spacing={2}
@@ -1264,10 +1278,64 @@ export default function Create() {
                       </MenuItem>
                     );
                   })}
-                  {/* <MenuItem value="ARTICLE2">Article Type - 2</MenuItem> */}
+                 
                 </Select>
               </FormControl>
-            </Grid>
+            </Grid> */}
+
+<Grid item xs={5} spacing={2} style={{ margin: "10px auto 20px auto" }}>
+  <FormControl style={{ marginTop: 5 }} fullWidth>
+    {type === "EDIT" ? (
+      <>
+        <InputLabel id="articleType-label" style={{ left: 12, top: -30 }}>
+          Select Article Type
+        </InputLabel>
+        <TextField
+          id="articleType"
+          value={formik.values.articleType || ''}
+          variant="outlined"
+          fullWidth
+          disabled
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+      </>
+    ) : (
+      <>
+        <InputLabel id="articleType-label" style={{ left: 12, top: -10 }}>
+          Select Article Type
+        </InputLabel>
+        <Select
+          id="articleType"
+          labelId="articleType-label"
+          variant="outlined"
+          label="Select Article Type"
+          value={formik.values.articleType || ''}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={Boolean(formik.errors.articleType && formik.touched.articleType)}
+          {...formik.getFieldProps("articleType")}
+          inputProps={{
+            classes: {
+              root: classes.selectInput,  // Assuming 'classes' is defined and properly imported
+            },
+          }}
+          disabled={type === "EDIT"}
+        >
+          {refinedArticleList.map((articleType) => (
+            <MenuItem key={articleType._id} value={articleType._id}>
+              {articleType.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </>
+    )}
+  </FormControl>
+</Grid>
+
+
+
             <Grid
               item
               xs={5}
