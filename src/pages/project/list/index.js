@@ -14,6 +14,9 @@ import VisibilityIcon from "@material-ui/icons/Visibility";
 import AddCommentIcon from "@material-ui/icons/AddComment";
 import { axio } from "../../../axios";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
+import InsertCommentIcon from '@material-ui/icons/InsertComment';
+import { useSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
 import {
   Paper,
   Button,
@@ -114,9 +117,26 @@ export default function List() {
   const [order, setOrder] = useState("dec");
   const [selectedRow, setSelectedRow] = useState(null);
   const [deleterows, setDeleterows] = React.useState([]);
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [deleteId, setDeleteId] = React.useState(false);
+  
+
+
+  // delete confirmation
+  const handeleOpen = (id) => {
+      setDeleteId(id);
+      setOpen(true);
+  };
+
+  const handeleClose = () => {
+    setOpen(false);
+};
+
 
   const getProjectDispatchFunc = (
     offset = INTERNAL.DEFAULT_INITIAL_PAGE_AFTER_SIDE_EFFECTS,
@@ -280,6 +300,33 @@ export default function List() {
   };
   
 
+  const handeleDelete = async () => {
+    console.log("handeleDelete", deleterows);
+
+    const token = localStorage.getItem("accessToken");
+
+    await axio
+      .delete(`/project/destroy`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+        params: {
+          _id: `${deleteId}`,
+        },
+      })
+      .then((deleteresponse) => {
+        console.log("deleteresponse", deleteresponse);
+        enqueueSnackbar("Successfully Deleted", { variant: "success" });
+        initialTableData();
+        setOpen(false);
+      })
+      .catch((err) => {
+        console.log("deleteERR", err);
+        setOpen(false);
+      });
+      
+  };
+  
   return (
     <Paper className={classes.paper}>
       {project?.payloadGetList?.payload?.data?.length > 0 ? (
@@ -573,7 +620,7 @@ export default function List() {
                             state={{ type: "EDIT", data: { ...row } }}
                           >
                             <IconButton>
-                              <EditIcon />
+                              <VisibilityIcon />
                             </IconButton>
                           </NavLink>
                           {
@@ -582,10 +629,17 @@ export default function List() {
                               state={{ _id: row._id }}
                             >
                               <IconButton>
-                                <QueryBuilderIcon />
+                                <InsertCommentIcon />
                               </IconButton>
                             </NavLink>
                           }
+                           
+                             
+                              <IconButton    onClick={() => handeleOpen(row._id)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            
+                           
                         </TableCell>
                       </TableRow>
                     </>
@@ -623,7 +677,40 @@ export default function List() {
       <Backdrop className={classes.backdrop} open={openBackdrop}>
         <CircularProgress color="inherit" />
       </Backdrop>
+
+
+        {/* delete confirmation */}
+        <div>
+        <Dialog
+          open={open}
+          onClose={handeleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Delete Confirmation"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to delete this item? This action cannot be
+              undone.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handeleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handeleDelete} color="primary">
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+      {/* delete confirmation end */}
+
     </Paper>
+
+    
   );
 }
 

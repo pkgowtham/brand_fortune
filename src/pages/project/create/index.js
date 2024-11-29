@@ -243,6 +243,7 @@ export default function Create() {
   const [brandList, setBrandList] = React.useState([]);
   const [articleTypeList, setArticleTypeList] = React.useState([]);
   const [refinedArticleList, setRefinedArticleList] = React.useState([]);
+  const [deleterows, setDeleterows] = useState([]);
 
   const [depressed, setDepressed] = useState(
     location?.state?.type == "EDIT"
@@ -939,7 +940,9 @@ export default function Create() {
       [index]: event.target.value,
     }));
   };
+
   useEffect(() => {
+   
     if (articleTypeList.length) {
       setRefinedArticleList(
         articleTypeList?.filter((articleType) =>
@@ -948,8 +951,14 @@ export default function Create() {
             .includes(formik.values.brand)
         )
       );
+     
     }
   }, [formik.values.brand]);
+
+  
+
+  
+
 
   return (
     <Container disableGutters>
@@ -1196,7 +1205,7 @@ export default function Create() {
  <FormControl style={{ marginTop: 5 }} fullWidth>
   {type === "EDIT" ? (
     <>
-    <InputLabel id="brand-label" style={{ left: 12, top: -30 }}>
+    <InputLabel id="brand-label" style={{ left: 12, top: -30 , fontSize:11}}>
     Select Brand
   </InputLabel>
     
@@ -1287,19 +1296,27 @@ export default function Create() {
   <FormControl style={{ marginTop: 5 }} fullWidth>
     {type === "EDIT" ? (
       <>
-        <InputLabel id="articleType-label" style={{ left: 12, top: -30 }}>
+        <InputLabel id="articleType-label" style={{ left: 12, top: -30 , fontSize:11}}>
           Select Article Type
         </InputLabel>
+        
         <TextField
           id="articleType"
-          value={formik.values.articleType || ''}
+          value={
+            articleTypeList.find(
+              (articleType) => articleType._id === formik.values.articleType
+            )?.label || formik.values.articleType 
+          }
+          readOnly 
           variant="outlined"
           fullWidth
           disabled
           InputProps={{
             readOnly: true,
           }}
+       
         />
+        
       </>
     ) : (
       <>
@@ -1325,7 +1342,7 @@ export default function Create() {
         >
           {refinedArticleList.map((articleType) => (
             <MenuItem key={articleType._id} value={articleType._id}>
-              {articleType.label}
+              {articleType.label} 
             </MenuItem>
           ))}
         </Select>

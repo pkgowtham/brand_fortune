@@ -147,15 +147,16 @@ function Create() {
       .put(
         `/articletype/update`,
         {
-          _id: articleType._id,
-          label: `${inputvalue.label}`,
-          brand: `${inputvalue.brand}`,
-        },
-        {
           headers: {
             Authorization: token ? `Bearer ${token}` : null,
           },
+        },
+        {
+          _id: articleType._id,
+          label: `${inputvalue.label}`,
+          brand: `${inputvalue.brand}`,
         }
+       
       )
       .then((updateresponse) => {
         console.log("formupdate", updateresponse);
