@@ -806,7 +806,7 @@ export default function Create() {
           {preview && (
             <img
               src={preview}
-              style={{ maxHeight: "200px", maxWidth: "200px" }}
+              style={{ maxHeight: "70px", maxWidth: "70px" }}
             />
           )}
         </Paper>
@@ -1387,6 +1387,7 @@ export default function Create() {
                 >
                   <MenuItem value="LISTING">Listing</MenuItem>
                   <MenuItem value="RELISTING">Relisting</MenuItem>
+                  <MenuItem value="DELISTING">Delisting</MenuItem>
                   <MenuItem value="CORRECTION">Correction request</MenuItem>
                   <MenuItem value="ENHANCEMENT">Content Enhancement</MenuItem>
                 </Select>

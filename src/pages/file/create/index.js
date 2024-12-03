@@ -356,7 +356,7 @@ function Create() {
           {fileDocPreview && (
             <img
               src={fileDocPreview}
-              style={{ maxHeight: "200px", maxWidth: "200px" }}
+              style={{ maxHeight: "70px", maxWidth: "70px" }}
             />
           )}
         </Paper>

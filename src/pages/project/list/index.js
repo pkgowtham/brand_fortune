@@ -124,18 +124,18 @@ export default function List() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [deleteId, setDeleteId] = React.useState(false);
-  
+
 
 
   // delete confirmation
   const handeleOpen = (id) => {
-      setDeleteId(id);
-      setOpen(true);
+    setDeleteId(id);
+    setOpen(true);
   };
 
   const handeleClose = () => {
     setOpen(false);
-};
+  };
 
 
   const getProjectDispatchFunc = (
@@ -292,13 +292,13 @@ export default function List() {
     { label: "JIO MART", value: "JIO_MART" },
     { label: "FYND", value: "FYND" }
   ];
-  
+
   // Helper function to get label by value
   const getLabelByValue = (value) => {
     const marketplace = marketplaceData.find(item => item.value === value);
     return marketplace ? marketplace.label : value; // If no match, return the value as a fallback
   };
-  
+
 
   const handeleDelete = async () => {
     console.log("handeleDelete", deleterows);
@@ -324,9 +324,9 @@ export default function List() {
         console.log("deleteERR", err);
         setOpen(false);
       });
-      
+
   };
-  
+
   return (
     <Paper className={classes.paper}>
       {project?.payloadGetList?.payload?.data?.length > 0 ? (
@@ -335,17 +335,22 @@ export default function List() {
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  <TableCell
-                    className={classes.tableCell}
-                    align="center"
-                    style={{ minWidth: "43px" }}
-                    onClick={() => handleSort("mailSubject")}
-                  >
-                    Task Id{" "}
-                    {orderBy === "mailSubject" && (
-                      <span>{order === "asc" ? "▲" : "▼"}</span>
-                    )}
-                  </TableCell>
+                {auth?.payloadLogin?.payload?.data?.user?.role  && (auth?.payloadLogin?.payload?.data?.user?.role.includes( "MANAGEMENT" || "ACCOUNT_MANAGER" || "ADMIN" || "CATALOG_REVIEWER" || "CATALOG_LEAD" || "CATALOG_EXCECUTIVE" || "ANALYSIS_EXECUTIVES" ||
+    "ANALYSIS_LEAD")) && (
+                    <TableCell
+                      className={classes.tableCell}
+                      align="center"
+                      style={{ minWidth: "43px" }}
+                      onClick={() => handleSort("mailSubject")}
+                    >
+                      Task Id{" "}
+                      {orderBy === "mailSubject" && (
+                        <span>{order === "asc" ? "▲" : "▼"}</span>
+                      )}
+                    </TableCell>
+                  )}
+
+
                   <TableCell
                     className={classes.tableCell}
                     align="center"
@@ -363,22 +368,26 @@ export default function List() {
                     style={{ minWidth: "43px" }}
                     onClick={() => handleSort("mailSubject")}
                   >
-                    Market Place{" "}
+                    Mail Date{" "}
                     {orderBy === "mailSubject" && (
                       <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
+
                   <TableCell
-                    align="left"
                     className={classes.tableCell}
-                    style={{ minWidth: "95px" }}
-                    onClick={() => handleSort("brand")}
+                    align="center"
+                    style={{ minWidth: "43px" }}
+                    onClick={() => handleSort("mailSubject")}
                   >
-                    Gender{" "}
-                    {orderBy === "brand" && (
+                    Mail Subject{" "}
+                    {orderBy === "mailSubject" && (
                       <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
+
+                  {auth?.payloadLogin?.payload?.data?.user?.role  && (auth?.payloadLogin?.payload?.data?.user?.role.includes( "MANAGEMENT" || "ACCOUNT_MANAGER" || "ADMIN" || "CATALOG_REVIEWER" || "CATALOG_LEAD" || "CATALOG_EXCECUTIVE" || "ANALYSIS_EXECUTIVES" ||
+    "ANALYSIS_LEAD")) && (
                   <TableCell
                     align="left"
                     className={classes.tableCell}
@@ -389,7 +398,45 @@ export default function List() {
                       <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
                   </TableCell>
+                  )}
+
                   <TableCell
+                    className={classes.tableCell}
+                    align="center"
+                    style={{ minWidth: "43px" }}
+                    onClick={() => handleSort("mailSubject")}
+                  >
+                    Market Place{" "}
+                    {orderBy === "mailSubject" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
+                    )}
+                  </TableCell>
+
+                  <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    onClick={() => handleSort("styles")}
+                  >
+                    No of Styles{" "}
+                    {orderBy === "styles" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
+                    )}
+                  </TableCell>
+
+
+                  {/* <TableCell
+                    align="left"
+                    className={classes.tableCell}
+                    style={{ minWidth: "95px" }}
+                    onClick={() => handleSort("brand")}
+                  >
+                    Gender{" "}
+                    {orderBy === "brand" && (
+                      <span>{order === "asc" ? "▲" : "▼"}</span>
+                    )}
+                  </TableCell> */}
+
+                  {/* <TableCell
                     align="left"
                     className={classes.tableCell}
                     onClick={() => handleSort("listingType")}
@@ -428,7 +475,7 @@ export default function List() {
                     {orderBy === "status" && (
                       <span>{order === "asc" ? "▲" : "▼"}</span>
                     )}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell
                     align="left"
                     className={classes.tableCell}
@@ -470,6 +517,26 @@ export default function List() {
                         >
                           {row.subtaskId ? row.subtaskId : "-"}
                         </TableCell>
+                        <TableCell align="center" className={classes.TablethZero}>
+                          {row.mailDate ? new Date(row.mailDate).toLocaleDateString('en-US') : "-"}
+                        </TableCell>
+
+                        <TableCell
+                          align="center"
+                          className={classes.TablethZero}
+                        >
+                          {row.mailSubject ? row.mailSubject : "-"}
+                        </TableCell>
+                        {auth?.payloadLogin?.payload?.data?.user?.role  && (auth?.payloadLogin?.payload?.data?.user?.role.includes( "MANAGEMENT" || "ACCOUNT_MANAGER" || "ADMIN" || "CATALOG_REVIEWER" || "CATALOG_LEAD" || "CATALOG_EXCECUTIVE" || "ANALYSIS_EXECUTIVES" ||
+    "ANALYSIS_LEAD")) && (
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          className={classes.TablethZero}
+                        >
+                          {row.brand?.label}
+                        </TableCell>
+    )}
                         {/* {row.marketPlaceSingle ? (
                           <TableCell
                             align="center"
@@ -486,30 +553,32 @@ export default function List() {
                           </TableCell>
                         )} */}
                         <TableCell align="center" className={classes.TablethZero}>
-  {row.marketPlaceSingle ? (
-    <>{getLabelByValue(row.marketPlaceSingle)}</>
-  ) : (
-    <>
-      {row?.marketPlace?.map(value => getLabelByValue(value)).join(', ')}
-    </>
-  )}
-</TableCell>
+                          {row.marketPlaceSingle ? (
+                            <>{getLabelByValue(row.marketPlaceSingle)}</>
+                          ) : (
+                            <>
+                              {row?.marketPlace?.map(value => getLabelByValue(value)).join(', ')}
+                            </>
+                          )}
+                        </TableCell>
 
                         <TableCell
                           component="th"
                           scope="row"
                           className={classes.TablethZero}
                         >
-                          {row.gender}
+                          {row.styles}
                         </TableCell>
-                        <TableCell
+
+                        {/* <TableCell
                           component="th"
                           scope="row"
                           className={classes.TablethZero}
                         >
-                          {row.brand?.label}
-                        </TableCell>
-                        <TableCell
+                          {row.gender}
+                        </TableCell> */}
+
+                        {/* <TableCell
                           component="th"
                           scope="row"
                           className={classes.TablethZero}
@@ -536,12 +605,12 @@ export default function List() {
                           className={classes.TablethZero}
                         >
                           {row.proirity}
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell
                           align="left"
                           className={classes.TablethZero}
                         >
-                        {getStatusLabel(row.status)}
+                          {getStatusLabel(row.status)}
                         </TableCell>
                         <TableCell
                           align="center"
@@ -633,13 +702,13 @@ export default function List() {
                               </IconButton>
                             </NavLink>
                           }
-                           
-                             
-                              <IconButton    onClick={() => handeleOpen(row._id)}>
-                                <DeleteIcon />
-                              </IconButton>
-                            
-                           
+
+
+                          <IconButton onClick={() => handeleOpen(row._id)}>
+                            <DeleteIcon />
+                          </IconButton>
+
+
                         </TableCell>
                       </TableRow>
                     </>
@@ -679,8 +748,8 @@ export default function List() {
       </Backdrop>
 
 
-        {/* delete confirmation */}
-        <div>
+      {/* delete confirmation */}
+      <div>
         <Dialog
           open={open}
           onClose={handeleClose}
@@ -710,7 +779,7 @@ export default function List() {
 
     </Paper>
 
-    
+
   );
 }
 
