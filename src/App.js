@@ -41,7 +41,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
         <div>
-          <Router basename='/'>
+          <Router basename='/dev'>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Navigate to={'/login'} />} />
