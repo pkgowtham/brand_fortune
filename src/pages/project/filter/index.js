@@ -417,15 +417,15 @@ export default function Filter() {
                   <MenuItem value="EXECUTIVE_SKU">
                   Submission executive SKU created
                   </MenuItem>
-                  <MenuItem value="ANALYSIS_DISCOUNT_DEPRESSION">Assigned for Inventory Discount-depression</MenuItem>
+                  <MenuItem value="ANALYSIS_DISCOUNT_DEPRESSION">Assigned for Inventory Discount-PMR</MenuItem>
 
                   <MenuItem value="ANALYSIS_SYN_DEPRESSION">
-                  Assigned for Inventory Sync-depression
+                  Assigned for Inventory Sync-PMR
                   </MenuItem>
                   <MenuItem value="ANALYSIS_UPLOAD_DEPRESSION">
-                  Assigned for Inventory upload-depression
+                  Assigned for Inventory upload-PMR
                   </MenuItem>
-                  <MenuItem value="LIVE_CHECK_DEPRESSION">Assigned for Live check-depression</MenuItem>
+                  <MenuItem value="LIVE_CHECK_DEPRESSION">Assigned for Live check-PMR</MenuItem>
                   <MenuItem value="ANALYSIS_DISCOUNT">
                   Assigned for Inventory Discount
                   </MenuItem>
