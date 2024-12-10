@@ -280,24 +280,24 @@ export default function List() {
   };
 
 
-  const marketplaceData = [
-    { label: "AJIO", value: "AJIO" },
-    { label: "NYKAA", value: "NYKAA" },
-    { label: "NYKAA FASHION", value: "NYKAA_FASHION" },
-    { label: "MEESHO", value: "MEESHO" },
-    { label: "TATA CLIQ", value: "TATA_CLIQ" },
-    { label: "AMAZON", value: "AMAZON" },
-    { label: "FLIPKART", value: "FLIPKART" },
-    { label: "MYNTRA", value: "MYNTHRA" },
-    { label: "JIO MART", value: "JIO_MART" },
-    { label: "FYND", value: "FYND" }
-  ];
+  // const marketplaceData = [
+  //   { label: "AJIO", value: "AJIO" },
+  //   { label: "NYKAA", value: "NYKAA" },
+  //   { label: "NYKAA FASHION", value: "NYKAA_FASHION" },
+  //   { label: "MEESHO", value: "MEESHO" },
+  //   { label: "TATA CLIQ", value: "TATA_CLIQ" },
+  //   { label: "AMAZON", value: "AMAZON" },
+  //   { label: "FLIPKART", value: "FLIPKART" },
+  //   { label: "MYNTRA", value: "MYNTHRA" },
+  //   { label: "JIO MART", value: "JIO_MART" },
+  //   { label: "FYND", value: "FYND" }
+  // ];
 
-  // Helper function to get label by value
-  const getLabelByValue = (value) => {
-    const marketplace = marketplaceData.find(item => item.value === value);
-    return marketplace ? marketplace.label : value; // If no match, return the value as a fallback
-  };
+  // // Helper function to get label by value
+  // const getLabelByValue = (value) => {
+  //   const marketplace = marketplaceData.find(item => item.value === value);
+  //   return marketplace ? marketplace.label : value; // If no match, return the value as a fallback
+  // };
 
 
   const handeleDelete = async () => {
@@ -537,22 +537,22 @@ export default function List() {
                           {row.brand?.label}
                         </TableCell>
     )}
-                        {/* {row.marketPlaceSingle ? (
+                        {row.marketPlaceSingle ? (
                           <TableCell
                             align="center"
                             className={classes.TablethZero}
                           >
-                            {row.marketPlaceSingle}
+                           {row.marketPlace?.[0]?.name}
                           </TableCell>
                         ) : (
                           <TableCell
                             align="center"
                             className={classes.TablethZero}
                           >
-                            {row?.marketPlace?.join()}
+                            {row.marketPlace?.map((market) => market.name).join(', ')}
                           </TableCell>
-                        )} */}
-                        <TableCell align="center" className={classes.TablethZero}>
+                        )} 
+                        {/* <TableCell align="center" className={classes.TablethZero}>
                           {row.marketPlaceSingle ? (
                             <>{getLabelByValue(row.marketPlaceSingle)}</>
                           ) : (
@@ -560,7 +560,7 @@ export default function List() {
                               {row?.marketPlace?.map(value => getLabelByValue(value)).join(', ')}
                             </>
                           )}
-                        </TableCell>
+                        </TableCell> */}
 
                         <TableCell
                           component="th"

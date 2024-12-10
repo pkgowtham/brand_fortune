@@ -42,67 +42,83 @@ const useStyles = makeStyles((theme) => ({
   button: {
     marginTop: "45px",
   },
+  description: {
+    padding: '10px',
+    border: '1px solid #c4c4c4',
+    borderRadius: '3px',
+    fontFamily: '"Roboto", "Helvetica", "Arial", "sans-serif"',
+    fontSize: '1rem',
+    width: '100%',
+    minHeight: '100px', // Adjust height as needed
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#3f51b5', // Example focus color
+    },
+  },
+  error: {
+    borderColor: '#f44336', // Error color
+  },
 }));
 
 function Create() {
   const classes = useStyles();
   const navigate = useNavigate();
   const location = useLocation();
-  const articleType = location?.state;
+  const listingType = location?.state;
 
-  console.log("articleTypes", articleType);
+  console.log("listingTypes", listingType);
 
   const [inputvalue, setInputvalue] = useState({
-    label: "",
-    brand: [],
+    name: "",
+    code: "",
   });
   const [deleterows, setDeleterows] = useState([]);
 
   console.log(inputvalue);
   const [error, setError] = useState({
-    label: false,
-    brand: false,
+    name: false,
+    code: false,
   });
 
   useEffect(() => {
-    if (articleType?.brand) {
-      let temp = [];
-      articleType.brand.map((branding) => {
-        temp.push(branding._id);
+    if (listingType) {
+      setInputvalue({
+        name: listingType.name || "", // Prefill name
+        code: listingType.code || "", // Prefill code
       });
-      setInputvalue({ label: articleType.label, brand: temp });
     }
-  }, []);
+  }, [listingType]);
+  
   // const regex = {
   //   label: /^[A-Za-z\s]+$/,
   // };
   const regex = {
-    label: /^[A-Za-z\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/,
+    name: /^[A-Za-z\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/,
   };
-  const initialTableData = async () => {
-    console.log("initialTableData", deleterows);
+  // const initialTableData = async () => {
+  //   console.log("initialTableData", deleterows);
 
-    const token = localStorage.getItem("accessToken");
+  //   const token = localStorage.getItem("accessToken");
 
-    await axio
-      .get("/brand/getlist", {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : null,
-        },
-      })
-      .then((tableresponse) => {
-        console.log("tableresponse", tableresponse);
-        setDeleterows(tableresponse.data.payload.data);
-      })
-      .catch((err) => {
-        console.log("tableERR", err);
-      });
-  };
+  //   await axio
+  //     .get("/brand/getlist", {
+  //       headers: {
+  //         Authorization: token ? `Bearer ${token}` : null,
+  //       },
+  //     })
+  //     .then((tableresponse) => {
+  //       console.log("tableresponse", tableresponse);
+  //       setDeleterows(tableresponse.data.payload.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log("tableERR", err);
+  //     });
+  // };
 
-  useEffect(() => {
-    console.log("tableruning");
-    initialTableData();
-  }, []);
+  // useEffect(() => {
+  //   console.log("tableruning");
+  //   initialTableData();
+  // }, []);
 
   const formCreate = async () => {
     console.log("Formmessage", inputvalue);
@@ -110,27 +126,25 @@ function Create() {
 
     await axio
       .post(
-        "/articletype/create",
+        "/listing/create",
+        {
+          name: `${inputvalue.name}`,
+
+          code: `${inputvalue.code}`,
+        },
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : null,
           },
-        },
-        {
-          label: `${inputvalue.label}`,
-
-          brand: `${inputvalue.brand}`,
         }
-
-      
       )
       .then((response) => {
         console.log("formmessage", response);
         enqueueSnackbar("Successfully Created", { variant: "success" });
-        navigate("/layout/articletype");
+        navigate("/layout/listingType");
         setInputvalue({
-          label: "",
-          brand: [],
+          name: "",
+          code: "",
         });
       })
       .catch((err) => {
@@ -147,27 +161,29 @@ function Create() {
 
     await axio
       .put(
-        `/articletype/update`,
+        `/listing/update`,
+        
+        {
+          _id: listingType._id,
+          name: `${inputvalue.name}`,
+          code: `${inputvalue.code}`,
+        },
         {
           headers: {
             Authorization: token ? `Bearer ${token}` : null,
           },
         },
-        {
-          _id: articleType._id,
-          label: `${inputvalue.label}`,
-          brand: `${inputvalue.brand}`,
-        }
+       
        
       )
       .then((updateresponse) => {
         console.log("formupdate", updateresponse);
         setInputvalue({
-          label: "",
-          brand: [],
+          name: "",
+          code: "",
         });
         enqueueSnackbar("Successfully Updated", { variant: "success" });
-        navigate("/layout/articletype");
+        navigate("/layout/listingType");
       })
       .catch((err) => {
         enqueueSnackbar("Please Fill the Form", {
@@ -186,11 +202,11 @@ function Create() {
     setError({ ...error, [name]: false });
     let isError = false;
     switch (name) {
-      case "label":
-        isError = !regex.label.test(value);
+      case "name":
+        isError = !regex.name.test(value);
         break;
 
-      case "brand":
+      case "code":
         isError = false;
         break;
 
@@ -202,7 +218,7 @@ function Create() {
 
   const handelSubmit = (e) => {
     e.preventDefault();
-    if (articleType) {
+    if (listingType) {
       console.log("im here1");
       formUpdate();
     } else {
@@ -223,7 +239,7 @@ function Create() {
             variant="contained"
             color="primary"
             type="submit"
-            onClick={() => navigate("/layout/articletype")}
+            onClick={() => navigate("/layout/listingType")}
           >
             Go Back
           </Button>
@@ -234,81 +250,35 @@ function Create() {
         <Grid item xs={6}>
           <FormControl className={classes.formControl}>
             <TextField
-              id="label"
-              label="Name"
+              id="name"
+              label="Listing Name"
               variant="outlined"
-              name="label"
-              value={inputvalue.label}
+              name="name"
+              value={inputvalue.name}
               onChange={handelTextinput}
-              error={error.label}
-              helperText={error.label ? "Enter a valid name" : ""}
+              error={error.name}
+              helperText={error.name ? "Enter a valid name" : ""}
             />
           </FormControl>
         </Grid>
       </Grid>
       <Grid container spacing={2}>
-        {/* <Grid item xs={6}>
-          <FormControl className={classes.formControl}>
+         <Grid item xs={6}>
+         <FormControl className={classes.formControl}>
             <TextField
-              id="description"
-              label="Description"
+              id="code"
+              label="Code"
               variant="outlined"
-              name="description"
-              value={inputvalue.description}
+              name="code"
+              value={inputvalue.code}
               onChange={handelTextinput}
-              error={error.description}
-              helperText={error.description ? "Enter a valid description" : ""}
+              error={error.code}
+              helperText={error.code ? "Enter a valid code" : ""}
             />
           </FormControl>
-        </Grid> */}
-        <Grid item xs={6} s>
-          <FormControl className={classes.formControl} fullWidth>
-            <InputLabel
-              id="demo-mutiple-checkbox-label"
-              style={{ left: 35, top: 15, cursor: "pointer" }}
-            >
-              Select Brand{" "}
-            </InputLabel>
-            <Select
-              labelId="demo-mutiple-checkbox-label"
-              id="demo-mutiple-checkbox"
-              variant="outlined"
-              multiple
-              label="Select Brand"
-              name="brand"
-              value={inputvalue.brand ? inputvalue.brand : []}
-              onChange={handelTextinput}
-              inputProps={{
-                name: "brand",
-                id: "outlined-age-native-simple",
-              }}
-             
-              renderValue={(selected) =>
-                deleterows
-                  .filter((row) => selected.includes(row._id))
-                  .map((row) => row.label)
-                  .join(",")
-              }
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 48 * 4.5 + 8,
-                    width: 250,
-                  },
-                },
-              }}
-            >
-              {deleterows.map((name) => (
-                <MenuItem key={name._id} value={name._id}>
-                  <Checkbox
-                    checked={inputvalue.brand.indexOf(name._id) > -1}
-                  />
-                  <ListItemText primary={name.label} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
+
+        </Grid>  
+        
       </Grid>
 
       <div className={classes.button}>
@@ -319,7 +289,7 @@ function Create() {
           onClick={handelSubmit}
           disabled={Object.values(error).includes(true)}
         >
-          {articleType ? "Update" : "Submit"}
+          {listingType ? "Update" : "Submit"}
         </Button>
       </div>
     </Container>

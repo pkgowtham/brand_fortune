@@ -20,8 +20,9 @@ import CardMedia from "@material-ui/core/CardMedia";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import DeviceHubIcon from "@material-ui/icons/DeviceHub";
-import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
+import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
 import RegionIcon from "@material-ui/icons/Public";
+import WcIcon from '@material-ui/icons/Wc';
 import TagIcon from "@material-ui/icons/LocalOffer";
 import CardGiftcardIcon from "@material-ui/icons/CardGiftcard";
 import ProductIcon from "@material-ui/icons/ShoppingCart";
@@ -42,6 +43,8 @@ import WorkIcon from "@material-ui/icons/Work";
 import PersonIcon from "@material-ui/icons/Person";
 import BeachAccessIcon from "@material-ui/icons/BeachAccess";
 import { filterDataProject } from "../../service/internal/action";
+import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
+import StorefrontIcon from '@material-ui/icons/Storefront';
 // import {axio} from "../../axios/index.js"
 import axios from "axios";
 import dayjs from "dayjs";
@@ -238,15 +241,18 @@ export default function NavBar() {
         },
         { label: "Brand", route: "brand", icon: <DeviceHubIcon /> },
         { label: "Article Type", route: "articletype", icon: <RegionIcon /> },
-       // { label: "Queries", route: "Queries", icon: <QueryBuilderIcon /> },
-        { label: "File Category", route: "filecategory",icon: <EcoIcon /> },
-        { label: "File",route: "filedoc", icon: <TagIcon /> },
+        { label: "Listing Type", route: "listingtype", icon: <FormatListBulletedIcon /> },
+        { label: "Market Place", route: "marketplace", icon: <StorefrontIcon /> },
+        { label: "Gender", route: "gender", icon: <WcIcon /> },
+        // { label: "Queries", route: "Queries", icon: <QueryBuilderIcon /> },
+        { label: "File Category", route: "filecategory", icon: <EcoIcon /> },
+        { label: "File", route: "filedoc", icon: <TagIcon /> },
         // { label: "Category", icon: <AccountTreeIcon /> },
         // { text: "Subcategory", icon: <DeviceHubIcon /> },
         // { text: "Region", icon: <RegionIcon /> },
         // { text: "Tag", icon: <TagIcon /> },
         // { text: "Product", icon: <ProductIcon /> },
-        
+
         // { text: "Orders", icon: <ShoppingBasketIcon /> },
         // { text: "Offers", icon: <CardGiftcardIcon /> },
       ]
@@ -259,8 +265,11 @@ export default function NavBar() {
         },
         { label: "Brand", route: "brand", icon: <DeviceHubIcon /> },
         { label: "Article Type", route: "articletype", icon: <RegionIcon /> },
-        { text: "File Category", route: "filecategory",icon: <EcoIcon /> },
-        { text: "File",route: "filedoc", icon: <TagIcon /> },
+        { label: "Listing Type", route: "listingtype", icon: <FormatListBulletedIcon /> },
+        { label: "Market Place", route: "marketplace", icon: <StorefrontIcon /> },
+        { label: "Gender", route: "gender", icon: <WcIcon /> },
+        { text: "File Category", route: "filecategory", icon: <EcoIcon /> },
+        { text: "File", route: "filedoc", icon: <TagIcon /> },
       ]
     : [
         { label: "Dashboard", route: "Dashboard", icon: <DashboardIcon /> },
@@ -457,11 +466,7 @@ export default function NavBar() {
         <Divider />
         <List>
           {navLinks.map((link) => (
-            <Tooltip
-              title={link.label}
-              placement="right"
-              key={link.label}
-            >
+            <Tooltip title={link.label} placement="right" key={link.label}>
               <NavLink
                 to={`/layout/${link.route.toLowerCase()}`}
                 className={classes.anyLink}

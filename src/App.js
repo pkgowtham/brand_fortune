@@ -26,7 +26,15 @@ import { default as BrandCreate } from './pages/brand/create';
 
 
 import Articletype from './pages/articleType';
+import Gender from './pages/gender';
+import Listingtype from './pages/listingType';
+import Marketplace from './pages/marketPlace';
+
 import { default as ArticletypeCreate } from './pages/articleType/create';
+import { default as GenderCreate } from './pages/gender/create';
+import { default as ListingtypeCreate } from './pages/listingType/create';
+import { default as MarketplaceCreate } from './pages/marketPlace/create';
+
 import FileDoc from './pages/file';
 import { default as FileDocCreate } from './pages/file/create';
 import FileCategory from './pages/fileCategory';
@@ -68,7 +76,13 @@ function App() {
                 <Route path="QueryDetails" element={<QueryDetails />} />
                 <Route path="brandcreate" element={<BrandCreate />} />
                 <Route path="articletype" element={<Articletype />} />
+                <Route path="gender" element={<Gender />} />
+                <Route path="listingtype" element={<Listingtype />} />
+                <Route path="marketplace" element={<Marketplace />} />
                 <Route path="articletypecreate" element={<ArticletypeCreate />} />
+                <Route path="gendercreate" element={<GenderCreate />} />
+                <Route path="listingtypecreate" element={<ListingtypeCreate />} />
+                <Route path="marketplacecreate" element={<MarketplaceCreate />} />
                 <Route path="filedoc" element={<FileDoc />} />
                 <Route path="filedoccreate" element={<FileDocCreate />} />
                 <Route path="filecategory" element={<FileCategory />} />
